@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Main Page</title>
+</head>
+<body>
+    <form action="http://127.0.0.1:5000/" method="POST">
+        <label for="msv">MSV</label><br>
+        <input type="text" name="msv" id="msv">
+        <input type="submit" value="Search">
+    </form>
+    <br>
+    <h2>{{ hello }}</h2>
+    <br>
+    <table border="1">
+        <tr>
+            <th>STT</th>
+            <th>Mã SV</th>
+            <th>Họ và tên</th>
+            <th>Ngày sinh</th>
+            <th>Lớp khoá học</th>
+            <th>Mã LMH</th>
+            <th>Tên môn học</th>
+            <th>Nhóm</th>
+            <th>Số TC</th>
+            <th>Ghi chú</th>
+        </tr>
+        {% for i in range(subjectList |length): %}
+        <tr>
+            <td>{{ i + 1 }}</td>
+            <td>{{ msv }}</td>
+            <td>{{ name }}</td>
+            <td>{{ birthdate }}</td>
+            <td>{{ class_name }}</td>
+            <td>{{ subjectList[i].LMH }}</td>
+            <td>{{ subjectList[i].LMHName }}</td>
+            <td>{{ subjectList[i].group }}</td>
+            <td>{{ subjectList[i].TC }}</td>
+            <td>{{ subjectList[i].note }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
