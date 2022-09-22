@@ -48,7 +48,7 @@ def home():
                              , (LMH, group))
             data3 = mycursor.fetchall()
             for line in data3:
-                subjectList.append(ClassInfor(LMH, LMHName, TC, line[1], note,
+                subjectList.append(ClassInfor(LMH, LMHName, line[1], TC, note,
                                               line[2], line[3], line[4], line[5], line[6], line[7]))
         return render_template('index.html', hello="Hello " + name, msv=msv, name=name,
                                birthdate=birthdate, class_name=class_name,gender=gender,
