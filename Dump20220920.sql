@@ -108,6 +108,8 @@ CREATE TABLE `sinhvien` (
   `Tên` varchar(255) NOT NULL,
   `Ngày_sinh` date DEFAULT NULL,
   `Lớp_khóa_học` varchar(255) DEFAULT NULL,
+  `Giới_tính` varchar(10) DEFAULT NULL,
+  `Nơi_sinh` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`MSV`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -118,7 +120,7 @@ CREATE TABLE `sinhvien` (
 
 LOCK TABLES `sinhvien` WRITE;
 /*!40000 ALTER TABLE `sinhvien` DISABLE KEYS */;
-INSERT INTO `sinhvien` VALUES (21020021,'Nguyễn Việt Anh Khoa','2003-02-10','QH-2021-I/CQ-J'),(21020537,'Lê Thanh Bình','2003-02-06','QH-2021-I/CQ-J'),(21020552,'Mai Tú Phương','2003-11-09','QH-2021-I/CQ-J');
+INSERT INTO `sinhvien` VALUES (21020021,'Nguyễn Việt Anh Khoa','2003-02-10','QH-2021-I/CQ-J','Nam','Hà Nội'),(21020537,'Lê Thanh Bình','2003-02-06','QH-2021-I/CQ-J','Nam','Hà Nội'),(21020552,'Mai Tú Phương','2003-11-09','QH-2021-I/CQ-J','Nữ','Hà Nội');
 /*!40000 ALTER TABLE `sinhvien` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -131,4 +133,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-09-18 17:53:14
+-- Dump completed on 2022-09-20 17:25:28

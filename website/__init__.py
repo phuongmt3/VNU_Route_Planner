@@ -9,20 +9,3 @@ def create_app():
     app.register_blueprint(views, url_prefix='/')
 
     return app
-
-
-'''{% for i in range(subCnt): %}
-        <tr>
-            <td>{{ i + 1 }}</td>
-            <td>{{ msv }}</td>
-            <td>{{ name }}</td>
-            <td>{{ birthdate }}</td>
-            <td>{{ class_name }}</td>
-            <td>{{ subjectList[i].LMH }}</td>
-            <td>{{ subjectList[i].LMHName }}</td>
-            <td>{{ subjectList[i].group }}</td>
-            <td>{{ subjectList[i].TC }}</td>
-            <td>{{ subjectList[i].note }}</td>
-        </tr>
-        {% endfor %}
-'''

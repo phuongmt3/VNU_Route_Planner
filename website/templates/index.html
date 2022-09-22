@@ -20,11 +20,19 @@
             <th>Họ và tên</th>
             <th>Ngày sinh</th>
             <th>Lớp khoá học</th>
+            <th>Giới tính</th>
+            <th>Nơi sinh</th>
             <th>Mã LMH</th>
             <th>Tên môn học</th>
-            <th>Nhóm</th>
             <th>Số TC</th>
             <th>Ghi chú</th>
+            <th>Nhóm</th>
+            <th>Tuần</th>
+            <th>Thứ</th>
+            <th>Tiết</th>
+            <th>Giảng đường</th>
+            <th>Số SV</th>
+            <th>Giảng viên</th>
         </tr>
         {% for i in range(subjectList |length): %}
         <tr>
@@ -33,11 +41,19 @@
             <td>{{ name }}</td>
             <td>{{ birthdate }}</td>
             <td>{{ class_name }}</td>
+            <td>{{ gender }}</td>
+            <td>{{ birthplace }}</td>
             <td>{{ subjectList[i].LMH }}</td>
             <td>{{ subjectList[i].LMHName }}</td>
-            <td>{{ subjectList[i].group }}</td>
             <td>{{ subjectList[i].TC }}</td>
             <td>{{ subjectList[i].note }}</td>
+            <td>{{ subjectList[i].group }}</td>
+            <td>{{ subjectList[i].week }}</td>
+            <td>{{ subjectList[i].day }}</td>
+            <td>{{ subjectList[i].time }}</td>
+            <td>{{ subjectList[i].place }}</td>
+            <td>{{ subjectList[i].svCnt }}</td>
+            <td>{{ subjectList[i].lecturer }}</td>
         </tr>
         {% endfor %}
     </table>

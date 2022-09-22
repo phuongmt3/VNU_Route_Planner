@@ -5,28 +5,33 @@ views = Blueprint('views', __name__)
 
 
 class ClassInfor:
-    def __init__(self, LMH, LMHName, group, TC, note):
+    def __init__(self, LMH, LMHName, group, TC, note, week, day, time, place, svCnt, lecturer):
         self.LMH = LMH
         self.LMHName = LMHName
         self.group = group
         self.TC = TC
         self.note = note
+        self.week = week
+        self.day = day
+        self.time = time
+        self.place = place
+        self.svCnt = svCnt
+        self.lecturer = lecturer
 
 
 @views.route('/', methods=['GET', 'POST'])
 def home():
-    # xu ly TH data empty
     if request.method == "POST":
         msv = request.form['msv']
-        if not msv:
-            return render_template('index.html')
         mycursor.execute("SELECT * FROM sinhvien WHERE MSV = (%s)", (msv,))
         data = mycursor.fetchone()
+        if not data:
+            return render_template('index.html', hello="Not found student!")
         name = data[1]
         birthdate = data[2]
         class_name = data[3]
-        if birthdate is None:
-            birthdate = ""
+        gender = data[4]
+        birthplace = data[5]
         mycursor.execute("SELECT * FROM dangky WHERE MSV = (%s)", (msv,))
         data = mycursor.fetchall()
         subjectList = []
@@ -39,9 +44,14 @@ def home():
             data2 = mycursor.fetchone()
             LMHName = data2[1]
             TC = data2[2]
-            subjectList.append(ClassInfor(LMH, LMHName, TC, group, note))
+            mycursor.execute("SELECT * FROM lopmonhoc WHERE Mã_LHP = (%s) AND (Nhóm = 'CL' OR Nhóm = (%s))"
+                             , (LMH, group))
+            data3 = mycursor.fetchall()
+            for line in data3:
+                subjectList.append(ClassInfor(LMH, LMHName, TC, line[1], note,
+                                              line[2], line[3], line[4], line[5], line[6], line[7]))
         return render_template('index.html', hello="Hello " + name, msv=msv, name=name,
-                               birthdate=birthdate, class_name=class_name,
-                               subjectList=subjectList)
+                               birthdate=birthdate, class_name=class_name,gender=gender,
+                               birthplace=birthplace, subjectList=subjectList)
 
     return render_template('index.html')
