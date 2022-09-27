@@ -19,6 +19,11 @@ class ClassInfor:
         self.lecturer = lecturer
 
 
+@views.route('/map')
+def map():
+    return render_template('map_test.html')
+
+
 @views.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == "POST":
@@ -40,18 +45,19 @@ def home():
             orgLMH = LMH[:7]
             group = row[2]
             note = row[3]
-            mycursor.execute("SELECT * FROM monhoc WHERE Mã_LHP = (%s)", (orgLMH,))
+            mycursor.execute(
+                "SELECT * FROM monhoc WHERE Mã_LHP = (%s)", (orgLMH,))
             data2 = mycursor.fetchone()
             LMHName = data2[1]
             TC = data2[2]
-            mycursor.execute("SELECT * FROM lopmonhoc WHERE Mã_LHP = (%s) AND (Nhóm = 'CL' OR Nhóm = (%s))"
-                             , (LMH, group))
+            mycursor.execute(
+                "SELECT * FROM lopmonhoc WHERE Mã_LHP = (%s) AND (Nhóm = 'CL' OR Nhóm = (%s))", (LMH, group))
             data3 = mycursor.fetchall()
             for line in data3:
                 subjectList.append(ClassInfor(LMH, LMHName, line[1], TC, note,
                                               line[2], line[3], line[4], line[5], line[6], line[7]))
         return render_template('index.html', hello="Hello " + name, msv=msv, name=name,
-                               birthdate=birthdate, class_name=class_name,gender=gender,
+                               birthdate=birthdate, class_name=class_name, gender=gender,
                                birthplace=birthplace, subjectList=subjectList)
 
     return render_template('index.html')
