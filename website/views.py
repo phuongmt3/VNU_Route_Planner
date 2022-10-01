@@ -1,5 +1,7 @@
+import re
 from flask import Blueprint, render_template, request
 from .models import mycursor
+import json
 
 views = Blueprint('views', __name__)
 
@@ -19,9 +21,26 @@ class ClassInfor:
         self.lecturer = lecturer
 
 
-@views.route('/map')
-def map():
-    return render_template('map_test.html')
+@views.route('/map', methods=['GET', 'POST'])
+def my_map():
+    if request.method == "POST" and request.form['bdName']:
+        bdNameList = request.form['bdName'].replace(" ", "").split(',')
+        bdInfoList = []
+        for bdName in bdNameList:
+            mycursor.execute(
+                "SELECT * FROM giangduong WHERE Mã_tòa_nhà = (%s)", (bdName,))
+            data = mycursor.fetchone()
+            if data:
+                bdInfoList.append(data[1])
+            else:
+                bdInfoList.append('')
+    else:
+        mycursor.execute("SELECT * FROM giangduong")
+        data = mycursor.fetchall()
+        bdNameList = [i[0] for i in data]
+        bdInfoList = [i[1] for i in data]
+
+    return render_template('map_test.html', bdNameList=json.dumps(bdNameList), bdInfoList=json.dumps(bdInfoList))
 
 
 @views.route('/', methods=['GET', 'POST'])
