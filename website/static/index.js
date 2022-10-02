@@ -1,5 +1,3 @@
-//21.03813/105.78315
-
 var geojsonFeature = {"type":"FeatureCollection", "features":[
     {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.7820477,21.0392492,0],[105.7820477,21.0391522,0],[105.7821217,21.0391522,0],[105.7821217,21.0391112,0],[105.7822277,21.0391112,0],[105.7822277,21.0391832,0],[105.7822757,21.0391832,0],[105.7822747,21.0392792,0],[105.7821957,21.0392792,0],[105.7821957,21.0393232,0],[105.7820917,21.0393222,0],[105.7820917,21.0392492,0],[105.7820477,21.0392492,0]]]},"properties":{"name":"C5","description":"","osm_way_id":"168945118","building":"yes","amenity":"","other_tags":"","office":"","leisure":"","tourism":""}},
     {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.7812462,21.0389057,0],[105.7813092,21.0389047,0],[105.7813082,21.0388667,0],[105.7814102,21.0388647,0],[105.7814112,21.0389047,0],[105.7814712,21.0389037,0],[105.7814742,21.0389977,0],[105.7814372,21.0389987,0],[105.7814392,21.0390757,0],[105.7812872,21.0390787,0],[105.7812852,21.0390027,0],[105.7812492,21.0390037,0],[105.7812462,21.0389057,0]]]},"properties":{"name":"C6","description":"","osm_way_id":"168945119","building":"university","amenity":"","other_tags":"","office":"","leisure":"","tourism":""}},
@@ -26,7 +24,7 @@ var geojsonFeature = {"type":"FeatureCollection", "features":[
     {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.7818086,21.0407037,0],[105.7818066,21.0406017,0],[105.7823486,21.0405927,0],[105.7823496,21.0406237,0],[105.7826216,21.0406187,0],[105.7826236,21.0407267,0],[105.7823546,21.0407307,0],[105.7823546,21.0406957,0],[105.7818086,21.0407037,0]]]},"properties":{"name":"14A","description":"","osm_way_id":"736410379","building":"dormitory","amenity":"","other_tags":"","office":"","leisure":"","tourism":""}},
     {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.7817918,21.0403704,0],[105.7817898,21.0402664,0],[105.7823268,21.0402554,0],[105.7823278,21.0402904,0],[105.7825998,21.0402844,0],[105.7826018,21.0403814,0],[105.7823298,21.0403874,0],[105.7823298,21.0403594,0],[105.7817918,21.0403704,0]]]},"properties":{"name":"14B","description":"","osm_way_id":"736410380","building":"dormitory","amenity":"","other_tags":"","office":"","leisure":"","tourism":""}},
     {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.78149,21.0402715,0],[105.781501,21.0406515,0],[105.781543,21.0406975,0],[105.781805,21.0406905,0],[105.781808,21.0408085,0],[105.781358,21.0408205,0],[105.781342,21.0402755,0],[105.78149,21.0402715,0]]]},"properties":{"name":"14C","description":"","osm_way_id":"736410381","building":"dormitory","amenity":"","other_tags":"","office":"","leisure":"","tourism":""}},
-    {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.7828817,21.0408645,0],[105.7828787,21.0407565,0],[105.7828477,21.0407575,0],[105.7828407,21.0405295,0],[105.7830807,21.0405235,0],[105.7830807,21.0405515,0],[105.7831867,21.0405485,0],[105.7831887,21.0406255,0],[105.7832127,21.0406255,0],[105.7832177,21.0407825,0],[105.7831877,21.0407835,0],[105.7831897,21.0408565,0],[105.7828817,21.0408645,0]]]},"properties":{"name":"GĐ2","description":"","osm_way_id":"736410382","building":"school","amenity":"","other_tags":"","office":"","leisure":"","tourism":""}},
+    {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.7828817,21.0408645,0],[105.7828787,21.0407565,0],[105.7828477,21.0407575,0],[105.7828407,21.0405295,0],[105.7830807,21.0405235,0],[105.7830807,21.0405515,0],[105.7831867,21.0405485,0],[105.7831887,21.0406255,0],[105.7832127,21.0406255,0],[105.7832177,21.0407825,0],[105.7831877,21.0407835,0],[105.7831897,21.0408565,0],[105.7828817,21.0408645,0]]]},"properties":{"name":"14D(GĐ2)","description":"","osm_way_id":"736410382","building":"school","amenity":"","other_tags":"","office":"","leisure":"","tourism":""}},
     {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.782844,21.039071,0],[105.782848,21.039263,0],[105.782706,21.039265,0],[105.782702,21.039074,0],[105.782844,21.039071,0]]]},"properties":{"name":"A3","description":"","osm_way_id":"817579438","building":"university","amenity":"","other_tags":"","office":"","leisure":"","tourism":""}},
     {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.7828572,21.0395665,0],[105.7828602,21.0396725,0],[105.7828632,21.0397775,0],[105.7828642,21.0398605,0],[105.7827682,21.0398625,0],[105.7827612,21.0395685,0],[105.7828572,21.0395665,0]]]},"properties":{"name":"A4","description":"","osm_way_id":"817579439","building":"university","amenity":"","other_tags":"","office":"","leisure":"","tourism":""}},
     {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.7831366,21.0398327,0],[105.7828736,21.0398367,0],[105.7828726,21.0397537,0],[105.7829906,21.0397527,0],[105.7831356,21.0397497,0],[105.7831366,21.0398327,0]]]},"properties":{"name":"A5","description":"","osm_way_id":"817579440","building":"yes","amenity":"","other_tags":"","office":"","leisure":"","tourism":"guest_house"}},
@@ -84,18 +82,24 @@ var layerControl = L.control.layers(baseMaps).addTo(map);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var T_waypoint = L.icon({
-    iconUrl: 'https://preview.redd.it/2yv5x9hto5f61.png?width=341&format=png&auto=webp&s=eccf34f646917d5a7c0196de5c2fc2e7ef3e2427',
-    // shadowUrl: '',
+// var T_waypoint = L.icon({
+//     iconUrl: 'https://preview.redd.it/2yv5x9hto5f61.png?width=341&format=png&auto=webp&s=eccf34f646917d5a7c0196de5c2fc2e7ef3e2427',
+//     // shadowUrl: '',
 
-    iconSize:     [34, 34], // size of the icon
-    // shadowSize:   [50, 64], // size of the shadow
-    iconAnchor:   [17, 34], // point of the icon which will correspond to marker's location
-    // shadowAnchor: [4, 62],  // the same for the shadow
-    popupAnchor:  [0, -34] // point from which the popup should open relative to the iconAnchor
-});
+//     iconSize:     [34, 34], // size of the icon
+//     // shadowSize:   [50, 64], // size of the shadow
+//     iconAnchor:   [17, 34], // point of the icon which will correspond to marker's location
+//     // shadowAnchor: [4, 62],  // the same for the shadow
+//     popupAnchor:  [0, -34] // point from which the popup should open relative to the iconAnchor
+// });
 
-var markerG2 = L.marker([21.038131, 105.783373], {icon: T_waypoint}, { alt: 'G2' }).addTo(map).bindPopup("I'm a cool marker!");
+// var markerG2 = L.marker([21.038131, 105.783373], {icon: T_waypoint}, { alt: 'G2' }).addTo(map).bindPopup("I'm a cool marker!");
+
+// L.tooltip([21.038049, 105.783349], {content: 'G2', permanent: true, direction: 'center', className: "my-labels"}).addTo(map);
+// L.tooltip([21.040695, 105.783011], {content: 'Giảng đường 2', permanent: true, direction: 'center', className: "my-labels"}).addTo(map);
+// L.tooltip([21.039931, 105.781533], {content: 'Nhà đa năng', permanent: true, direction: 'center', className: "my-labels"}).addTo(map);
+// L.tooltip([21.038412, 105.782775], {content: 'E5', permanent: true, direction: 'center', className: "my-labels"}).addTo(map);
+// L.tooltip([21.038079, 105.782104], {content: 'G3', permanent: true, direction: 'center', className: "my-labels"}).addTo(map);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -112,13 +116,20 @@ map.on('click', onMapClick);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-for (let i = 0; i < bdNameList.length; i++) {
+for (let i = 0; i < bdList.length; i++) {
     L.geoJSON(geojsonFeature, {
         filter: function(feature) {
-            return (bdNameList[i]) ? (feature.properties.name.toLowerCase() == bdNameList[i].toLowerCase()) : true;
+            return feature.properties.name.toLowerCase() == bdList[i][0].toLowerCase();
         }, 
         onEachFeature: function(feature, layer) {
-            layer.bindPopup(feature.properties.name + ' - ' + bdInfoList[i]);
+            layer.bindPopup(feature.properties.name + ' - ' + bdList[i][1]);
+            // layer.on('mouseover', function (e) {
+            //     this.openPopup();
+            // });
+            // layer.on('mouseout', function (e) {
+            //     this.closePopup();
+            // });
+            // layer.bindTooltip(feature.properties.name, {permanent: true, direction: 'center', className: "my-labels"}).openTooltip();
         },
         style: {
             "color": "#FF0000",
