@@ -7,19 +7,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Map</title>
 
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css"
         integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.1/dist/leaflet.js"
+        integrity="sha256-NDI0K41gVbWqfkkaHj15IzU7PtMoelkzyKp8TOaFQ3s=" crossorigin=""></script>
+
+    <script src="../static/BoundaryCanvas.js"></script>
+    <script>
+        var bdList = {{ bdList| safe }};
+    </script>
+
     <style>
         .leaflet-tooltip {
             padding: 0;
             margin: 0;
         }
 
+        html,
+        body,
         #map {
-            height: 720px;
+            height: 98%;
+            margin: 0px;
         }
 
         .leaflet-tooltip.my-labels {
@@ -30,13 +43,6 @@
             font-size: 18px;
         }
     </style>
-
-    <script src="https://unpkg.com/leaflet@1.9.1/dist/leaflet.js"
-        integrity="sha256-NDI0K41gVbWqfkkaHj15IzU7PtMoelkzyKp8TOaFQ3s=" crossorigin=""></script>
-
-    <script>
-        var bdList = {{ bdList| safe }};
-    </script>
 </head>
 
 <body>

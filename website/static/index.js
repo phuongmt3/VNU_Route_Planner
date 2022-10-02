@@ -12,11 +12,11 @@ var geojsonFeature = {"type":"FeatureCollection", "features":[
     {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.782416,21.038343,0],[105.782413,21.038217,0],[105.782498,21.038215,0],[105.782589,21.038213,0],[105.782848,21.038208,0],[105.782952,21.038205,0],[105.782955,21.038332,0],[105.782416,21.038343,0]]]},"properties":{"name":"E3","description":"","osm_way_id":"669916758","building":"yes","amenity":"","other_tags":"\"addr:city\"=&gt;\"HÃ  Ná»™i\",\"addr:district\"=&gt;\"Cáº§u Giáº¥y\",\"addr:housenumber\"=&gt;\"144\",\"addr:postcode\"=&gt;\"100000\",\"addr:province\"=&gt;\"HÃ  Ná»™i\",\"addr:street\"=&gt;\"XuÃ¢n Thá»§y\",\"addr:subdistrict\"=&gt;\"Dá»‹ch Vá»ng Háºu\"","office":"educational_institution","leisure":"","tourism":""}},
     {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.782395,21.037968,0],[105.782392,21.037832,0],[105.782945,21.037821,0],[105.782945,21.0379549,0],[105.782583,21.037964,0],[105.782493,21.037966,0],[105.782395,21.037968,0]]]},"properties":{"name":"E1","description":"","osm_way_id":"669930483","building":"university","amenity":"","other_tags":"\"addr:city\"=&gt;\"HÃ  Ná»™i\",\"addr:district\"=&gt;\"Cáº§u Giáº¥y\",\"addr:housenumber\"=&gt;\"144\",\"addr:postcode\"=&gt;\"100000\",\"addr:province\"=&gt;\"HÃ  Ná»™i\",\"addr:street\"=&gt;\"XuÃ¢n Thá»§y\",\"addr:subdistrict\"=&gt;\"Dá»‹ch Vá»ng Háºu\",\"building:levels\"=&gt;\"7\",\"roof:levels\"=&gt;\"0\"","office":"","leisure":"","tourism":""}},
     {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.782255,21.037584,0],[105.782252,21.037453,0],[105.782378,21.03745,0],[105.782372,21.037188,0],[105.782402,21.037186,0],[105.782418,21.037186,0],[105.782504,21.037183,0],[105.78251,21.037448,0],[105.782707,21.037444,0],[105.782825,21.037441,0],[105.782826,21.037491,0],[105.782827,21.037528,0],[105.782828,21.037571,0],[105.782255,21.037584,0]]]},"properties":{"name":"B2","description":"","osm_way_id":"733437296","building":"university","amenity":"","other_tags":"","office":"","leisure":"","tourism":""}},
-    {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.782916,21.037169,0],[105.782794,21.037173,0],[105.782698,21.037176,0],[105.782504,21.037183,0],[105.782418,21.037186,0],[105.782414,21.037073,0],[105.782912,21.037055,0],[105.782916,21.037169,0]]]},"properties":{"name":"B2","description":"","osm_way_id":"733437297","building":"university","amenity":"","other_tags":"","office":"","leisure":"","tourism":""}},
+    // {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.782916,21.037169,0],[105.782794,21.037173,0],[105.782698,21.037176,0],[105.782504,21.037183,0],[105.782418,21.037186,0],[105.782414,21.037073,0],[105.782912,21.037055,0],[105.782916,21.037169,0]]]},"properties":{"name":"B2","description":"","osm_way_id":"733437297","building":"university","amenity":"","other_tags":"","office":"","leisure":"","tourism":""}},
     {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.783131,21.0381967,0],[105.783125,21.0379857,0],[105.783242,21.0379827,0],[105.783241,21.0379207,0],[105.783477,21.0379147,0],[105.783478,21.0379757,0],[105.7836,21.0379717,0],[105.783606,21.0381847,0],[105.783131,21.0381967,0]]]},"properties":{"name":"G2","description":"","osm_way_id":"733437304","building":"university","amenity":"","other_tags":"","office":"","leisure":"","tourism":""}},
     {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.781493,21.037696,0],[105.781635,21.037556,0],[105.781704,21.037614,0],[105.781736,21.037582,0],[105.781812,21.037648,0],[105.781639,21.037823,0],[105.781493,21.037696,0]]]},"properties":{"name":"D2","description":"","osm_way_id":"733437305","building":"university","amenity":"","other_tags":"","office":"","leisure":"","tourism":""}},
     {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.782237,21.037192,0],[105.782235,21.037118,0],[105.782292,21.037116,0],[105.7822797,21.0368986,0],[105.782392,21.036892,0],[105.782394,21.036942,0],[105.782402,21.037186,0],[105.782372,21.037188,0],[105.782237,21.037192,0]]]},"properties":{"name":"G4","description":"","osm_way_id":"733437311","building":"university","amenity":"","other_tags":"","office":"","leisure":"","tourism":""}},
-    {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.782707,21.037444,0],[105.782698,21.037176,0],[105.782794,21.037173,0],[105.782795,21.037214,0],[105.782934,21.03721,0],[105.782941,21.037437,0],[105.782825,21.037441,0],[105.782707,21.037444,0]]]},"properties":{"name":"B1","description":"","osm_way_id":"733437313","building":"university","amenity":"","other_tags":"","office":"","leisure":"","tourism":""}},
+    // {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.782707,21.037444,0],[105.782698,21.037176,0],[105.782794,21.037173,0],[105.782795,21.037214,0],[105.782934,21.03721,0],[105.782941,21.037437,0],[105.782825,21.037441,0],[105.782707,21.037444,0]]]},"properties":{"name":"B1","description":"","osm_way_id":"733437313","building":"university","amenity":"","other_tags":"","office":"","leisure":"","tourism":""}},
     {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.7812196,21.0374304,0],[105.7813646,21.0372874,0],[105.7814236,21.0373394,0],[105.7814486,21.0373144,0],[105.7816331,21.0374747,0],[105.7814361,21.0376682,0],[105.7813966,21.0376294,0],[105.7812626,21.0375114,0],[105.7812856,21.0374884,0],[105.7812196,21.0374304,0]]]},"properties":{"name":"D1","description":"","osm_way_id":"733437315","building":"university","amenity":"","other_tags":"","office":"","leisure":"","tourism":""}},
     {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.7811634,21.0384692,0],[105.7811624,21.0383682,0],[105.7816124,21.0383622,0],[105.7816134,21.0384322,0],[105.7816134,21.0384632,0],[105.7811634,21.0384692,0]]]},"properties":{"name":"G7","description":"","osm_way_id":"733437316","building":"university","amenity":"","other_tags":"","office":"","leisure":"","tourism":""}},
     {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[105.7816186,21.0384577,0],[105.7816176,21.0383587,0],[105.7822866,21.0383517,0],[105.7822876,21.0384507,0],[105.7816186,21.0384577,0]]]},"properties":{"name":"B3","description":"","osm_way_id":"733437317","building":"university","amenity":"","other_tags":"","office":"","leisure":"","tourism":""}},
@@ -45,6 +45,10 @@ var geojsonFeature = {"type":"FeatureCollection", "features":[
 ]
 }
 
+// var geom = {
+//     "type": "MultiPolygon", "coordinates": [[[[105.7812545, 21.0409001], [105.7817336, 21.0408875], [105.781739, 21.0409629], [105.783365, 21.0409076], [105.7833621, 21.0408215], [105.7833341, 21.0399802], [105.7833084, 21.0392067], [105.7828711, 21.0392179], [105.7828676, 21.0391067], [105.7826902, 21.039111], [105.7826675, 21.0385919], [105.7836409, 21.038555], [105.7836311, 21.0378809], [105.7830562, 21.0378918], [105.7830574, 21.0376439], [105.7828284, 21.0376461], [105.7828282, 21.0375709], [105.7828249, 21.037441], [105.7827066, 21.0374437], [105.7825035, 21.037183], [105.7824181, 21.0371859], [105.7824136, 21.0370728], [105.7824157, 21.0369412], [105.7825348, 21.0369377], [105.7825329, 21.0368812], [105.7829769, 21.0368682], [105.7829738, 21.0367756], [105.7823884, 21.0367927], [105.7822806, 21.0367958], [105.7817635, 21.0368219], [105.781136, 21.0374073], [105.7812545, 21.0409001]]]]
+// };
+
 var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '© OpenStreetMap'
@@ -65,9 +69,16 @@ var mb = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World
     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 });
 
+// var mb = L.TileLayer.boundaryCanvas('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+//     maxZoom: 19,
+//     boundary: geom,
+//     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+// });
+
 var map = L.map('map', {
-    center: [21.03813, 105.78315],
-    zoom: 18,
+    center: [21.038965, 105.782375],
+    zoom: 17,
+    maxBounds: L.latLngBounds([21.04242, 105.774801], [21.03538, 105.789896]),
     layers: [osm, ggStreets, ggSat, mb]
 });
 
@@ -77,10 +88,6 @@ var baseMaps = {
     "Google Map": ggSat,
     "ESRI satellite": mb
 };
-
-var layerControl = L.control.layers(baseMaps).addTo(map);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // var T_waypoint = L.icon({
 //     iconUrl: 'https://preview.redd.it/2yv5x9hto5f61.png?width=341&format=png&auto=webp&s=eccf34f646917d5a7c0196de5c2fc2e7ef3e2427',
@@ -93,7 +100,37 @@ var layerControl = L.control.layers(baseMaps).addTo(map);
 //     popupAnchor:  [0, -34] // point from which the popup should open relative to the iconAnchor
 // });
 
-// var markerG2 = L.marker([21.038131, 105.783373], {icon: T_waypoint}, { alt: 'G2' }).addTo(map).bindPopup("I'm a cool marker!");
+var Icon_Inventory_Food = L.icon({
+    iconUrl: 'static/Icon_Food.png',
+    iconSize:     [30, 30],
+    iconAnchor:   [15, 15], 
+    popupAnchor:  [0, -15]
+});
+
+var Icon_Book = L.icon({
+    iconUrl: 'static/Icon_Store.png',
+    iconSize:     [30, 30], 
+    iconAnchor:   [15, 15], 
+    popupAnchor:  [0, -15] 
+});
+
+var food1 = L.marker([21.038229, 105.782236], {icon: Icon_Inventory_Food}).bindPopup("I'm a food marker 1!");
+var food2 = L.marker([21.038477, 105.783226], {icon: Icon_Inventory_Food}).bindPopup("I'm a food marker 2!");
+var food3 = L.marker([21.037934, 105.782222], {icon: Icon_Inventory_Food}).bindPopup("I'm a food marker 3!");
+var food4 = L.marker([21.040682, 105.783016], {icon: Icon_Inventory_Food}).bindPopup("I'm a food marker 4!");
+var food5 = L.marker([21.038478, 105.782426], {icon: Icon_Inventory_Food}).bindPopup("I'm a food marker 5!");
+var food6 = L.marker([21.04057, 105.782233], {icon: Icon_Inventory_Food}).bindPopup("I'm a food marker 6!");
+var foodMarkers = L.layerGroup([food1, food2, food3, food4, food5, food6]);
+
+var bookStore = L.marker([21.036843, 105.782241], {icon: Icon_Book}).bindPopup("I'm a book store!");
+var bookStores = L.layerGroup([bookStore]);
+
+var overlayMaps = {
+    "Food": foodMarkers,
+    "Book Store": bookStores
+};
+
+var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 
 // L.tooltip([21.038049, 105.783349], {content: 'G2', permanent: true, direction: 'center', className: "my-labels"}).addTo(map);
 // L.tooltip([21.040695, 105.783011], {content: 'Giảng đường 2', permanent: true, direction: 'center', className: "my-labels"}).addTo(map);
