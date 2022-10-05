@@ -153,6 +153,30 @@ map.on('click', onMapClick);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+L.geoJSON(geojsonFeature, {
+    onEachFeature: function(feature, layer) {
+        layer.on('mouseover', function (e) {
+            this.setStyle({
+                "opacity": 1,
+                "fillOpacity": 0.25
+            });
+        });
+        layer.on('mouseout', function (e) {
+            this.setStyle({
+                "opacity": 0,
+                "fillOpacity": 0
+            });
+        });
+        // layer.bindTooltip(feature.properties.name, {permanent: true, direction: 'center', className: "my-labels"}).openTooltip();
+    },
+    style: {
+        "color": "#FF0000",
+        "weight": 1,
+        "opacity": 0,
+        "fillOpacity": 0
+    }
+}).addTo(map);
+
 for (let i = 0; i < bdList.length; i++) {
     L.geoJSON(geojsonFeature, {
         filter: function(feature) {
@@ -160,18 +184,12 @@ for (let i = 0; i < bdList.length; i++) {
         }, 
         onEachFeature: function(feature, layer) {
             layer.bindPopup(feature.properties.name + ' - ' + bdList[i][1]);
-            // layer.on('mouseover', function (e) {
-            //     this.openPopup();
-            // });
-            // layer.on('mouseout', function (e) {
-            //     this.closePopup();
-            // });
-            // layer.bindTooltip(feature.properties.name, {permanent: true, direction: 'center', className: "my-labels"}).openTooltip();
         },
         style: {
             "color": "#FF0000",
             "weight": 1,
-            "opacity": 1
+            "opacity": 1,
+            "fillOpacity": 0.25
         }
     }).addTo(map);
 }
