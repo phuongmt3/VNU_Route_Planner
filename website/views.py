@@ -40,6 +40,7 @@ def home():
             orgLMH = LMH[:7]
             group = row[2]
             note = row[3]
+            print(LMH, orgLMH, group, note)
             mycursor.execute("SELECT * FROM monhoc WHERE Mã_LHP = (%s)", (orgLMH,))
             data2 = mycursor.fetchone()
             LMHName = data2[1]
