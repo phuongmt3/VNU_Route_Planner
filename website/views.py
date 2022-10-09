@@ -23,21 +23,21 @@ class ClassInfor:
 
 @views.route('/map', methods=['GET', 'POST'])
 def my_map():
-    bdList = []
-    if request.method == "POST":
-        bdNameList = request.form['bdName'].replace(" ", "")
-        if (bdNameList != ""):
-            bdNameList = bdNameList.split(",")
-            for bdName in bdNameList:
-                mycursor.execute(
-                    "SELECT * FROM toanha WHERE Mã_tòa_nhà LIKE (%s)", ('%' + bdName + '%',))
-                bd = mycursor.fetchall()
-                bdList += bd
-    else:
-        mycursor.execute("SELECT * FROM toanha")
-        bdList = mycursor.fetchall()
+    mycursor.execute("SELECT * FROM toanha")
+    bdListFull = mycursor.fetchall()
 
-    return render_template('map_test.html', bdList=json.dumps(bdList))
+    bdListSelect = []
+    if request.method == "POST":
+        bdNames = request.form['bdName']
+        for x in bdListFull:
+            if x[0] in bdNames:
+                bdListSelect += [x + (1,)]
+            else:
+                bdListSelect += [x + (0,)]
+    else:
+        bdListSelect = [x + (0,) for x in bdListFull]
+
+    return render_template('map_test.html', bdListSelect=json.dumps(bdListSelect))
 
 
 @views.route('/', methods=['GET', 'POST'])
