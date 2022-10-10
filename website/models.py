@@ -4,7 +4,7 @@ db = mysql.connector.connect(
     host='localhost',
     user='root',
     password='',
-    database='vnu_route_planner_db_test'
+    database='vnu_route'
 )
 
 mycursor = db.cursor()
