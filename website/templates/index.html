@@ -5,57 +5,29 @@
     <title>Main Page</title>
 </head>
 <body>
+    <br>
     <form action="http://127.0.0.1:5000/" method="POST">
-        <label for="msv">MSV</label><br>
-        <input type="text" name="msv" id="msv">
+        <label for="startPlace">From </label>
+        <select name="startPlace">
+            <option value=""></option>
+            {% for i in showedPlaceList: %}
+            <option value={{i}}>{{placeNames[i]}}</option>
+            {% endfor %}
+        </select>
+        <label for="endPlace">To </label>
+        <select name="endPlace">
+            <option value=""></option>
+            {% for i in showedPlaceList: %}
+            <option value={{i}}>{{placeNames[i]}}</option>
+            {% endfor %}
+        </select>
+        <br><br>
         <input type="submit" value="Search">
     </form>
     <br>
-    <h2>{{ hello }}</h2>
+    <p>Route is from {{startPlace}} to {{endPlace}}</p>
+    <p>Distance is {{distance}}</p>
     <br>
-    <table border="1">
-        <tr>
-            <th>STT</th>
-            <th>Mã SV</th>
-            <th>Họ và tên</th>
-            <th>Ngày sinh</th>
-            <th>Lớp khoá học</th>
-            <th>Giới tính</th>
-            <th>Nơi sinh</th>
-            <th>Mã LMH</th>
-            <th>Tên môn học</th>
-            <th>Số TC</th>
-            <th>Ghi chú</th>
-            <th>Nhóm</th>
-            <th>Tuần</th>
-            <th>Thứ</th>
-            <th>Tiết</th>
-            <th>Giảng đường</th>
-            <th>Số SV</th>
-            <th>Giảng viên</th>
-        </tr>
-        {% for i in range(subjectList |length): %}
-        <tr>
-            <td>{{ i + 1 }}</td>
-            <td>{{ msv }}</td>
-            <td>{{ name }}</td>
-            <td>{{ birthdate }}</td>
-            <td>{{ class_name }}</td>
-            <td>{{ gender }}</td>
-            <td>{{ birthplace }}</td>
-            <td>{{ subjectList[i].LMH }}</td>
-            <td>{{ subjectList[i].LMHName }}</td>
-            <td>{{ subjectList[i].TC }}</td>
-            <td>{{ subjectList[i].note }}</td>
-            <td>{{ subjectList[i].group }}</td>
-            <td>{{ subjectList[i].week }}</td>
-            <td>{{ subjectList[i].day }}</td>
-            <td>{{ subjectList[i].time }}</td>
-            <td>{{ subjectList[i].place }}</td>
-            <td>{{ subjectList[i].svCnt }}</td>
-            <td>{{ subjectList[i].lecturer }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+
 </body>
 </html>
