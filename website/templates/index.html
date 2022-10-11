@@ -25,8 +25,17 @@
         <input type="submit" value="Search">
     </form>
     <br>
-    <p>Route is from {{startPlace}} to {{endPlace}}</p>
+    <p>Route is from {{placeNames[idStartPlace]}} to {{placeNames[idEndPlace]}}</p>
     <p>Distance is {{distance}}</p>
+    <p>Tracking order: </p>
+    <p>{{placeNames[idStartPlace]}} =>
+        {% for id in trackingList:%}
+            {% if id > 0: %}
+                {{id}} =>
+            {% endif %}
+        {% endfor %}
+        {{placeNames[idEndPlace]}}
+    </p>
     <br>
 
 </body>

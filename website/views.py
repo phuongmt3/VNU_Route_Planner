@@ -8,18 +8,18 @@ views = Blueprint('views', __name__)
 
 def getDistanceBetween2Points(id1, id2):
     if id1 == id2:
-        return 0
+        return [0, []]
     if id1 > id2:
         return getDistanceBetween2Points(id2, id1)
-    mycursor.execute("select * from `dijistra` where `id1`=(%s) and `id2`=(%s)", (id1, id2))
-    data = mycursor.fetchone()
-    if not data:
-        mycursor.execute("select * from `points`")
-        data = mycursor.fetchall()
+    mycursor.execute("select `minDistance` from `dijistra` where `id1`=(%s) and `id2`=(%s)", (id1, id2))
+    ans = mycursor.fetchone()
+    if not ans:
+        mycursor.execute("select Count(*) from `points`")
+        data = mycursor.fetchone()
         pq = PriorityQueue()
-        finished = [False] * (len(data) + 1)
+        finished = [False] * (data[0] + 1)
         kc = [(0, 0, 0)]  # (curMinKc, thisID, trackingID)
-        for i in range(len(data)):
+        for i in range(data[0]):
             kc.append((1000000, i + 1, -1))
         kc[id1] = (0, id1, kc[id1][1])
         pq.put(kc[id1])
@@ -43,7 +43,14 @@ def getDistanceBetween2Points(id1, id2):
                     db.commit()
 
             if cur[1] == id2:
-                return cur[0]
+                trackingList = []
+                aim = id2
+                while aim != 0:
+                    mycursor.execute("select * from `dijistra` where id1=%s and id2=%s", (min(id1, aim), max(id1, aim)))
+                    data = mycursor.fetchone()
+                    trackingList.append(data[3])
+                    aim = data[3]
+                return [cur[0], trackingList]
             mycursor.execute("select * from `dijistra` where `id1`=%s or `id2`=%s", (cur[1], cur[1]))
             data = mycursor.fetchall()
             for i in data:
@@ -56,7 +63,15 @@ def getDistanceBetween2Points(id1, id2):
                     kc[remainID] = (kc[cur[1]][0] + i[2], remainID, cur[1])
                     pq.put(kc[remainID])
         return -1
-    return data[2]
+    # calculated
+    trackingList = []
+    aim = id2
+    while aim != 0:
+        mycursor.execute("select * from `dijistra` where id1=%s and id2=%s", (min(id1, aim), max(id1, aim)))
+        data = mycursor.fetchone()
+        trackingList.append(data[3])
+        aim = data[3]
+    return [ans[0], trackingList]
 
 
 @views.route('/', methods=['GET', 'POST'])
@@ -68,7 +83,7 @@ def home():
     for d in data:
         if d[2] == 1 or d[2] == 0:
             showedPlaceList.append(d[0])
-        # placeNames.append(d[1])
+        #placeNames.append(d[1])
         placeNames.append(d[0])
 
     if request.method == 'POST':
@@ -78,11 +93,13 @@ def home():
             return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList)
         idStartPlace = int(idStartPlace)
         idEndPlace = int(idEndPlace)
-        startPlace = placeNames[idStartPlace]
-        endPlace = placeNames[idEndPlace]
-        distance = getDistanceBetween2Points(idStartPlace, idEndPlace)
+        getDistance = getDistanceBetween2Points(idStartPlace, idEndPlace)
+        distance = getDistance[0]
+        trackingList = getDistance[1]
+        if idEndPlace > idStartPlace:
+            trackingList.reverse()
         return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList,
-                               startPlace=startPlace, endPlace=endPlace, distance=distance)
+                               idStartPlace=idStartPlace, idEndPlace=idEndPlace, distance=distance, trackingList=trackingList)
 
     if request.method == 'GET':
         return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList)
