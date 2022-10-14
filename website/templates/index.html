@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Main Page</title>
+    <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+    <script src="{{url_for('static', filename='myjavascript.js')}}"></script>
 </head>
 <body>
     <br>
     <form action="http://127.0.0.1:5000/" method="POST">
-        <label for="startPlace">From </label>
+        <label>From </label>
         <select name="startPlace">
             <option value=""></option>
             {% for i in showedPlaceList: %}
             <option value={{i}}>{{placeNames[i]}}</option>
             {% endfor %}
         </select>
-        <label for="endPlace">To </label>
+        <label>To </label>
         <select name="endPlace">
             <option value=""></option>
             {% for i in showedPlaceList: %}
@@ -37,6 +39,19 @@
         {{placeNames[idEndPlace]}}
     </p>
     <br>
+    <div>
+        <canvas id="myCanvas"
+                style="border: 1px solid #d3d3d3;
+                        width: 100%;
+                        background-image: url('{{url_for('static', filename='maps-1.jpg')}}');
+                        background-size: 100%;
+                        background-repeat: no-repeat">
+            Your browser does not support the HTML5 canvas tag.
+        </canvas>
+        <div style="padding-top:20px;">
+            <div id="coord"></div>
+        </div>
+    </div>
 
 </body>
 </html>
