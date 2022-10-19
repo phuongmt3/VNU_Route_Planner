@@ -7,6 +7,9 @@
     <script src="{{url_for('static', filename='myjavascript.js')}}"></script>
 </head>
 <body>
+    {% for message in get_flashed_messages() %}
+        <p>{{ message }}</p>
+    {% endfor %}
     <br>
     <form action="http://127.0.0.1:5000/" method="POST">
         <label>From </label>
@@ -24,17 +27,17 @@
             {% endfor %}
         </select>
         <br><br>
-        <input type="submit" value="Search">
+        <input type="submit" name="submit_button" value="Search">
+        <input type="submit" name="submit_button" value="Reset Dijkstra database">
     </form>
+
+    <p>Database size: {{ dbsize }}</p>
     <br>
     <p>Route is from {{placeNames[idStartPlace]}} to {{placeNames[idEndPlace]}}</p>
     <p>Distance is {{distance}}</p>
     <p>Tracking order: </p>
-    <p>{{placeNames[idStartPlace]}} =>
-        {% for id in trackingList:%}
-            {% if id > 0: %}
-                {{id}} =>
-            {% endif %}
+    <p>{% for i in range (trackingList|length - 1, -1, -1):%}
+            {{trackingList[i]}} =>
         {% endfor %}
         {{placeNames[idEndPlace]}}
     </p>
