@@ -3,6 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Main Page</title>
+    <style>
+        table, th, td {
+            border: 2px solid black;
+            border-collapse: collapse;
+        }
+        table {
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
     <form action="http://127.0.0.1:5000/" method="POST">
@@ -54,6 +63,32 @@
             <td>{{ subjectList[i].place }}</td>
             <td>{{ subjectList[i].svCnt }}</td>
             <td>{{ subjectList[i].lecturer }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br><br>
+    <table>
+        <tr>
+            <th colspan="7">Thời khóa biểu</th>
+        </tr>
+        <tr>
+            <th>Tiết</th>
+            <th>Thứ 2</th>
+            <th>Thứ 3</th>
+            <th>Thứ 4</th>
+            <th>Thứ 5</th>
+            <th>Thứ 6</th>
+            <th>Thứ 7</th>
+        </tr>
+        {% for i in range(arr | length): %}
+        <tr>
+            <td>{{ i + 1 }}</td>
+            <td>{{ arr[i][0] }}</td>
+            <td>{{ arr[i][1] }}</td>
+            <td>{{ arr[i][2] }}</td>
+            <td>{{ arr[i][3] }}</td>
+            <td>{{ arr[i][4] }}</td>
+            <td>{{ arr[i][5] }}</td>
         </tr>
         {% endfor %}
     </table>
