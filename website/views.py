@@ -7,7 +7,7 @@ views = Blueprint('views', __name__)
 
 
 def resetDijkstraTable():
-    mycursor.execute("delete from `dijistra`")
+    mycursor.execute("delete from `dijkstra`")
     db.commit()
     mycursor.execute("select * from `distance`")
     data = mycursor.fetchall()
@@ -96,6 +96,8 @@ def getDistanceBetween2Points(id1, id2):
 def home():
     showedPlaceList = []
     placeNames = [""]
+    posX = [0]
+    posY = [0]
     mycursor.execute("select * from `points`")
     data = mycursor.fetchall()
     for d in data:
@@ -103,30 +105,34 @@ def home():
             showedPlaceList.append(d[0])
         #placeNames.append(d[1])
         placeNames.append(d[0])
+        posX.append(d[3])
+        posY.append(d[4])
 
     if request.method == 'POST':
         if request.form['submit_button'] == 'Search':
             idStartPlace = request.form['startPlace']
             idEndPlace = request.form['endPlace']
             if not idStartPlace or not idEndPlace:
-                return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList)
+                return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, clicked=False)
             idStartPlace = int(idStartPlace)
             idEndPlace = int(idEndPlace)
             getDistance = getDistanceBetween2Points(idStartPlace, idEndPlace)
             distance = getDistance[0]
             trackingList = getDistance[1]
+            trackingList.insert(0, idEndPlace)
 
             mycursor.execute("select Count(*) from `dijkstra`")
             dbsize = mycursor.fetchone()[0]
             return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, dbsize=dbsize,
-                                   idStartPlace=idStartPlace, idEndPlace=idEndPlace, distance=distance, trackingList=trackingList)
+                                   idStartPlace=idStartPlace, idEndPlace=idEndPlace, distance=distance,
+                                   trackingList=trackingList, posX=posX, posY=posY, clicked=True)
 
         elif request.form['submit_button'] == 'Reset Dijkstra database':
             resetDijkstraTable()
             flash('Reset Dijkstra database successfully!')
-            return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList)
+            return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, clicked=False)
 
     if request.method == 'GET':
-        return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList)
+        return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, clicked=False)
 
     return render_template('index.html')
