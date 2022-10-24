@@ -28,7 +28,7 @@ def my_map():
 
     bdListSelect = []
     if request.method == "POST":
-        bdNames = request.form['bdName']
+        bdNames = request.form['bdName'].upper()
         for x in bdListFull:
             if x[0] in bdNames:
                 bdListSelect += [x + (1,)]
