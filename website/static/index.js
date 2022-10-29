@@ -12,12 +12,16 @@ import {geojsonFeature as roads} from '../static/roads.js'
 //     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 // });
 
+// Map layer
+
 var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    id: "osm",
     maxZoom: 19,
     attribution: '© OpenStreetMap'
 });
 
 var mb = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    id: "mb",
     maxZoom: 19,
     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 });
@@ -28,7 +32,7 @@ var map = L.map('map', {
     zoomSnap: 0.25,
     wheelPxPerZoomLevel: 120,
     maxBounds: L.latLngBounds([21.04242, 105.774801], [21.03538, 105.789896]),
-    layers: [osm, mb]
+    layers: [mb]
 });
 
 var baseMaps = {
@@ -37,6 +41,8 @@ var baseMaps = {
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Icons stuff
 
 // var T_waypoint = L.icon({
 //     iconUrl: 'https://preview.redd.it/2yv5x9hto5f61.png?width=341&format=png&auto=webp&s=eccf34f646917d5a7c0196de5c2fc2e7ef3e2427',
@@ -83,6 +89,7 @@ var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Todo: add a site on click
 var popup = L.popup();
 
 function onMapClick(e) {
@@ -110,31 +117,56 @@ function unMark(layer) {
     });
 }
 
+function calculateCenter(coordinate) {
+    let lat = 0;
+    let long = 0;
+    for (let i = 0; i < coordinate.length; i++) {
+        lat += coordinate[i][0];
+        long += coordinate[i][1];
+    }
+    lat /= coordinate.length;
+    long /= coordinate.length;
+
+    return [long, lat];
+}
+
+// Buildings selecting events 
 for (let i = 0; i < bdListSelect.length; i++) {
     L.geoJSON(buildings, {
         filter: function(feature) {
             return feature.properties.name.toLowerCase() == bdListSelect[i][0].toLowerCase();
         }, 
         onEachFeature: function(feature, layer) {
-            layer.bindPopup(feature.properties.name + ' - ' + bdListSelect[i][1]);
+            var position = calculateCenter(feature.geometry.coordinates[0][0]);
+
+            // Building's name
+            L.tooltip(position, {content: feature.properties.name, permanent: true, direction: 'center', className: "my-labels"})
+                .addTo(map);
+
+            // Building's info
+            layer.bindPopup(bdListSelect[i][1]);
+            layer.on('click', function(e) {
+                if (bdListSelect[i][2] == 0) {
+                    map.setView(e.latlng);
+
+                    bdListSelect[i][2] = 1;
+                    layer.openPopup(position);
+                } else {
+                    bdListSelect[i][2] = 0;
+                    layer.closePopup(position);
+                }
+            });
+
+            // Red mark
             layer.on('mouseover', function (e) {
-                layer.openPopup();
                 if (!bdListSelect[i][2]) mark(layer);
             });
             layer.on('mouseout', function (e) {
-                layer.closePopup();
                 if (!bdListSelect[i][2]) unMark(layer);
             });
-            layer.on('click', function(e) {
-                bdListSelect[i][2] = (bdListSelect[i][2] == 0) ? 1 : 0;
-                map.setView(e.latlng);
-            });
-
             if (bdListSelect[i][2]) {
                 mark(layer);
             }
-            // Todo: Check layer if == satellite
-            // layer.bindTooltip(feature.properties.name, {permanent: true, direction: 'center', className: "my-labels"}).openTooltip();
         },
         style: {
             "color": "#FF0000",
@@ -144,6 +176,16 @@ for (let i = 0; i < bdListSelect.length; i++) {
         }
     }).addTo(map);
 }
+
+// Hide building's name when change layer to OpenStreetMap
+map.on('baselayerchange', function(e) {
+    console.log(e.name);
+    if (e.name == "OpenStreetMap") {
+        $(".leaflet-tooltip").css("display","none")
+    } else { 
+        $(".leaflet-tooltip").css("display","block")
+    }
+});
 
 // Testing
 L.geoJSON(roads, {
@@ -155,17 +197,26 @@ L.geoJSON(roads, {
     }
 }).addTo(map);
 
-roads.features.forEach(feature => {
-    feature.geometry.coordinates.forEach(coordinate => {
-        var marker = L.marker(L.latLng(coordinate[1], coordinate[0])).addTo(map);
-        marker.bindPopup("[" + coordinate[1] + ", " + coordinate[0] + "]").openPopup();
-    });
-});
+// buildings.features.forEach(feature => {
+//     feature.geometry.coordinates[0][0].forEach(coordinate => {
+//         var marker = L.marker(L.latLng(coordinate[1], coordinate[0])).addTo(map);
+//         marker.bindPopup("[" + coordinate[1] + ", " + coordinate[0] + "]").openPopup();
 
-var latlngs = [
-    [ 21.0376489, 105.7837679 ], [ 21.0378964, 105.7837739 ], [ 21.0382533, 105.7837838 ]
-];
+//         console.log(coordinate);
+//     });
+// });
 
-var polyline = L.polyline(latlngs, {color: 'blue'}).addTo(map);
+// roads.features.forEach(feature => {
+//     feature.geometry.coordinates.forEach(coordinate => {
+//         var marker = L.marker(L.latLng(coordinate[1], coordinate[0])).addTo(map);
+//         marker.bindPopup("[" + coordinate[1] + ", " + coordinate[0] + "]").openPopup();
+//     });
+// });
+
+// var latlngs = [
+//     [ 21.0376489, 105.7837679 ], [ 21.0378964, 105.7837739 ], [ 21.0382533, 105.7837838 ]
+// ];
+
+// var polyline = L.polyline(latlngs, {color: 'blue'}).addTo(map);
 
     
