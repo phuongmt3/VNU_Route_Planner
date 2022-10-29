@@ -31,6 +31,16 @@
         <br><br>
         <input type="submit" name="submit_button" value="Search">
         <input type="submit" name="submit_button" value="Reset Dijkstra database">
+        <br><br>
+        <label>Add place </label>
+        <select name="addPlace">
+            <option value=""></option>
+            {% for i in showedPlaceList: %}
+            <option value={{i}}>{{placeNames[i]}}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" name="submit_button" value="Add Place">
+
     </form>
 
     <script>
@@ -46,6 +56,15 @@
     <p>Database size: {{ dbsize }}</p>
     <br>
     <p>Route is from {{placeNames[idStartPlace]}} to {{placeNames[idEndPlace]}}</p>
+    <p>Included places:</p>
+    <p>
+        {% for i in range (0, addedList|length) %}
+            {% if i > 0 %}
+                 ,
+            {% endif %}
+            {{addedList[i]}}
+        {% endfor %}
+    </p>
     <p>Distance is {{distance}}</p>
     <p>Tracking order: </p>
     <p>{% for i in range (trackingList|length - 1, -1, -1) %}

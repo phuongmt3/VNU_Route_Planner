@@ -92,24 +92,29 @@ def getDistanceBetween2Points(id1, id2):
     return [ans[0], trackingList]
 
 
+showedPlaceList = []
+addedList = []
+placeNames = [""]
+idStartPlace = None
+idEndPlace = None
+posX = [0]
+posY = [0]
+mycursor.execute("select * from `points`")
+data = mycursor.fetchall()
+for d in data:
+    if d[2] == 1 or d[2] == 0:
+        showedPlaceList.append(d[0])
+    #placeNames.append(d[1])
+    placeNames.append(d[0])
+    posX.append(d[3])
+    posY.append(d[4])
+
+
 @views.route('/', methods=['GET', 'POST'])
 def home():
-    showedPlaceList = []
-    placeNames = [""]
-    posX = [0]
-    posY = [0]
-    mycursor.execute("select * from `points`")
-    data = mycursor.fetchall()
-    for d in data:
-        if d[2] == 1 or d[2] == 0:
-            showedPlaceList.append(d[0])
-        #placeNames.append(d[1])
-        placeNames.append(d[0])
-        posX.append(d[3])
-        posY.append(d[4])
-
     if request.method == 'POST':
         if request.form['submit_button'] == 'Search':
+            global idStartPlace, idEndPlace
             idStartPlace = request.form['startPlace']
             idEndPlace = request.form['endPlace']
             if not idStartPlace or not idEndPlace:
@@ -125,12 +130,23 @@ def home():
             dbsize = mycursor.fetchone()[0]
             return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, dbsize=dbsize,
                                    idStartPlace=idStartPlace, idEndPlace=idEndPlace, distance=distance,
-                                   trackingList=trackingList, posX=posX, posY=posY, clicked=True)
+                                   trackingList=trackingList, posX=posX, posY=posY, clicked=True, addedList=addedList)
 
         elif request.form['submit_button'] == 'Reset Dijkstra database':
             resetDijkstraTable()
             flash('Reset Dijkstra database successfully!')
             return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, clicked=False)
+
+        elif request.form['submit_button'] == 'Add Place':
+            addPlaceId = request.form['addPlace']
+            if not addPlaceId or not idStartPlace or not idEndPlace:
+                return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList,
+                                       clicked=False)
+            addPlaceId = int(addPlaceId)
+            addedList.append(addPlaceId)
+            #function calculate way
+            return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, clicked=False,
+                                   addedList=addedList, idStartPlace=idStartPlace, idEndPlace=idEndPlace)
 
     if request.method == 'GET':
         return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, clicked=False)
