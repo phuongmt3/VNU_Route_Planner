@@ -2,9 +2,7 @@ from queue import PriorityQueue
 
 from flask import Blueprint, render_template, request, flash
 from .models import mycursor, db
-import re
 from flask import Blueprint, render_template, request
-from .models import mycursor
 import json
 
 views = Blueprint('views', __name__)
@@ -16,12 +14,17 @@ def resetDijkstraTable():
     mycursor.execute("select * from `distance`")
     data = mycursor.fetchall()
     for row in data:
+        print(row)
         mycursor.execute("insert into `dijkstra` value (%s,%s,%s,%s)", (row[0], row[1], row[2], row[0]))
         mycursor.execute("insert into `dijkstra` value (%s,%s,%s,%s)", (row[1], row[0], row[2], row[1]))
     db.commit()
 def getDistance(p1, p2):
     mycursor.execute("select `distance` from `distance` where `id1`=%s and `id2`=%s", (min(p1, p2), max(p1, p2)))
-    return mycursor.fetchone()[0]
+    data = mycursor.fetchone()
+    if not data:
+        mycursor.execute("select `distance` from `distance` where `id1`=%s and `id2`=%s", (max(p1, p2), min(p1, p2)))
+        data = mycursor.fetchone()
+    return data[0]
 
 def getDistanceBetween2Points(id1, id2):
     if id1 == id2:
@@ -132,7 +135,7 @@ def my_map():
 
     return render_template('map_test.html', bdListSelect=json.dumps(bdListSelect))
 
-
+'''
 @views.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == "POST":
@@ -169,11 +172,11 @@ def home():
                                birthdate=birthdate, class_name=class_name, gender=gender,
                                birthplace=birthplace, subjectList=subjectList)
 
+'''
 
 
 
-
-@views.route('/findroad', methods=['GET', 'POST'])
+@views.route('/', methods=['GET', 'POST'])
 def findroad():
     if request.method == 'POST':
         if request.form['submit_button'] == 'Search':
