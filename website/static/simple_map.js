@@ -1,3 +1,11 @@
+// Currently not used
+
+// Style:
+
+// blue: #5FB0CE
+// yellow: #FEF7DB
+// green: #75B7AD
+
 var map = L.map('map', {
     crs: L.CRS.Simple,
     minZoom: -2,
