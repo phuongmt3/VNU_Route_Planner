@@ -26,6 +26,13 @@
     <script>
         var bdListSelect = {{ bdListSelect| safe }};
         console.log(bdListSelect);
+
+        var posx = [];
+        var posy = [];
+        {% for i in range (trackingList|length - 1, -1, -1):%}
+            posx.push('{{ posX[trackingList[i]] }}');
+            posy.push('{{ posY[trackingList[i]] }}');
+        {% endfor %}
     </script>
 
     <style>
@@ -92,12 +99,7 @@
 
     <script>
         var clicked = '{{ clicked }}';
-        var posx = [];
-        var posy = [];
-        {% for i in range (trackingList|length - 1, -1, -1):%}
-            posx.push('{{ posX[trackingList[i]] }}');
-            posy.push('{{ posY[trackingList[i]] }}');
-        {% endfor %}
+        
     </script>
 
     <p>Database size: {{ dbsize }}</p>

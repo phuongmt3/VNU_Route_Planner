@@ -197,7 +197,7 @@ def findroad():
             getDistance = getDistanceBetween2Points(idStartPlace, idEndPlace)
             distance = getDistance[0]
             trackingList = getDistance[1]
-            trackingList.insert(0, idEndPlace)
+            trackingList.pop()
 
             mycursor.execute("select Count(*) from `dijkstra`")
             dbsize = mycursor.fetchone()[0]
