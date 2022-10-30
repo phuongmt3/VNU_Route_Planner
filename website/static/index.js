@@ -188,14 +188,25 @@ map.on('baselayerchange', function(e) {
 });
 
 // Testing
-L.geoJSON(roads, {
-    style: {
-        "color": "#FF0000",
-        "weight": 2,
-        "opacity": 1,
-        "fillOpacity": 0.25
-    }
-}).addTo(map);
+// L.geoJSON(roads, {
+//     style: {
+//         "color": "#FF0000",
+//         "weight": 2,
+//         "opacity": 1,
+//         "fillOpacity": 0.25
+//     }
+// }).addTo(map);
+
+// console.log(posx)
+// console.log(posy)
+
+for (let i = 0; i < posx.length-1; i++) {
+    var latlngs = [
+        [ posx[i], posy[i] ], [ posx[i+1], posy[i+1] ]
+    ];
+
+    L.polyline(latlngs, {color: 'red'}).addTo(map);
+}
 
 // buildings.features.forEach(feature => {
 //     feature.geometry.coordinates[0][0].forEach(coordinate => {
