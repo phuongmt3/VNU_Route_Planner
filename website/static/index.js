@@ -1,5 +1,4 @@
 import {geojsonFeature as buildings} from '../static/buildings.js'
-import {geojsonFeature as roads} from '../static/roads.js'
 
 // Boundary Canvas:
 
@@ -177,15 +176,30 @@ for (let i = 0; i < bdListSelect.length; i++) {
     }).addTo(map);
 }
 
-// Hide building's name when change layer to OpenStreetMap
+// Hide building's name
 map.on('baselayerchange', function(e) {
-    console.log(e.name);
     if (e.name == "OpenStreetMap") {
         $(".leaflet-tooltip").css("display","none")
     } else { 
         $(".leaflet-tooltip").css("display","block")
     }
 });
+
+map.on('zoomend', function() {
+  if (map.getZoom() < 16) {
+      $(".leaflet-tooltip").css("display","none")
+  } else { 
+      $(".leaflet-tooltip").css("display","block")
+  }
+})
+
+// Render roads from posx, posy
+for (let i = 0; i < posx.length-1; i++) {
+    var latlngs = [
+        [ posx[i], posy[i] ], [ posx[i+1], posy[i+1] ]
+    ];
+    L.polyline(latlngs, {color: 'red'}).addTo(map);
+}
 
 // Testing
 // L.geoJSON(roads, {
@@ -196,17 +210,6 @@ map.on('baselayerchange', function(e) {
 //         "fillOpacity": 0.25
 //     }
 // }).addTo(map);
-
-// console.log(posx)
-// console.log(posy)
-
-for (let i = 0; i < posx.length-1; i++) {
-    var latlngs = [
-        [ posx[i], posy[i] ], [ posx[i+1], posy[i+1] ]
-    ];
-
-    L.polyline(latlngs, {color: 'red'}).addTo(map);
-}
 
 // buildings.features.forEach(feature => {
 //     feature.geometry.coordinates[0][0].forEach(coordinate => {
@@ -229,5 +232,7 @@ for (let i = 0; i < posx.length-1; i++) {
 // ];
 
 // var polyline = L.polyline(latlngs, {color: 'blue'}).addTo(map);
+
+$('.leaflet-container').css('cursor','crosshair');
 
     

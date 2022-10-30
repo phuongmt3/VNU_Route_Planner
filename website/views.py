@@ -120,64 +120,59 @@ for d in data:
     posY.append(d[4])
 
 
-@views.route('/map', methods=['GET', 'POST'])
-def my_map():
-    mycursor.execute("SELECT * FROM toanha")
-    bdListFull = mycursor.fetchall()
+# @views.route('/map', methods=['GET', 'POST'])
+# def my_map():
+#     mycursor.execute("SELECT * FROM toanha")
+#     bdListFull = mycursor.fetchall()
 
-    bdListSelect = []
-    if request.method == "POST":
-        bdNames = request.form['bdName'].upper()
-        for x in bdListFull:
-            if x[0] in bdNames:
-                bdListSelect += [x + (1,)]
-            else:
-                bdListSelect += [x + (0,)]
-    else:
-        bdListSelect = [x + (0,) for x in bdListFull]
+#     bdListSelect = []
+#     if request.method == "POST":
+#         bdNames = request.form['bdName'].upper()
+#         for x in bdListFull:
+#             if x[0] in bdNames:
+#                 bdListSelect += [x + (1,)]
+#             else:
+#                 bdListSelect += [x + (0,)]
+#     else:
+#         bdListSelect = [x + (0,) for x in bdListFull]
 
-    return render_template('map_test.html', bdListSelect=json.dumps(bdListSelect))
+#     return render_template('map_test.html', bdListSelect=json.dumps(bdListSelect))
 
-'''
-@views.route('/', methods=['GET', 'POST'])
-def home():
-    if request.method == "POST":
-        msv = request.form['msv']
-        mycursor.execute("SELECT * FROM sinhvien WHERE MSV = (%s)", (msv,))
-        data = mycursor.fetchone()
-        if not data:
-            return render_template('index.html', hello="Not found student!")
-        name = data[1]
-        birthdate = data[2]
-        class_name = data[3]
-        gender = data[4]
-        birthplace = data[5]
-        mycursor.execute("SELECT * FROM dangky WHERE MSV = (%s)", (msv,))
-        data = mycursor.fetchall()
-        subjectList = []
-        for row in data:
-            LMH = row[1]
-            orgLMH = LMH[:7]
-            group = row[2]
-            note = row[3]
-            mycursor.execute(
-                "SELECT * FROM monhoc WHERE Mã_LHP = (%s)", (orgLMH,))
-            data2 = mycursor.fetchone()
-            LMHName = data2[1]
-            TC = data2[2]
-            mycursor.execute(
-                "SELECT * FROM lopmonhoc WHERE Mã_LHP = (%s) AND (Nhóm = 'CL' OR Nhóm = (%s))", (LMH, group))
-            data3 = mycursor.fetchall()
-            for line in data3:
-                subjectList.append(ClassInfor(LMH, LMHName, line[1], TC, note,
-                                              line[2], line[3], line[4], line[5], line[6], line[7]))
-        return render_template('index.html', hello="Hello " + name, msv=msv, name=name,
-                               birthdate=birthdate, class_name=class_name, gender=gender,
-                               birthplace=birthplace, subjectList=subjectList)
-
-'''
-
-
+# @views.route('/', methods=['GET', 'POST'])
+# def home():
+#     if request.method == "POST":
+#         msv = request.form['msv']
+#         mycursor.execute("SELECT * FROM sinhvien WHERE MSV = (%s)", (msv,))
+#         data = mycursor.fetchone()
+#         if not data:
+#             return render_template('index.html', hello="Not found student!")
+#         name = data[1]
+#         birthdate = data[2]
+#         class_name = data[3]
+#         gender = data[4]
+#         birthplace = data[5]
+#         mycursor.execute("SELECT * FROM dangky WHERE MSV = (%s)", (msv,))
+#         data = mycursor.fetchall()
+#         subjectList = []
+#         for row in data:
+#             LMH = row[1]
+#             orgLMH = LMH[:7]
+#             group = row[2]
+#             note = row[3]
+#             mycursor.execute(
+#                 "SELECT * FROM monhoc WHERE Mã_LHP = (%s)", (orgLMH,))
+#             data2 = mycursor.fetchone()
+#             LMHName = data2[1]
+#             TC = data2[2]
+#             mycursor.execute(
+#                 "SELECT * FROM lopmonhoc WHERE Mã_LHP = (%s) AND (Nhóm = 'CL' OR Nhóm = (%s))", (LMH, group))
+#             data3 = mycursor.fetchall()
+#             for line in data3:
+#                 subjectList.append(ClassInfor(LMH, LMHName, line[1], TC, note,
+#                                               line[2], line[3], line[4], line[5], line[6], line[7]))
+#         return render_template('index.html', hello="Hello " + name, msv=msv, name=name,
+#                                birthdate=birthdate, class_name=class_name, gender=gender,
+#                                birthplace=birthplace, subjectList=subjectList)
 
 @views.route('/', methods=['GET', 'POST'])
 def findroad():
@@ -202,7 +197,6 @@ def findroad():
             trackingList = getDistance[1]
             #trackingList.pop()
             trackingList.insert(0, idEndPlace)
-
 
             mycursor.execute("select Count(*) from `dijkstra`")
             dbsize = mycursor.fetchone()[0]
@@ -244,6 +238,7 @@ def findroad():
                                    addedList=addedList, idStartPlace=idStartPlace, idEndPlace=idEndPlace)
 
     if request.method == 'GET':
-        return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, clicked=False)
+        bdListSelect = [x + (0,) for x in bdListFull]
+        return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, clicked=False, bdListSelect=json.dumps(bdListSelect))
 
     return render_template('index.html')
