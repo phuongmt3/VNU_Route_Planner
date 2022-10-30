@@ -84,6 +84,10 @@ def getDistanceBetween2Points(id1, id2):
                     remainID = i[1]
                 if finished[remainID] or isMin[remainID]:
                     continue
+                mycursor.execute("select * from `points` where `id`=%s", (remainID,))
+                po = mycursor.fetchone()
+                if po[2] == 1 and remainID != id1 and remainID != id2:
+                    continue
                 if kc[remainID][0] > kc[cur[1]][0] + i[2]:
                     kc[remainID] = (kc[cur[1]][0] + i[2], remainID, cur[1])
                     pq.put(kc[remainID])
@@ -109,7 +113,7 @@ posY = [0]
 mycursor.execute("select * from `points`")
 data = mycursor.fetchall()
 for d in data:
-    if d[2] == 1:
+    if d[2] > 0:
         showedPlaceList.append(d[0])
     placeNames.append(d[1])
     posX.append(d[3])
@@ -196,7 +200,8 @@ def findroad():
             getDistance = getDistanceBetween2Points(idStartPlace, idEndPlace)
             distance = getDistance[0]
             trackingList = getDistance[1]
-            trackingList.pop()
+            #trackingList.pop()
+            trackingList.insert(0, idEndPlace)
 
 
             mycursor.execute("select Count(*) from `dijkstra`")
