@@ -178,6 +178,13 @@ def home():
 
 @views.route('/', methods=['GET', 'POST'])
 def findroad():
+    # Building list
+    mycursor.execute("SELECT * FROM toanha")
+    bdListFull = mycursor.fetchall()
+
+    bdListSelect = []
+    ###############
+
     if request.method == 'POST':
         if request.form['submit_button'] == 'Search':
             global idStartPlace, idEndPlace
@@ -194,9 +201,26 @@ def findroad():
 
             mycursor.execute("select Count(*) from `dijkstra`")
             dbsize = mycursor.fetchone()[0]
+
+            # Building's name
+            bdNames = []
+
+            mycursor.execute("select `name` from `points` where `id`=%s", (idStartPlace, ))
+            bdNames.append(mycursor.fetchone()[0])
+
+            mycursor.execute("select `name` from `points` where `id`=%s", (idEndPlace, ))
+            bdNames.append(mycursor.fetchone()[0])
+
+            for x in bdListFull:
+                if x[0] in bdNames:
+                    bdListSelect += [x + (1,)]
+                else:
+                    bdListSelect += [x + (0,)]
+            ##################
+
             return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, dbsize=dbsize,
                                    idStartPlace=idStartPlace, idEndPlace=idEndPlace, distance=distance,
-                                   trackingList=trackingList, posX=posX, posY=posY, clicked=True, addedList=addedList)
+                                   trackingList=trackingList, posX=posX, posY=posY, clicked=True, addedList=addedList, bdListSelect=json.dumps(bdListSelect))
 
         elif request.form['submit_button'] == 'Reset Dijkstra database':
             resetDijkstraTable()
