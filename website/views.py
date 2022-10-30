@@ -109,10 +109,9 @@ posY = [0]
 mycursor.execute("select * from `points`")
 data = mycursor.fetchall()
 for d in data:
-    if d[2] == 1 or d[2] == 0:
+    if d[2] == 1:
         showedPlaceList.append(d[0])
-    #placeNames.append(d[1])
-    placeNames.append(d[0])
+    placeNames.append(d[1])
     posX.append(d[3])
     posY.append(d[4])
 
@@ -197,7 +196,8 @@ def findroad():
             getDistance = getDistanceBetween2Points(idStartPlace, idEndPlace)
             distance = getDistance[0]
             trackingList = getDistance[1]
-            trackingList.insert(0, idEndPlace)
+            trackingList.pop()
+            #trackingList.insert(0, idEndPlace)
 
             mycursor.execute("select Count(*) from `dijkstra`")
             dbsize = mycursor.fetchone()[0]
