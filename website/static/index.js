@@ -156,7 +156,7 @@ for (let i = 0; i < bdListSelect.length; i++) {
                 lineGroup.clearLayers()
 
                 // Send and receive data backend
-                fetch(`/addplace/${feature.properties.name}`)
+                fetch(`/post_place/${feature.properties.name}`)
                     .then(function (response) {
                         return response.json();
                     }).then(function (pos) {
