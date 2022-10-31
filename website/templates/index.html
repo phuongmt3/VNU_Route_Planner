@@ -21,13 +21,13 @@
 
     <link rel="stylesheet" href="../static/styles.css">
 
+    <script src="../static/plugins/L.Polyline.SnakeAnim.js"></script>
     <script>
         var bdListSelect = {{ bdListSelect| safe }};
-        console.log(bdListSelect);
 
         var posx = [];
         var posy = [];
-        {% for i in range (trackingList|length - 1, -1, -1):%}
+        {% for i in range (0, trackingList|length, 1):%}
             posx.push('{{ posX[trackingList[i]] }}');
             posy.push('{{ posY[trackingList[i]] }}');
         {% endfor %}
@@ -39,7 +39,7 @@
     {% endfor %}
     <br>
 
-    <form action="http://127.0.0.1:5000/" method="POST">
+    <form action="http://127.0.0.1:5000/" method="POST" id="my-form">
         <label>From </label>
         <select name="startPlace">
             <option value=""></option>
@@ -60,15 +60,6 @@
         <input type="submit" name="submit_button" value="Reset Dijkstra database">
         <br><br>
 
-        <label>Add place </label>
-        <select name="addPlace">
-            <option value=""></option>
-            {% for i in showedPlaceList: %}
-            <option value={{i}}>{{placeNames[i]}}</option>
-            {% endfor %}
-        </select>
-        <input type="submit" name="submit_button" value="Add Place">
-        <br><br>
     </form>
 
     <div id="map"></div>
@@ -81,19 +72,12 @@
 
     <p>Database size: {{ dbsize }}</p>
     <br>
-    <p>Included places:</p>
-    <p>
-        {% for i in range (0, addedList|length) %}
-            {% if i > 0 %}
-                 ,
-            {% endif %}
-            {{ placeNames[addedList[i]] }}({{addedList[i]}})
-        {% endfor %}
-    </p>
+    <p>Route is from {{placeNames[idStartPlace]}} to {{placeNames[idEndPlace]}}</p>
+
     <p>Distance is {{distance}}</p>
     <p>Tracking order: </p>
-    <p>{% for i in range (trackingList|length - 1, -1, -1) %}
-            {% if i < trackingList|length - 1 %}
+    <p>{% for i in range (0, trackingList|length, 1):%}
+            {% if i < trackingList|length %}
                  =>
             {% endif %}
             {{trackingList[i]}}
