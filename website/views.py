@@ -16,6 +16,24 @@ class DecimalEncoder(json.JSONEncoder):
 
 views = Blueprint('views', __name__)
 
+# global variables
+showedPlaceList = []
+placesByTime = []
+placeNames = [""]
+idStartPlace = None
+idEndPlace = None
+posX = [0]
+posY = [0]
+distance = 0
+mycursor.execute("select * from `points`")
+data = mycursor.fetchall()
+for d in data:
+    if d[2] > 0:
+        showedPlaceList.append(d[0])
+    placeNames.append(d[1])
+    posX.append(d[3])
+    posY.append(d[4])
+
 
 def resetDijkstraTable():
     mycursor.execute("delete from `dijkstra`")
@@ -23,21 +41,17 @@ def resetDijkstraTable():
     mycursor.execute("select * from `distance`")
     data = mycursor.fetchall()
     for row in data:
-        print(row)
-        mycursor.execute("insert into `dijkstra` value (%s,%s,%s,%s)",
-                         (row[0], row[1], row[2], row[0]))
-        mycursor.execute("insert into `dijkstra` value (%s,%s,%s,%s)",
-                         (row[1], row[0], row[2], row[1]))
+        mycursor.execute("insert into `dijkstra` value (%s,%s,%s,%s)", (row[0], row[1], row[2], row[0]))
+        mycursor.execute("insert into `dijkstra` value (%s,%s,%s,%s)", (row[1], row[0], row[2], row[1]))
     db.commit()
 
 
 def getDistance(p1, p2):
-    mycursor.execute(
-        "select `distance` from `distance` where `id1`=%s and `id2`=%s", (min(p1, p2), max(p1, p2)))
+    # between 2 direct places on map
+    mycursor.execute("select `distance` from `distance` where `id1`=%s and `id2`=%s", (p1, p2))
     data = mycursor.fetchone()
     if not data:
-        mycursor.execute(
-            "select `distance` from `distance` where `id1`=%s and `id2`=%s", (max(p1, p2), min(p1, p2)))
+        mycursor.execute("select `distance` from `distance` where `id1`=%s and `id2`=%s", (p2, p1))
         data = mycursor.fetchone()
     return data[0]
 
@@ -45,22 +59,27 @@ def getDistance(p1, p2):
 def getDistanceBetween2Points(id1, id2):
     if id1 == id2:
         return [0, []]
-    mycursor.execute(
-        "select `minDistance` from `dijkstra` where `id1`=(%s) and `id2`=(%s)", (id1, id2))
+    mycursor.execute("select `minDistance` from `dijkstra` where `id1`=(%s) and `id2`=(%s)", (id1, id2))
+
     ans = mycursor.fetchone()
+
     if not ans:
+        # if not yet have answer
         mycursor.execute("select Count(*) from `points`")
         data = mycursor.fetchone()
         pq = PriorityQueue()
         finished = [False] * (data[0] + 1)
-        isMin = [False] * (data[0] + 1)
+        isMin = [False] * (data[0] + 1)  # to not rerun the old roads when min distance is reached in previous steps
         kc = [(0, 0, 0)]  # (curMinKc, thisID, trackingID)
+
         for i in range(data[0]):
             kc.append((1000000, i + 1, -1))
         kc[id1] = (0, id1, 0)
         finished[id1] = True
         isMin[id1] = True
-        mycursor.execute("select * from `dijkstra` where `id1`=%s", (id1, ))
+
+        # put all adjacent places of startID into pq
+        mycursor.execute("select * from `dijkstra` where `id1`=%s", (id1,))
         data = mycursor.fetchall()
         for k in data:
             kc[k[1]] = (k[2], k[1], k[3])
@@ -72,6 +91,8 @@ def getDistanceBetween2Points(id1, id2):
             if finished[cur[1]]:
                 continue
             finished[cur[1]] = True
+
+            # save calculated min roads into dijkstra table
             oldaim = cur[1]
             aim = cur[2]
             minkc = 0
@@ -86,30 +107,31 @@ def getDistanceBetween2Points(id1, id2):
             db.commit()
 
             if cur[1] == id2:
-                trackingList = []
-                aim = id2
-                while aim != id1:
-                    aim = kc[aim][2]
-                    trackingList.append(aim)
-                return [cur[0], trackingList]
+                # meet endPlace
+                return cur[0]
 
-            mycursor.execute(
-                "select * from `distance` where `id1`=%s or `id2`=%s", (cur[1], cur[1]))
+            # add nextID to pq
+            mycursor.execute("select * from `distance` where `id1`=%s or `id2`=%s", (cur[1], cur[1]))
             data = mycursor.fetchall()
             for i in data:
-                remainID = i[0]
+                nextID = i[0]
                 if i[0] == cur[1]:
-                    remainID = i[1]
-                if finished[remainID] or isMin[remainID]:
+                    nextID = i[1]
+                if finished[nextID] or isMin[nextID]:
                     continue
-                mycursor.execute(
-                    "select * from `points` where `id`=%s", (remainID,))
+                    
+                mycursor.execute("select * from `points` where `id`=%s", (remainID,))
+
+                # # check if nextID is a main place or not
+                # mycursor.execute("select * from `points` where `id`=%s", (nextID,))
+                
                 po = mycursor.fetchone()
-                if po[2] == 1 and remainID != id1 and remainID != id2:
+                if po[2] == 1 and nextID != id1 and nextID != id2:
                     continue
-                if kc[remainID][0] > kc[cur[1]][0] + i[2]:
-                    kc[remainID] = (kc[cur[1]][0] + i[2], remainID, cur[1])
-                    pq.put(kc[remainID])
+
+                if kc[nextID][0] > kc[cur[1]][0] + i[2]:
+                    kc[nextID] = (kc[cur[1]][0] + i[2], nextID, cur[1])
+                    pq.put(kc[nextID])
         return -1
     # calculated
     trackingList = []
@@ -121,6 +143,9 @@ def getDistanceBetween2Points(id1, id2):
         trackingList.append(data[3])
         aim = data[3]
     return [ans[0], trackingList]
+    
+    # if answer is already existed
+    # return ans[0]
 
 trackingList = []
 showedPlaceList = []
@@ -140,6 +165,28 @@ for d in data:
     posY.append(d[4])
 
 
+def getDistanceWhenAddPlace(addedId):
+    # change distance & placesByTime
+    global distance, placesByTime
+    for i in placesByTime:
+        if i == addedId:
+            return
+            
+    distanceAns = distance - getDistanceBetween2Points(placesByTime[0], placesByTime[1]) \
+                  + getDistanceBetween2Points(placesByTime[0], addedId) \
+                  + getDistanceBetween2Points(addedId, placesByTime[1])
+    posToAdd = 1
+    for i in range(1, len(placesByTime) - 1):
+        newDistance = distance - getDistanceBetween2Points(placesByTime[i], placesByTime[i + 1]) \
+                  + getDistanceBetween2Points(placesByTime[i], addedId) \
+                  + getDistanceBetween2Points(addedId, placesByTime[i + 1])
+        if newDistance < distanceAns:
+            distanceAns = newDistance
+            posToAdd = i + 1
+
+    distance = distanceAns
+    placesByTime.insert(posToAdd, addedId)
+            
 @views.route('/addplace/<name>', methods=['GET'])
 def add_place(name):
     global idStartPlace, idEndPlace
@@ -195,7 +242,19 @@ def add_place(name):
         pos.append([posX[i], posY[i]])
 
     return json.dumps(pos, cls=DecimalEncoder)
-
+    
+def getTrackingList():
+    global placesByTime
+    trackingList = []
+    for i in range(len(placesByTime) - 1, 0, -1):
+        aim = placesByTime[i]
+        while aim != placesByTime[i - 1]:
+            mycursor.execute("select * from `dijkstra` where id1=%s and id2=%s", (placesByTime[i - 1], aim))
+            data = mycursor.fetchone()
+            trackingList.append(data[3])
+            aim = data[3]
+    return trackingList
+    
 
 @views.route('/', methods=['GET', 'POST'])
 def home():
@@ -233,7 +292,94 @@ def home():
             return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, clicked=False)
 
     return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, clicked=False)
+    
 
+@views.route('/findroad', methods=['GET', 'POST'])
+def findroad():
+    # Building list
+    mycursor.execute("SELECT * FROM toanha")
+    bdListFull = mycursor.fetchall()
+
+    bdListSelect = []
+    ###############
+
+    global idStartPlace, idEndPlace, placesByTime, distance
+    if request.method == 'POST':
+        if request.form['submit_button'] == 'Search':
+            idStartPlace = request.form['startPlace']
+            idEndPlace = request.form['endPlace']
+            if not idStartPlace or not idEndPlace:
+                for x in bdListFull:
+                    bdListSelect += [x + (0,)]
+                return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList,
+                                       clicked=False, bdListSelect=json.dumps(bdListSelect))
+            idStartPlace = int(idStartPlace)
+            idEndPlace = int(idEndPlace)
+            placesByTime.clear()
+            placesByTime.append(idStartPlace)
+            placesByTime.append(idEndPlace)
+
+            distance = getDistanceBetween2Points(idStartPlace, idEndPlace)
+            trackingList = getTrackingList()
+            # trackingList.pop()
+            trackingList.insert(0, idEndPlace)
+
+            mycursor.execute("select Count(*) from `dijkstra`")
+            dbSize = mycursor.fetchone()[0]
+
+            # Building's name
+            bdNames = []
+
+            mycursor.execute("select `name` from `points` where `id`=%s", (idStartPlace,))
+            bdNames.append(mycursor.fetchone()[0])
+
+            mycursor.execute("select `name` from `points` where `id`=%s", (idEndPlace,))
+            bdNames.append(mycursor.fetchone()[0])
+
+            for x in bdListFull:
+                if x[0] in bdNames:
+                    bdListSelect += [x + (1,)]
+                else:
+                    bdListSelect += [x + (0,)]
+            ##################
+
+            return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, dbsize=dbSize,
+                                   idStartPlace=idStartPlace, idEndPlace=idEndPlace, distance=distance,
+                                   trackingList=trackingList, posX=posX, posY=posY, clicked=True,
+                                   addedList=placesByTime,
+                                   bdListSelect=json.dumps(bdListSelect))
+
+        elif request.form['submit_button'] == 'Reset Dijkstra database':
+            resetDijkstraTable()
+            flash('Reset Dijkstra database successfully!')
+
+        elif request.form['submit_button'] == 'Add Place':
+            for x in bdListFull:
+                bdListSelect += [x + (0,)]
+
+            addPlaceId = request.form['addPlace']
+            if not addPlaceId or not idStartPlace or not idEndPlace:
+                return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList,
+                                       distance=distance, clicked=False, addedList=placesByTime, posX=posX, posY=posY,
+                                       bdListSelect=json.dumps(bdListSelect))
+            addPlaceId = int(addPlaceId)
+            getDistanceWhenAddPlace(addPlaceId)
+            trackingList = getTrackingList()
+            trackingList.insert(0, placesByTime[len(placesByTime) - 1])
+            return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, clicked=False,
+                                   addedList=placesByTime, idStartPlace=idStartPlace, idEndPlace=idEndPlace, posX=posX, posY=posY,
+                                   trackingList=trackingList, distance=distance, bdListSelect=json.dumps(bdListSelect))
+
+    for x in bdListFull:
+        bdListSelect += [x + (0,)]
+
+    if request.method == 'GET':
+        bdListSelect = [x + (0,) for x in bdListFull]
+        return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, clicked=False,
+                               bdListSelect=json.dumps(bdListSelect))
+
+    return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, clicked=False,
+                           bdListSelect=json.dumps(bdListSelect))
 
 # @views.route('/', methods=['GET', 'POST'])
 # def oldHome():
