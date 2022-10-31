@@ -1,15 +1,4 @@
-import {geojsonFeature as buildings} from '../static/buildings.js'
-
-// Boundary Canvas:
-
-// var geom = {
-//     "type": "MultiPolygon", "coordinates": [[[[105.7812545, 21.0409001], [105.7817336, 21.0408875], [105.781739, 21.0409629], [105.783365, 21.0409076], [105.7833621, 21.0408215], [105.7833341, 21.0399802], [105.7833084, 21.0392067], [105.7828711, 21.0392179], [105.7828676, 21.0391067], [105.7826902, 21.039111], [105.7826675, 21.0385919], [105.7836409, 21.038555], [105.7836311, 21.0378809], [105.7830562, 21.0378918], [105.7830574, 21.0376439], [105.7828284, 21.0376461], [105.7828282, 21.0375709], [105.7828249, 21.037441], [105.7827066, 21.0374437], [105.7825035, 21.037183], [105.7824181, 21.0371859], [105.7824136, 21.0370728], [105.7824157, 21.0369412], [105.7825348, 21.0369377], [105.7825329, 21.0368812], [105.7829769, 21.0368682], [105.7829738, 21.0367756], [105.7823884, 21.0367927], [105.7822806, 21.0367958], [105.7817635, 21.0368219], [105.781136, 21.0374073], [105.7812545, 21.0409001]]]]
-// };
-// var mb = L.TileLayer.boundaryCanvas('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-//     maxZoom: 19,
-//     boundary: geom,
-//     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-// });
+import {geojsonFeature as buildings} from '../static/buildingData.js'
 
 // Map layer
 
@@ -129,6 +118,8 @@ function calculateCenter(coordinate) {
     return [long, lat];
 }
 
+var lineGroup = L.layerGroup()
+
 // Buildings selecting events 
 for (let i = 0; i < bdListSelect.length; i++) {
     L.geoJSON(buildings, {
@@ -154,6 +145,28 @@ for (let i = 0; i < bdListSelect.length; i++) {
                     bdListSelect[i][2] = 0;
                     layer.closePopup(position);
                 }
+
+                lineGroup.clearLayers()
+
+                $.post( "/postnewpoint", {
+                    javascript_data: feature.properties.name
+                });
+
+                setTimeout(function(){ 
+                    $.get("/getnewpoint", function(data) {
+                        var pos = $.parseJSON(data)
+                        console.log(pos)
+    
+                        // Render roads from pos
+                        for (let i = 0; i < pos.length-1; i++) {
+                            var latlngs = [
+                                [ pos[i][0], pos[i][1] ], [ pos[i+1][0], pos[i+1][1] ]
+                            ];
+                            lineGroup.addLayer(L.polyline(latlngs, {color: 'red'}))
+                        }
+                        lineGroup.addTo(map)
+                    });
+                }, 1000);
             });
 
             // Red mark
@@ -198,8 +211,11 @@ for (let i = 0; i < posx.length-1; i++) {
     var latlngs = [
         [ posx[i], posy[i] ], [ posx[i+1], posy[i+1] ]
     ];
-    L.polyline(latlngs, {color: 'red'}).addTo(map);
+    lineGroup.addLayer(L.polyline(latlngs, {color: 'red'}))
 }
+lineGroup.addTo(map)
+posx = [];
+posy = [];
 
 // Testing
 // L.geoJSON(roads, {
