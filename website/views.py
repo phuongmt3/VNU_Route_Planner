@@ -2,7 +2,7 @@ from queue import PriorityQueue
 
 from flask import Blueprint, render_template, request, flash
 
-from website.vnubuilding import getBuilding
+from website.vnubuilding import getBuildingList
 from .models import mycursor, db
 import json
 
@@ -140,48 +140,61 @@ for d in data:
     posY.append(d[4])
 
 
-@views.route('/getnewpoint')
-def get_new_point():
+@views.route('/addplace/<name>', methods=['GET'])
+def add_place(name):
+    global idStartPlace, idEndPlace
+
+    # Get id from name
+    mycursor.execute("select `id` from `points` where `name` = %s", (name, ))
+    thisId = int(str(mycursor.fetchone()[0]))
+
+    # Add or remove from addedList
+    # Todo: sort AddedList to minimize distance
+    if thisId not in addedList:
+        addedList.append(thisId)
+    else:
+        addedList.remove(thisId)
+
+    print("AddedList: ")
+    print(addedList)
+
+    # Find trackingList
+    # Todo: calculate and print distance
+    trackingList = []
+
+    if len(addedList) == 0:
+        getDistance = getDistanceBetween2Points(idStartPlace, idEndPlace)
+        # distance = getDistance[0]
+        trackingList.append(idEndPlace)
+        trackingList.extend(getDistance[1])
+
+    else:
+        getDistance = getDistanceBetween2Points(addedList[len(addedList)-1], idEndPlace)
+        # distance = getDistance[0]
+        trackingList.append(idEndPlace)
+        trackingList.extend(getDistance[1])
+        trackingList.pop()
+
+        for i in range(len(addedList)-1, 0, -1):
+            getDistance = getDistanceBetween2Points(addedList[i-1], addedList[i])
+            # distance = getDistance[0]
+            trackingList.append(addedList[i])
+            trackingList.extend(getDistance[1])
+            trackingList.pop()
+
+        getDistance = getDistanceBetween2Points(idStartPlace, addedList[0])
+        # distance = getDistance[0]
+        trackingList.append(addedList[0])
+        trackingList.extend(getDistance[1])
+
+    trackingList.reverse()  
+
+    # Find points from trackingList
     pos = []
     for i in trackingList:
         pos.append([posX[i], posY[i]])
+
     return json.dumps(pos, cls=DecimalEncoder)
-
-
-@views.route('/postnewpoint', methods = ['POST'])
-def post_new_point():
-    global idStartPlace, idEndPlace, trackingList
-
-    mycursor.execute("select `id` from `points` where `name` = %s", (request.form['javascript_data'], ))
-    data = mycursor.fetchone()[0]
-
-    addedList.append(data)
-
-    print("AddeddList: ")
-    print(addedList)
-
-    trackingList = []
-
-    getDistance = getDistanceBetween2Points(addedList[len(addedList)-1], idEndPlace)
-    # distance = getDistance[0]
-    trackingList.append(idEndPlace)
-    trackingList.extend(getDistance[1])
-
-    for i in range(len(addedList)-1, 0, -1):
-        getDistance = getDistanceBetween2Points(addedList[i-1], addedList[i])
-        # distance = getDistance[0]
-        trackingList.append(addedList[i])
-        trackingList.extend(getDistance[1])
-
-    getDistance = getDistanceBetween2Points(idStartPlace, addedList[0])
-    # distance = getDistance[0]
-    trackingList.append(addedList[0])
-    trackingList.extend(getDistance[1])
-
-    # Get empty list of building
-    bdListSelect = getBuilding(1, 1)
-
-    return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, clicked=False, bdListSelect=json.dumps(bdListSelect))
 
 
 @views.route('/', methods=['GET', 'POST'])
@@ -189,51 +202,37 @@ def home():
     global idStartPlace, idEndPlace, trackingList
 
     if request.method == 'POST':
+        addedList.clear()
+
         if request.form['submit_button'] == 'Search':
-            idStartPlace = request.form['startPlace']
-            idEndPlace = request.form['endPlace']
+
+            idStartPlace = int(request.form['startPlace'])
+            idEndPlace = int(request.form['endPlace'])
 
             if not idStartPlace or not idEndPlace:
                 return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, clicked=False)
             
-            idStartPlace = int(idStartPlace)
-            idEndPlace = int(idEndPlace)
-
             getDistance = getDistanceBetween2Points(idStartPlace, idEndPlace)
             distance = getDistance[0]
             trackingList = getDistance[1]
             trackingList.insert(0, idEndPlace)
+            trackingList.reverse()  
 
             mycursor.execute("select Count(*) from `dijkstra`")
             dbsize = mycursor.fetchone()[0]
 
-            # Get start and end buildings
-            bdListSelect = getBuilding(idStartPlace, idEndPlace)
+            bdListSelect = getBuildingList(idStartPlace, idEndPlace)
 
             return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, dbsize=dbsize,
                                    idStartPlace=idStartPlace, idEndPlace=idEndPlace, distance=distance,
-                                   trackingList=trackingList, posX=posX, posY=posY, clicked=True, addedList=addedList, bdListSelect=json.dumps(bdListSelect))
+                                   trackingList=trackingList, posX=posX, posY=posY, clicked=True, bdListSelect=json.dumps(bdListSelect))
 
         elif request.form['submit_button'] == 'Reset Dijkstra database':
             resetDijkstraTable()
             flash('Reset Dijkstra database successfully!')
             return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, clicked=False)
 
-        elif request.form['submit_button'] == 'Add Place':
-            addPlaceId = request.form['addPlace']
-            if not addPlaceId or not idStartPlace or not idEndPlace:
-                return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList,
-                                       clicked=False)
-            addPlaceId = int(addPlaceId)
-            addedList.append(addPlaceId)
-            # function calculate way
-            return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, clicked=False,
-                                   addedList=addedList, idStartPlace=idStartPlace, idEndPlace=idEndPlace)
-
-    # Get empty list of building
-    bdListSelect = getBuilding(1, 1)
-
-    return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, clicked=False, bdListSelect=json.dumps(bdListSelect))
+    return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, clicked=False)
 
 
 # @views.route('/', methods=['GET', 'POST'])

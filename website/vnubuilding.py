@@ -1,13 +1,11 @@
 from .models import mycursor
 
 
-def getBuilding(idStartPlace, idEndPlace):
-    # Building list
+def getBuildingList(idStartPlace, idEndPlace):
     mycursor.execute("SELECT * FROM toanha")
     bdListFull = mycursor.fetchall()
 
     bdListSelect = []
-    # Building's name
     bdNames = []
 
     mycursor.execute(

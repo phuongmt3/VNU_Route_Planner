@@ -1,4 +1,4 @@
-import {geojsonFeature as buildings} from '../static/buildingData.js'
+import { geojsonFeature as buildings } from '../static/geoData/buildingData.js'
 
 // Map layer
 
@@ -45,27 +45,27 @@ var baseMaps = {
 
 var Icon_Inventory_Food = L.icon({
     iconUrl: 'static/icon/Icon_Food.png',
-    iconSize:     [30, 30],
-    iconAnchor:   [15, 15], 
-    popupAnchor:  [0, -15]
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+    popupAnchor: [0, -15]
 });
 
 var Icon_Book = L.icon({
     iconUrl: 'static/icon/Icon_Store.png',
-    iconSize:     [30, 30], 
-    iconAnchor:   [15, 15], 
-    popupAnchor:  [0, -15] 
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+    popupAnchor: [0, -15]
 });
 
-var food1 = L.marker([21.038229, 105.782236], {icon: Icon_Inventory_Food}).bindPopup("I'm a food marker 1!");
-var food2 = L.marker([21.038477, 105.783226], {icon: Icon_Inventory_Food}).bindPopup("I'm a food marker 2!");
-var food3 = L.marker([21.037934, 105.782222], {icon: Icon_Inventory_Food}).bindPopup("I'm a food marker 3!");
-var food4 = L.marker([21.040682, 105.783016], {icon: Icon_Inventory_Food}).bindPopup("I'm a food marker 4!");
-var food5 = L.marker([21.038478, 105.782426], {icon: Icon_Inventory_Food}).bindPopup("I'm a food marker 5!");
-var food6 = L.marker([21.04057, 105.782233], {icon: Icon_Inventory_Food}).bindPopup("I'm a food marker 6!");
+var food1 = L.marker([21.038229, 105.782236], { icon: Icon_Inventory_Food }).bindPopup("I'm a food marker 1!");
+var food2 = L.marker([21.038477, 105.783226], { icon: Icon_Inventory_Food }).bindPopup("I'm a food marker 2!");
+var food3 = L.marker([21.037934, 105.782222], { icon: Icon_Inventory_Food }).bindPopup("I'm a food marker 3!");
+var food4 = L.marker([21.040682, 105.783016], { icon: Icon_Inventory_Food }).bindPopup("I'm a food marker 4!");
+var food5 = L.marker([21.038478, 105.782426], { icon: Icon_Inventory_Food }).bindPopup("I'm a food marker 5!");
+var food6 = L.marker([21.04057, 105.782233], { icon: Icon_Inventory_Food }).bindPopup("I'm a food marker 6!");
 var foodMarkers = L.layerGroup([food1, food2, food3, food4, food5, food6]);
 
-var bookStore = L.marker([21.036843, 105.782241], {icon: Icon_Book}).bindPopup("I'm a book store!");
+var bookStore = L.marker([21.036843, 105.782241], { icon: Icon_Book }).bindPopup("I'm a book store!");
 var bookStores = L.layerGroup([bookStore]);
 
 var overlayMaps = {
@@ -90,6 +90,8 @@ function onMapClick(e) {
 map.on('click', onMapClick);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Render 
 
 function mark(layer) {
     layer.setStyle({
@@ -118,63 +120,66 @@ function calculateCenter(coordinate) {
     return [long, lat];
 }
 
-var lineGroup = L.layerGroup()
+// Render roads from posx, posy
+var lineGroup = L.layerGroup([], { snakingPause: 0 })
 
-// Buildings selecting events 
+for (let i = 0; i < posx.length - 1; i++) {
+    var latlngs = [
+        [posx[i], posy[i]], [posx[i + 1], posy[i + 1]]
+    ];
+    lineGroup.addLayer(L.polyline(latlngs, { color: 'red' }))
+}
+lineGroup.addTo(map).snakeIn();
+
+// Render buildings and building selecting events 
 for (let i = 0; i < bdListSelect.length; i++) {
     L.geoJSON(buildings, {
-        filter: function(feature) {
+        filter: function (feature) {
             return feature.properties.name.toLowerCase() == bdListSelect[i][0].toLowerCase();
-        }, 
-        onEachFeature: function(feature, layer) {
+        },
+        onEachFeature: function (feature, layer) {
             var position = calculateCenter(feature.geometry.coordinates[0][0]);
 
-            // Building's name
-            L.tooltip(position, {content: feature.properties.name, permanent: true, direction: 'center', className: "my-labels"})
-                .addTo(map);
-
             // Building's info
+            L.tooltip(position, { content: feature.properties.name, permanent: true, direction: 'center', className: "my-labels" })
+                .addTo(map);
             layer.bindPopup(bdListSelect[i][1]);
-            layer.on('click', function(e) {
+
+            layer.on('click', function (e) {
                 if (bdListSelect[i][2] == 0) {
                     map.setView(e.latlng);
-
                     bdListSelect[i][2] = 1;
-                    layer.openPopup(position);
                 } else {
                     bdListSelect[i][2] = 0;
-                    layer.closePopup(position);
                 }
 
                 lineGroup.clearLayers()
 
-                $.post( "/postnewpoint", {
-                    javascript_data: feature.properties.name
-                });
-
-                setTimeout(function(){ 
-                    $.get("/getnewpoint", function(data) {
-                        var pos = $.parseJSON(data)
-                        console.log(pos)
-    
+                // Send and receive data backend
+                fetch(`/addplace/${feature.properties.name}`)
+                    .then(function (response) {
+                        return response.json();
+                    }).then(function (pos) {
                         // Render roads from pos
-                        for (let i = 0; i < pos.length-1; i++) {
+                        for (let i = 0; i < pos.length - 1; i++) {
                             var latlngs = [
-                                [ pos[i][0], pos[i][1] ], [ pos[i+1][0], pos[i+1][1] ]
+                                [pos[i][0], pos[i][1]], [pos[i + 1][0], pos[i + 1][1]]
                             ];
-                            lineGroup.addLayer(L.polyline(latlngs, {color: 'red'}))
+                            var line = L.polyline(latlngs, { color: 'red' });
+                            lineGroup.addLayer(line);
                         }
-                        lineGroup.addTo(map)
+                        lineGroup.addTo(map).snakeIn();
                     });
-                }, 1000);
             });
 
             // Red mark
             layer.on('mouseover', function (e) {
                 if (!bdListSelect[i][2]) mark(layer);
+                layer.openPopup(position);
             });
             layer.on('mouseout', function (e) {
                 if (!bdListSelect[i][2]) unMark(layer);
+                layer.closePopup(position);
             });
             if (bdListSelect[i][2]) {
                 mark(layer);
@@ -190,65 +195,30 @@ for (let i = 0; i < bdListSelect.length; i++) {
 }
 
 // Hide building's name
-map.on('baselayerchange', function(e) {
+map.on('baselayerchange', function (e) {
     if (e.name == "OpenStreetMap") {
-        $(".leaflet-tooltip").css("display","none")
-    } else { 
-        $(".leaflet-tooltip").css("display","block")
+        $(".leaflet-tooltip").css("display", "none")
+    } else {
+        $(".leaflet-tooltip").css("display", "block")
+
+        map.on('zoomend', function () {
+            if (map.getZoom() < 16) {
+                $(".leaflet-tooltip").css("display", "none")
+            } else {
+                $(".leaflet-tooltip").css("display", "block")
+            }
+        })
     }
 });
 
-map.on('zoomend', function() {
-  if (map.getZoom() < 16) {
-      $(".leaflet-tooltip").css("display","none")
-  } else { 
-      $(".leaflet-tooltip").css("display","block")
-  }
-})
-
-// Render roads from posx, posy
-for (let i = 0; i < posx.length-1; i++) {
-    var latlngs = [
-        [ posx[i], posy[i] ], [ posx[i+1], posy[i+1] ]
-    ];
-    lineGroup.addLayer(L.polyline(latlngs, {color: 'red'}))
-}
-lineGroup.addTo(map)
-posx = [];
-posy = [];
-
 // Testing
-// L.geoJSON(roads, {
-//     style: {
-//         "color": "#FF0000",
-//         "weight": 2,
-//         "opacity": 1,
-//         "fillOpacity": 0.25
-//     }
-// }).addTo(map);
 
-// buildings.features.forEach(feature => {
-//     feature.geometry.coordinates[0][0].forEach(coordinate => {
-//         var marker = L.marker(L.latLng(coordinate[1], coordinate[0])).addTo(map);
-//         marker.bindPopup("[" + coordinate[1] + ", " + coordinate[0] + "]").openPopup();
-
-//         console.log(coordinate);
-//     });
-// });
-
-// roads.features.forEach(feature => {
+// roadData.features.forEach(feature => {
 //     feature.geometry.coordinates.forEach(coordinate => {
 //         var marker = L.marker(L.latLng(coordinate[1], coordinate[0])).addTo(map);
 //         marker.bindPopup("[" + coordinate[1] + ", " + coordinate[0] + "]").openPopup();
 //     });
 // });
 
-// var latlngs = [
-//     [ 21.0376489, 105.7837679 ], [ 21.0378964, 105.7837739 ], [ 21.0382533, 105.7837838 ]
-// ];
+$('.leaflet-container').css('cursor', 'crosshair');
 
-// var polyline = L.polyline(latlngs, {color: 'blue'}).addTo(map);
-
-$('.leaflet-container').css('cursor','crosshair');
-
-    
