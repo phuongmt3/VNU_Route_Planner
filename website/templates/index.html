@@ -81,14 +81,13 @@
 
     <p>Database size: {{ dbsize }}</p>
     <br>
-    <p>Route is from {{placeNames[idStartPlace]}} to {{placeNames[idEndPlace]}}</p>
     <p>Included places:</p>
     <p>
         {% for i in range (0, addedList|length) %}
             {% if i > 0 %}
                  ,
             {% endif %}
-            {{addedList[i]}}
+            {{ placeNames[addedList[i]] }}({{addedList[i]}})
         {% endfor %}
     </p>
     <p>Distance is {{distance}}</p>
