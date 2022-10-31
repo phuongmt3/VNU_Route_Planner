@@ -22,6 +22,8 @@
     <br>
     <h2>{{ hello }}</h2>
     <br>
+    <h2>{{ timestamp }}</h2>
+    <br>
     <table border="1">
         <tr>
             <th>STT</th>
@@ -80,15 +82,15 @@
             <th>Thứ 6</th>
             <th>Thứ 7</th>
         </tr>
-        {% for i in range(arr | length): %}
+        {% for i in range(arr[curWeek] | length): %}
         <tr>
             <td>{{ i + 1 }}</td>
-            <td>{{ arr[i][0] }}</td>
-            <td>{{ arr[i][1] }}</td>
-            <td>{{ arr[i][2] }}</td>
-            <td>{{ arr[i][3] }}</td>
-            <td>{{ arr[i][4] }}</td>
-            <td>{{ arr[i][5] }}</td>
+            <td>{{ arr[curWeek][i][0] }}</td>
+            <td>{{ arr[curWeek][i][1] }}</td>
+            <td>{{ arr[curWeek][i][2] }}</td>
+            <td>{{ arr[curWeek][i][3] }}</td>
+            <td>{{ arr[curWeek][i][4] }}</td>
+            <td>{{ arr[curWeek][i][5] }}</td>
         </tr>
         {% endfor %}
     </table>

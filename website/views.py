@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request
+from datetime import datetime
 from .models import mycursor
 
 views = Blueprint('views', __name__)
@@ -35,6 +36,9 @@ def home():
         mycursor.execute("SELECT * FROM dangky WHERE MSV = (%s)", (msv,))
         data = mycursor.fetchall()
         subjectList = []
+        d1 = datetime.strptime("2022/08/26", "%Y/%m/%d")
+        d2 = datetime.now()
+        curWeek = int((d2 - d1).days / 7)
         for row in data:
             HP = row[1]
             LHP = row[2]
@@ -56,18 +60,31 @@ def home():
                     lecturers += li[1]
                     lecturers += "\n"
                 subjectList.append(ClassInfor(HP + ' ' + LHP, LMHName, line[2], TC, note, line[3], line[4],
-                                              line[5], line[6] + ' ' + line[7], line[8], lecturers))
-        rows, cols = (12, 6)
-        arr = [['' for j in range(cols)] for i in range(rows)]
+                                              line[5], line[6] + '-' + line[7], line[8], lecturers))
+        totWeeks, rows, cols = (15, 12, 6)
+        arr = [[['' for j in range(cols)] for i in range(rows)] for k in range(totWeeks)]
         for line in subjectList:
             day = line.day - 2
             start, end = (int(s) for s in line.time.split('-'))
             subject = line.LMH
             subjectName = line.LMHName
-            for i in range(start - 1, end):
-                arr[i][day] = subject + " - " + subjectName
-        return render_template('index.html', hello="Hello " + name, msv=msv, name=name,
-                               birthdate=birthdate, class_name=class_name,gender=gender,
-                               birthplace=birthplace, subjectList=subjectList, arr=arr)
+            place = line.place
+            if '-' in line.week:
+                weekStart, weekEnd = (int(s) for s in line.week.split('-'))
+                for week in range(weekStart - 1, weekEnd):
+                    for i in range(start - 1, end):
+                        arr[week][i][day] = subject + "\n" + subjectName + "\n" + place
+            elif ',' in line.week:
+                studyWeeks = (int(s) for s in line.week.split(','))
+                for week in studyWeeks:
+                    for i in range(start - 1, end):
+                        arr[week][i][day] = subject + "\n" + subjectName + "\n" + place
+            else:
+                for week in range(15):
+                    for i in range(start - 1, end):
+                        arr[week][i][day] = subject + "\n" + subjectName + "\n" + place
+        return render_template('index.html', hello="Hello " + name, timestamp="Tuần hiện tại: " + str(curWeek + 1),
+                               msv=msv, name=name, birthdate=birthdate, class_name=class_name,gender=gender,
+                               birthplace=birthplace, subjectList=subjectList, arr=arr, curWeek=curWeek)
 
     return render_template('index.html')
