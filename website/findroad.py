@@ -3,12 +3,15 @@ from .models import mycursor, db
 
 
 def initGlobal():
-    global placesByTime, distance
+    global placesByTime, distance, posX, posY
     placesByTime = []
     distance = 0
+    posX = [0]
+    posY = [0]
 
 
-def initRoad(showedPlaceList, placeNames, posX, posY):
+def initRoad(showedPlaceList, placeNames):
+    global posX, posY
     mycursor.execute("select * from `points`")
     data = mycursor.fetchall()
     for d in data:

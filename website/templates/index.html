@@ -24,13 +24,7 @@
     <script src="../static/plugins/L.Polyline.SnakeAnim.js"></script>
     <script>
         var bdListSelect = {{ bdListSelect| safe }};
-
-        var posx = [];
-        var posy = [];
-        {% for i in range (0, trackingList|length):%}
-            posx.push('{{ posX[trackingList[i]] }}');
-            posy.push('{{ posY[trackingList[i]] }}');
-        {% endfor %}
+        var posList = {{ posList| safe }};
     </script>
 </head>
 <body>
@@ -47,6 +41,7 @@
             <option value={{i}}>{{placeNames[i]}}</option>
             {% endfor %}
         </select>
+
         <label>To </label>
         <select name="endPlace">
             <option value=""></option>
@@ -64,29 +59,7 @@
 
     <div id="map"></div>
     <script type="module" src="../static/index.js"></script>
-    <br><br>
 
-    <script>
-        var clicked = '{{ clicked }}';
-        {% if posX %}
-            var posX = {{ posX|tojson }};
-            var posY = {{ posY|tojson }};
-        {% endif %}
-    </script>
-
-    <p>Database size: {{ dbSize }}</p>
-    <br>
-    <p>Route is from {{placeNames[idStartPlace]}} to {{placeNames[idEndPlace]}}</p>
-
-    <p>Distance is {{distance}}</p>
-    <p>Tracking order: </p>
-    <p>{% for i in range (0, trackingList|length, 1):%}
-            {% if i < trackingList|length %}
-                 =>
-            {% endif %}
-            {{trackingList[i]}}
-        {% endfor %}
-    </p>
-    <br>
+    <footer class="fixed-bottom bg-light p-2">Distance: <u id="distance">{{distance}}</u> </footer>
 </body>
 </html>

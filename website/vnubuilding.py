@@ -18,8 +18,8 @@ def getBuildingList(idStartPlace, idEndPlace):
 
     for x in bdListFull:
         if x[0] in bdNames:
-            bdListSelect += [x + (1,)]
+            bdListSelect += [x + (True,)]
         else:
-            bdListSelect += [x + (0,)]
+            bdListSelect += [x + (False,)]
 
     return bdListSelect

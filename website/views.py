@@ -1,3 +1,4 @@
+from dis import dis
 from flask import Blueprint, render_template, request, flash
 
 from . import findroad
@@ -17,89 +18,67 @@ class DecimalEncoder(json.JSONEncoder):
 
 views = Blueprint('views', __name__)
 
-
 @views.route('/post_place/<name>', methods=['POST'])
 def postPlace(name):
-    posX = request.json['posX']
-    posY = request.json['posY']
-
     # Get id from name
     mycursor.execute("select `id` from `points` where `name` = %s", (name,))
     thisPlaceId = int(str(mycursor.fetchone()[0]))
 
-    if not thisPlaceId or len(findroad.placesByTime) < 2:
-        return None
+    if thisPlaceId is findroad.placesByTime[0] or thisPlaceId is findroad.placesByTime[len(findroad.placesByTime) - 1]:
+        return json.dumps([])
 
     # Add or remove id from placesByTime, update distance
     if thisPlaceId not in findroad.placesByTime:
         addPlace(thisPlaceId)
-    elif thisPlaceId not in (findroad.placesByTime[0], findroad.placesByTime[len(findroad.placesByTime) - 1]):
+    else:
         removePlace(thisPlaceId)
 
-    # Update trackingList
+    # Find posList
     trackingList = [findroad.placesByTime[len(findroad.placesByTime) - 1]]
     trackingList.extend(getTrackingList())
     trackingList.reverse()
+    posList = [[findroad.posX[i], findroad.posY[i]] for i in trackingList]
 
-    # Find point list from trackingList
-    pos = []
-    for i in trackingList:
-        pos.append([posX[i], posY[i]])
+    mycursor.execute("select Count(*) from `dijkstra`")
+    dbSize = mycursor.fetchone()[0]
 
-    print("placesByTime: ")
-    print(findroad.placesByTime)
-
-    print("trackingList")
-    print(trackingList)
-
-    print("distance")
-    print(findroad.distance)
-
-    return json.dumps(pos, cls=DecimalEncoder)
+    return json.dumps([posList, findroad.distance, dbSize], cls=DecimalEncoder)
 
 
 @views.route('/', methods=['GET', 'POST'])
 def home():
-    showedPlaceList = []
-    placeNames = [""]
-    posX = [0]
-    posY = [0]
-    initRoad(showedPlaceList, placeNames, posX, posY)
     initGlobal()
 
+    showedPlaceList = []
+    placeNames = [""]
+    initRoad(showedPlaceList, placeNames)
+
+    idStartPlace = idEndPlace = 1
+    posList = []
+
     if request.method == 'POST':
-        if request.form['submit_button'] == 'Search':
+        if request.form['submit_button'] == 'Search' and request.form['startPlace'] and request.form['endPlace']:
             idStartPlace = int(request.form['startPlace'])
             idEndPlace = int(request.form['endPlace'])
-
-            if not idStartPlace or not idEndPlace:
-                return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList,
-                                       clicked=False)
 
             findroad.placesByTime = [idStartPlace, idEndPlace]
             findroad.distance = getDistanceBetween2Points(idStartPlace, idEndPlace)
 
+            # Find posList
             trackingList = [idEndPlace]
             trackingList.extend(getTrackingList())
             trackingList.reverse()
-
-            mycursor.execute("select Count(*) from `dijkstra`")
-            dbSize = mycursor.fetchone()[0]
-
-            bdListSelect = getBuildingList(idStartPlace, idEndPlace)
-
-            return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, dbSize=dbSize,
-                                   idStartPlace=idStartPlace, idEndPlace=idEndPlace, distance=findroad.distance,
-                                   trackingList=trackingList, posX=posX, posY=posY, clicked=True,
-                                   bdListSelect=json.dumps(bdListSelect))
+            posList = [[findroad.posX[i], findroad.posY[i]] for i in trackingList]
 
         elif request.form['submit_button'] == 'Reset Dijkstra database':
             resetDijkstraTable()
             flash('Reset Dijkstra database successfully!')
+    
+    bdListSelect = getBuildingList(idStartPlace, idEndPlace)
 
-    bdListSelect = getBuildingList(1, 1)
-    return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, clicked=False,
-                           bdListSelect=json.dumps(bdListSelect))
+    return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, distance=findroad.distance,
+                            posList=json.dumps(posList, cls=DecimalEncoder), bdListSelect=json.dumps(bdListSelect))
+
 
 # @views.route('/', methods=['GET', 'POST'])
 # def oldHome():
