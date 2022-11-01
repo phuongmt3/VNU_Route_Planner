@@ -19,7 +19,6 @@ var map = L.map('map', {
     zoom: 17,
     zoomSnap: 0.25,
     wheelPxPerZoomLevel: 120,
-    maxBounds: L.latLngBounds([21.04242, 105.774801], [21.03538, 105.789896]),
     layers: [mb]
 });
 
@@ -77,42 +76,62 @@ for (let i = 0; i < bdListSelect.length; i++) {
             // Building's info
             L.tooltip(centerPosition, { content: feature.properties.name, permanent: true, direction: 'center', className: "my-labels" })
                 .addTo(map);
-            layer.bindPopup(bdListSelect[i][1]);
 
+            var smallPopup = L.popup()
+                .setLatLng(centerPosition)
+                .setContent(bdListSelect[i][1]);
+                
+            // Full info and visit method
+            layer.bindPopup(L.popup({autoClose: false})
+                .setLatLng(centerPosition)
+                .setContent(`
+                    <div class="modal-dialog" role="document" >
+                        <div class="modal-content overflow-auto" style="height: 200px">
+                            <div class="modal-header">
+                                <h5 class="modal-title">` + bdListSelect[i][1] + `</h5>
+                                <button type="button" id="` + i + `" class="postPlace btn btn-outline-success">Visit</button>
+                            </div>
+                            <div class="modal-body">
+                                <p>` + `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.` + `</p>
+                                <img src="../static/images/test.jpg" alt="building image" class="img-fluid">
+                            </div>
+                            <div class="modal-footer">
+                            </div>
+                        </div>
+                    </div>
+                    `))
+
+            layer.getPopup().on('remove', function() {
+                if (bdListSelect[i][2]) {
+                    mark(layer);
+                } else {
+                    unMark(layer);
+                }
+            });
+            
             // When hovering a building
             layer.on('mouseover', function () {
                 if (!bdListSelect[i][2]) mark(layer);
-                layer.openPopup(centerPosition);
+                smallPopup.openOn(map);
             });
             layer.on('mouseout', function () {
                 if (!bdListSelect[i][2]) unMark(layer);
-                layer.closePopup(centerPosition);
+                smallPopup.close();
             });
 
             // When click on a building
             layer.on('click', function () {
-                bdListSelect[i][2] = !bdListSelect[i][2];
+                // Displace unvisit if building's visiting
+                if (bdListSelect[i][2]) {
+                    $(document).ready(function(){
+                        $(".postPlace").replaceWith(`<button type="button" id="` + i + `" class="postPlace btn btn-outline-danger">Unvisit</button>`);
+                    })
+                }
 
-                // Add place and update path, distance
-                fetch(`/post_place/${feature.properties.name}`, {
-                    method: "POST",
-                    headers: { 'Content-Type': 'application/json' },
-                })
-                    .then(function (response) {
-                        return response.json();
-                    }).then(function (response) {
-                        // Select default buildings
-                        if (response.length == 0) {
-                            bdListSelect[i][2] = !bdListSelect[i][2];
-                            return 0;
-                        }
-
-                        renderRoad(response[0]);
-                        document.getElementById("distance").textContent = response[1];
-                        console.log("Database' size = " + response[2]);
-                    });
+                layer.openPopup();
             });
 
+            // Default
             if (bdListSelect[i][2]) {
                 mark(layer);
             } else {
@@ -128,6 +147,31 @@ for (let i = 0; i < bdListSelect.length; i++) {
         }
     }).addTo(map);
 }
+
+// Add place and update path, distance
+$(document).on('click','.postPlace',function() {
+    let bdIndex = this.id
+
+    fetch(`/post_place/${bdListSelect[bdIndex][0]}`, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+    })
+        .then(function (response) {
+            return response.json();
+        }).then(function (response) {
+            // Selecting default buildings
+            if (response.length == 0) {
+                return 0;
+            }
+
+            bdListSelect[bdIndex][2] = !bdListSelect[bdIndex][2];
+            map.closePopup();
+
+            renderRoad(response[0]);
+            document.getElementById("distance").textContent = response[1];
+            console.log("Database' size = " + response[2]);
+        });
+});
 
 // Hide building's name
 map.on('baselayerchange', function (e) {
