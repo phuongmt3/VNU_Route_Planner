@@ -24,73 +24,18 @@
     <br>
     <h2>{{ timestamp }}</h2>
     <br>
-    <table border="1">
-        <tr>
-            <th>STT</th>
-            <th>Mã SV</th>
-            <th>Họ và tên</th>
-            <th>Ngày sinh</th>
-            <th>Lớp khoá học</th>
-            <th>Giới tính</th>
-            <th>Nơi sinh</th>
-            <th>Mã LMH</th>
-            <th>Tên môn học</th>
-            <th>Số TC</th>
-            <th>Ghi chú</th>
-            <th>Nhóm</th>
-            <th>Tuần</th>
-            <th>Thứ</th>
-            <th>Tiết</th>
-            <th>Giảng đường</th>
-            <th>Số SV</th>
-            <th>Giảng viên</th>
-        </tr>
-        {% for i in range(subjectList |length): %}
-        <tr>
-            <td>{{ i + 1 }}</td>
-            <td>{{ msv }}</td>
-            <td>{{ name }}</td>
-            <td>{{ birthdate }}</td>
-            <td>{{ class_name }}</td>
-            <td>{{ gender }}</td>
-            <td>{{ birthplace }}</td>
-            <td>{{ subjectList[i].LMH }}</td>
-            <td>{{ subjectList[i].LMHName }}</td>
-            <td>{{ subjectList[i].TC }}</td>
-            <td>{{ subjectList[i].note }}</td>
-            <td>{{ subjectList[i].group }}</td>
-            <td>{{ subjectList[i].week }}</td>
-            <td>{{ subjectList[i].day }}</td>
-            <td>{{ subjectList[i].time }}</td>
-            <td>{{ subjectList[i].place }}</td>
-            <td>{{ subjectList[i].svCnt }}</td>
-            <td>{{ subjectList[i].lecturer }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    <br><br>
     <table>
         <tr>
-            <th colspan="7">Thời khóa biểu</th>
+            <th colspan="2">Thời khóa biểu</th>
         </tr>
         <tr>
             <th>Tiết</th>
-            <th>Thứ 2</th>
-            <th>Thứ 3</th>
-            <th>Thứ 4</th>
-            <th>Thứ 5</th>
-            <th>Thứ 6</th>
-            <th>Thứ 7</th>
+            <th>Môn học</th>
         </tr>
-        {% for i in range(arr[curWeek] | length): %}
+        {% for i in range(12) %}
         <tr>
             <td>{{ i + 1 }}</td>
-            <td>{{ arr[curWeek][i][0] }}</td>
-            <td>{{ arr[curWeek][i][1] }}</td>
-            <td>{{ arr[curWeek][i][2] }}</td>
-            <td>{{ arr[curWeek][i][3] }}</td>
-            <td>{{ arr[curWeek][i][4] }}</td>
-            <td>{{ arr[curWeek][i][5] }}</td>
+            <td>{{ arr[curWeek][i][curDay] }}</td>
         </tr>
         {% endfor %}
     </table>
