@@ -68,8 +68,10 @@
 
     <script>
         var clicked = '{{ clicked }}';
-        var posX = {{ posX|tojson }};
-        var posY = {{ posY|tojson }};
+        {% if posX %}
+            var posX = {{ posX|tojson }};
+            var posY = {{ posY|tojson }};
+        {% endif %}
     </script>
 
     <p>Database size: {{ dbSize }}</p>
