@@ -27,7 +27,7 @@
 
         var posx = [];
         var posy = [];
-        {% for i in range (0, trackingList|length, 1):%}
+        {% for i in range (0, trackingList|length):%}
             posx.push('{{ posX[trackingList[i]] }}');
             posy.push('{{ posY[trackingList[i]] }}');
         {% endfor %}
@@ -68,6 +68,8 @@
 
     <script>
         var clicked = '{{ clicked }}';
+        var posX = {{ posX|tojson }};
+        var posY = {{ posY|tojson }};
     </script>
 
     <p>Database size: {{ dbSize }}</p>
