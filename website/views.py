@@ -47,7 +47,7 @@ def home():
             LHP = row[2]
             group = row[3]
             note = row[4]
-            mycursor.execute("SELECT * FROM monhoc WHERE Mã_HP = (%s)", (HP))
+            mycursor.execute("SELECT * FROM monhoc WHERE Mã_HP = (%s)", (HP, ))
             data2 = mycursor.fetchone()
             LMHName = data2[1]
             TC = data2[2]
@@ -88,4 +88,4 @@ def home():
                                msv=msv, name=name, birthdate=birthdate, class_name=class_name, gender=gender,
                                birthplace=birthplace, subjectList=subjectList, arr=arr, curWeek=curWeek, curDay=curDay)
 
-    return render_template('index.html', arr=arr)
+    return render_template('index.html', arr=arr, curDay=1, curWeek=1)
