@@ -1,4 +1,3 @@
-from dis import dis
 from flask import Blueprint, render_template, request, flash
 
 from . import findroad
@@ -6,17 +5,10 @@ from .findroad import *
 from .vnubuilding import getBuildingList
 from .models import mycursor
 import json
-import decimal
-
-
-class DecimalEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, decimal.Decimal):
-            return str(o)
-        return super(DecimalEncoder, self).default(o)
 
 
 views = Blueprint('views', __name__)
+
 
 @views.route('/post_place/<name>', methods=['POST'])
 def postPlace(name):
@@ -55,6 +47,8 @@ def home():
 
     idStartPlace = idEndPlace = 1
     posList = []
+    newpos = []
+    phu = [[], []]
 
     if request.method == 'POST':
         if request.form['submit_button'] == 'Search' and request.form['startPlace'] and request.form['endPlace']:
@@ -73,12 +67,16 @@ def home():
         elif request.form['submit_button'] == 'Reset Dijkstra database':
             resetDijkstraTable()
             flash('Reset Dijkstra database successfully!')
-    
+
+        elif request.form['submit_button'] == 'Add Location' and request.form['pos1'] and request.form['pos2']:
+            newpos = [float(request.form['pos1']), float(request.form['pos2'])]
+            phu = nearestRoad(newpos)
+
     bdListSelect = getBuildingList(idStartPlace, idEndPlace)
 
-    return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, distance=findroad.distance,
-                            posList=json.dumps(posList, cls=DecimalEncoder), bdListSelect=json.dumps(bdListSelect))
-
+    return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList,
+                           distance=findroad.distance, newpos=newpos, road=phu[0], roadVuong=phu[1],
+                           posList=json.dumps(posList, cls=DecimalEncoder), bdListSelect=json.dumps(bdListSelect))
 
 # @views.route('/', methods=['GET', 'POST'])
 # def oldHome():

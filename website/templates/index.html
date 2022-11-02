@@ -58,11 +58,26 @@
         <input type="submit" name="submit_button" value="Reset Dijkstra database">
         <br><br>
 
+        <label>Added location coordinates: </label>
+        <input type="number" name="pos1" min="21.036483" max="21.0419" step="0.000001">
+        <input type="number" name="pos2" min="105.780971" max="105.786121" step="0.000001">
+        <input type="submit" name="submit_button" value="Add Location">
+        <br><br>
+
     </form>
 
     <div id="map"></div>
     <script type="module" src="../static/index.js"></script>
 
     <footer class="fixed-bottom bg-light p-2">Distance: <u id="distance">{{distance}}</u> </footer>
+
+    <script type="text/javascript">
+        var newpos = {{ newpos| tojson }};
+        const dif = 0.000001;
+        var latlngs = [newpos, [newpos[0], newpos[1] + dif]];
+        var line = L.polyline(latlngs, { color: 'red' });
+        var road = L.polyline({{ road| tojson }}, { color: 'red' });
+        var roadVuong = L.polyline({{ roadVuong| tojson }}, { color: 'red' });
+    </script>
 </body>
 </html>

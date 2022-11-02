@@ -1,13 +1,24 @@
+import math
 from queue import PriorityQueue
+import heapq
 from .models import mycursor, db
+import json
+import decimal
+
+
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, decimal.Decimal):
+            return float(o)
+        return super(DecimalEncoder, self).default(o)
 
 
 def initGlobal():
     global placesByTime, distance, posX, posY
     placesByTime = []
     distance = 0
-    posX = [0]
-    posY = [0]
+    posX = [0.0]
+    posY = [0.0]
 
 
 def initRoad(showedPlaceList, placeNames):
@@ -18,8 +29,8 @@ def initRoad(showedPlaceList, placeNames):
         if d[2] > 0:
             showedPlaceList.append(d[0])
         placeNames.append(d[1])
-        posX.append(d[3])
-        posY.append(d[4])
+        posX.append(float(json.dumps(d[3], cls=DecimalEncoder)))
+        posY.append(float(json.dumps(d[4], cls=DecimalEncoder)))
 
 
 def resetDijkstraTable():
@@ -165,3 +176,64 @@ def removePlace(removeId):
                - getDistanceBetween2Points(removeId, placesByTime[index + 1])
 
     placesByTime.remove(removeId)
+
+
+# Find route nearest point
+def nearestRoad(newpos):
+    disToPoint = []
+    mycursor.execute("SELECT `id` FROM `points`")
+    points = mycursor.fetchall()
+    for p in points:
+        kc = (newpos[0] - posX[p[0]]) * (newpos[0] - posX[p[0]]) + (newpos[1] - posY[p[0]]) * (newpos[1] - posY[p[0]])
+        heapq.heappush(disToPoint, (kc, p[0]))
+
+    neareastPoints = []
+    roadlimit = 5
+    minDis = 100000
+    road = []
+    roadVuong = []
+    while len(disToPoint):
+        t = heapq.heappop(disToPoint)
+        for p in neareastPoints:
+            if roadlimit == 0:
+                return road, roadVuong
+
+            mycursor.execute("SELECT * FROM `distance` WHERE `id1`=%s AND `id2`=%s", (p[1], t[1]))
+            existRoad1 = mycursor.fetchone()
+            mycursor.execute("SELECT * FROM `distance` WHERE `id1`=%s AND `id2`=%s", (t[1], p[1]))
+            existRoad2 = mycursor.fetchone()
+
+            if existRoad1 or existRoad2:
+                roadlimit -= 1
+                pa = [posX[p[1]], posY[p[1]]]
+                pb = [posX[t[1]], posY[t[1]]]
+                curdis = distancePoint_Road(pa, pb, newpos)
+                shadowP = shadowPoint(pa, pb, newpos)
+                if curdis < minDis and between2Points(pa, pb, shadowP):
+                    minDis = curdis
+                    road = [pa, pb]
+                    roadVuong = [newpos, shadowP]
+                continue
+
+        neareastPoints.append(t)
+
+
+def distancePoint_Road(pa, pb, pc):
+    a = pa[1] - pb[1]
+    b = pb[0] - pa[0]
+    c = pa[0] * pb[1] - pb[0] * pa[1]
+    return math.fabs(a * pc[0] + b * pc[1] + c) / math.sqrt(a * a + b * b)
+
+
+def shadowPoint(pa, pb, pc):
+    t = ((pa[1] - pc[1]) * (pa[1] - pb[1]) - (pa[0] - pc[0]) * (pb[0] - pa[0])) \
+        / ((pb[0] - pa[0]) * (pb[0] - pa[0]) + (pb[1] - pa[1]) * (pb[1] - pa[1]))
+    x = pa[0] + (pb[0] - pa[0]) * t
+    y = pa[1] + (pb[1] - pa[1]) * t
+    return [x, y]
+
+
+def between2Points(pa, pb, checkp):
+    test1 = (checkp[0] - pa[0]) * (checkp[0] - pb[0])
+    test2 = (checkp[1] - pa[1]) * (checkp[1] - pb[1])
+    return test1 <= 0 and test2 <= 0
