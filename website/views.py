@@ -24,68 +24,167 @@ class ClassInfor:
 def home():
     totWeeks, rows, cols = (15, 12, 6)
     arr = [[[' ' for j in range(cols)] for i in range(rows)] for k in range(totWeeks)]
+    d1 = datetime.strptime("2022/08/29", "%Y/%m/%d")
+    d2 = datetime.now()
+    curWeek = int((d2 - d1).days / 7) 
+    curDay = (d2 - d1).days % 7
+    timestamp = ""
+    if (curDay == 8):
+        timestamp += "Chủ nhật"
+    else:
+        timestamp += "Thứ " + str(curDay + 2)
+    timestamp += " Tuần " + str(curWeek + 1)
     if request.method == "POST":
         msv = request.form['msv']
         mycursor.execute("SELECT * FROM sinhvien WHERE MSV = (%s)", (msv,))
         data = mycursor.fetchone()
         if not data:
-            return render_template('index.html', hello="Not found student!")
+            return render_template('index.html', hello="Not found student!"
+                                    , arr=arr, curWeek=curWeek, curDay=curDay, timestamp = timestamp)
         name = data[1]
-        birthdate = data[2]
-        class_name = data[3]
-        gender = data[4]
-        birthplace = data[5]
         mycursor.execute("SELECT * FROM dangky WHERE MSV = (%s)", (msv,))
-        data = mycursor.fetchall()
+        dataFromDangky = mycursor.fetchall()
         subjectList = []
-        d1 = datetime.strptime("2022/08/29", "%Y/%m/%d")
-        d2 = datetime.now()
-        curWeek = int((d2 - d1).days / 7)
-        curDay = (d2 - d1).days % 7 
-        for row in data:
-            HP = row[1]
-            LHP = row[2]
-            group = row[3]
-            note = row[4]
-            mycursor.execute("SELECT * FROM monhoc WHERE Mã_HP = (%s)", (HP, ))
-            data2 = mycursor.fetchone()
-            LMHName = data2[1]
-            TC = data2[2]
+        for itemDangky in dataFromDangky:
+            HP = itemDangky[1]
+            LHP = itemDangky[2]
+            LMH = HP + ' ' + LHP 
+            group = itemDangky[3]
+            note = itemDangky[4]
+            mycursor.execute("SELECT * FROM monhoc WHERE Mã_HP = (%s)", (HP,))
+            dataFromMonhoc = mycursor.fetchone()
+            LMHName = dataFromMonhoc[1]
+            TC = dataFromMonhoc[2]
             mycursor.execute("SELECT * FROM lopmonhoc WHERE Mã_HP = (%s) AND Mã_LHP = (%s) AND (Nhóm = 'CL' OR Nhóm = (%s))"
                              , (HP, LHP, group))
-            data3 = mycursor.fetchall()
-            for line in data3:
+            dataFromLopmonhoc = mycursor.fetchall()
+            for itemLopmonhoc in dataFromLopmonhoc:
                 mycursor.execute("SELECT * FROM giangvien WHERE ID_Giangvien = (%s) OR ID_Giangvien = (%s)"
-                             , (line[-1], line[-2]))
-                data4 = mycursor.fetchall()
+                             , (itemLopmonhoc[-1], itemLopmonhoc[-2]))
+                dataFromGiangvien = mycursor.fetchall()
                 lecturers = ""
-                for li in data4:
-                    lecturers += li[1]
+                group = itemLopmonhoc[2]
+                week = itemLopmonhoc[3]
+                day = itemLopmonhoc[4]
+                time = itemLopmonhoc[5]
+                place = itemLopmonhoc[6] + '-' + itemLopmonhoc[7]
+                totStudents = itemLopmonhoc[8]
+                for itemGiangvien in dataFromGiangvien:
+                    lecturers += itemGiangvien[1]
                     lecturers += "\n"
-                subjectList.append(ClassInfor(HP + ' ' + LHP, LMHName, line[2], TC, note, line[3], line[4],
-                                              line[5], line[6] + '-' + line[7], line[8], lecturers))
-        for line in subjectList:
-            day = line.day - 2
-            start, end = (int(s) for s in line.time.split('-'))
-            subject = line.LMH
-            subjectName = line.LMHName
-            place = line.place
-            if '-' in line.week:
-                weekStart, weekEnd = (int(s) for s in line.week.split('-'))
+                subjectList.append(ClassInfor(LMH, LMHName, group, TC, note, week, day
+                                    , time, place, totStudents, lecturers))
+        for item in subjectList:
+            day = item.day - 2
+            start, end = (int(s) for s in item.time.split('-'))
+            subjectID = item.LMH
+            place = item.place
+            if (place[0] == '-'):
+                place = place[1:]
+            if '-' in item.week:
+                weekStart, weekEnd = (int(s) for s in item.week.split('-'))
                 for week in range(weekStart - 1, weekEnd):
                     for i in range(start - 1, end):
-                        arr[week][i][day] = subject + "\n" + subjectName + "\n" + place
-            elif ',' in line.week:
-                studyWeeks = (int(s) for s in line.week.split(','))
+                        arr[week][i][day] = subjectID + " - " + place
+            elif ',' in item.week:
+                studyWeeks = (int(s) for s in item.week.split(','))
                 for week in studyWeeks:
                     for i in range(start - 1, end):
-                        arr[week][i][day] = subject + "\n" + subjectName + "\n" + place
+                        arr[week][i][day] = subjectID + " - " + place
             else:
                 for week in range(15):
                     for i in range(start - 1, end):
-                        arr[week][i][day] = subject + "\n" + subjectName + "\n" + place
-        return render_template('index.html', hello="Hello " + name + " " + msv, timestamp="Tuần " + str(curWeek + 1) + " Thứ " + str(curDay),
-                               msv=msv, name=name, birthdate=birthdate, class_name=class_name, gender=gender,
-                               birthplace=birthplace, subjectList=subjectList, arr=arr, curWeek=curWeek, curDay=curDay)
+                        arr[week][i][day] = subjectID + " - " + place
+        return render_template('index.html', hello="Hello " + name + " " + msv, timestamp=timestamp
+                            , msv=msv, name=name, arr=arr, curWeek=curWeek, curDay=curDay)
 
-    return render_template('index.html', arr=arr, curDay=1, curWeek=1)
+    return render_template('index.html', arr=arr, curWeek=curWeek, curDay=curDay, timestamp = timestamp)
+
+
+@views.route('/viewbyweek', methods=['GET', 'POST'])
+def viewbyweek():
+    totWeeks, rows, cols = (15, 12, 6)
+    arr = [[[' ' for j in range(cols)] for i in range(rows)] for k in range(totWeeks)]
+    d1 = datetime.strptime("2022/08/29", "%Y/%m/%d")
+    d2 = datetime.now()
+    curWeek = int((d2 - d1).days / 7) 
+    curDay = (d2 - d1).days % 7
+    timestamp = ""
+    if (curDay == 8):
+        timestamp += "Chủ nhật"
+    else:
+        timestamp += "Thứ " + str(curDay + 2)
+    timestamp += " Tuần " + str(curWeek + 1)
+    if request.method == "POST":
+        msv = request.form['msv']
+        mycursor.execute("SELECT * FROM sinhvien WHERE MSV = (%s)", (msv,))
+        data = mycursor.fetchone()
+        if not data:
+            return render_template('viewbyweek.html', hello="Not found student!"
+                                    , arr=arr, curWeek=curWeek, timestamp = timestamp)
+        name = data[1]
+        birthdate = data[2]
+        classname = data[3]
+        gender = data[4]
+        birthplace = data[5]
+        mycursor.execute("SELECT * FROM dangky WHERE MSV = (%s)", (msv,))
+        dataFromDangky = mycursor.fetchall()
+        subjectList = []
+
+        for itemDangky in dataFromDangky:
+            HP = itemDangky[1]
+            LHP = itemDangky[2]
+            LMH = HP + ' ' + LHP 
+            group = itemDangky[3]
+            note = itemDangky[4]
+            mycursor.execute("SELECT * FROM monhoc WHERE Mã_HP = (%s)", (HP,))
+            dataFromMonhoc = mycursor.fetchone()
+            LMHName = dataFromMonhoc[1]
+            TC = dataFromMonhoc[2]
+            mycursor.execute("SELECT * FROM lopmonhoc WHERE Mã_HP = (%s) AND Mã_LHP = (%s) AND (Nhóm = 'CL' OR Nhóm = (%s))"
+                             , (HP, LHP, group))
+            dataFromLopmonhoc = mycursor.fetchall()
+            for itemLopmonhoc in dataFromLopmonhoc:
+                mycursor.execute("SELECT * FROM giangvien WHERE ID_Giangvien = (%s) OR ID_Giangvien = (%s)"
+                             , (itemLopmonhoc[-1], itemLopmonhoc[-2]))
+                dataFromGiangvien = mycursor.fetchall()
+                lecturers = ""
+                group = itemLopmonhoc[2]
+                week = itemLopmonhoc[3]
+                day = itemLopmonhoc[4]
+                time = itemLopmonhoc[5]
+                place = itemLopmonhoc[6] + '-' + itemLopmonhoc[7]
+                totStudents = itemLopmonhoc[8]
+                for itemGiangvien in dataFromGiangvien:
+                    lecturers += itemGiangvien[1]
+                    lecturers += "\n"
+
+                subjectList.append(ClassInfor(LMH, LMHName, group, TC, note, week, day
+                                    , time, place, totStudents, lecturers))
+        for item in subjectList:
+            day = item.day - 2
+            start, end = (int(s) for s in item.time.split('-'))
+            subjectID = item.LMH
+            place = item.place
+            if (place[0] == '-'):
+                place = place[1:]
+            if '-' in item.week:
+                weekStart, weekEnd = (int(s) for s in item.week.split('-'))
+                for week in range(weekStart - 1, weekEnd):
+                    for i in range(start - 1, end):
+                        arr[week][i][day] = subjectID + " - " + place
+            elif ',' in item.week:
+                studyWeeks = (int(s) for s in item.week.split(','))
+                for week in studyWeeks:
+                    for i in range(start - 1, end):
+                        arr[week][i][day] = subjectID + " - " + place
+            else:
+                for week in range(15):
+                    for i in range(start - 1, end):
+
+                        arr[week][i][day] = subjectID + " - " + place
+        return render_template('viewbyweek.html', hello="Hello " + name + " " + msv, timestamp=timestamp, msv=msv, name=name
+                                , birthplace=birthplace, birthdate=birthdate, gender=gender, classname=classname
+                                , subjectList=subjectList, arr=arr, curWeek=curWeek)
+
+    return render_template('viewbyweek.html', arr=arr, curWeek=curWeek, timestamp = timestamp)
