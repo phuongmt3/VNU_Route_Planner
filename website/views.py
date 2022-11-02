@@ -130,6 +130,7 @@ def viewbyweek():
         mycursor.execute("SELECT * FROM dangky WHERE MSV = (%s)", (msv,))
         dataFromDangky = mycursor.fetchall()
         subjectList = []
+
         for itemDangky in dataFromDangky:
             HP = itemDangky[1]
             LHP = itemDangky[2]
@@ -157,6 +158,7 @@ def viewbyweek():
                 for itemGiangvien in dataFromGiangvien:
                     lecturers += itemGiangvien[1]
                     lecturers += "\n"
+
                 subjectList.append(ClassInfor(LMH, LMHName, group, TC, note, week, day
                                     , time, place, totStudents, lecturers))
         for item in subjectList:
@@ -179,6 +181,7 @@ def viewbyweek():
             else:
                 for week in range(15):
                     for i in range(start - 1, end):
+
                         arr[week][i][day] = subjectID + " - " + place
         return render_template('viewbyweek.html', hello="Hello " + name + " " + msv, timestamp=timestamp, msv=msv, name=name
                                 , birthplace=birthplace, birthdate=birthdate, gender=gender, classname=classname
