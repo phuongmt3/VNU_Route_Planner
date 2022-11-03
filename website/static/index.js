@@ -59,12 +59,12 @@ map.on('click', onMapClick);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Render 
+// Render
 
 var lineGroup = L.layerGroup([], { snakingPause: 0 })
 renderRoad(posList);
 
-// Render buildings and add selecting events 
+// Render buildings and add selecting events
 for (let i = 0; i < bdListSelect.length; i++) {
     L.geoJSON(buildings, {
         filter: function (feature) {
@@ -80,7 +80,7 @@ for (let i = 0; i < bdListSelect.length; i++) {
             var smallPopup = L.popup()
                 .setLatLng(centerPosition)
                 .setContent(bdListSelect[i][1]);
-                
+
             // Full info and visit method
             layer.bindPopup(L.popup({autoClose: false})
                 .setLatLng(centerPosition)
@@ -108,7 +108,7 @@ for (let i = 0; i < bdListSelect.length; i++) {
                     unMark(layer);
                 }
             });
-            
+
             // When hovering a building
             layer.on('mouseover', function () {
                 if (!bdListSelect[i][2]) mark(layer);
@@ -226,7 +226,7 @@ function renderRoad(posList) {
         ];
         var line = L.polyline(latlngs, { color: 'red' });
 
-        // Check if latlngs is overlapping lines in lineGroup 
+        // Check if latlngs is overlapping lines in lineGroup
         for (const layer of Object.values(lineGroup._layers).reverse()) {
             if (latlngs.toString() === [Object.values(layer._latlngs[1]), Object.values(layer._latlngs[0])].toString()) {
                 line.setStyle({ weight: 6 })
@@ -250,4 +250,3 @@ function renderRoad(posList) {
 // });
 
 $('.leaflet-container').css('cursor', 'crosshair');
-
