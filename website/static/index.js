@@ -240,9 +240,11 @@ function renderRoad(posList) {
 }
 
 // Test add location
-line.addTo(map);
-road.addTo(map);
-roadVuong.addTo(map);
+if (newpos.length != 0) {
+    line.addTo(map);
+    road.addTo(map);
+    roadVuong.addTo(map);
+}
 
 // Testing
 

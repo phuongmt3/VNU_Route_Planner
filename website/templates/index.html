@@ -73,11 +73,13 @@
 
     <script type="text/javascript">
         var newpos = {{ newpos| tojson }};
-        const dif = 0.000001;
-        var latlngs = [newpos, [newpos[0], newpos[1] + dif]];
-        var line = L.polyline(latlngs, { color: 'red' });
-        var road = L.polyline({{ road| tojson }}, { color: 'red' });
-        var roadVuong = L.polyline({{ roadVuong| tojson }}, { color: 'red' });
+        if (newpos.length != 0) {
+            const dif = 0.000001;
+            var latlngs = [newpos, [newpos[0], newpos[1] + dif]];
+            var line = L.polyline(latlngs, { color: 'red' });
+            var road = L.polyline({{ road| tojson }}, { color: 'red' });
+            var roadVuong = L.polyline({{ roadVuong| tojson }}, { color: 'red' });
+        }
     </script>
 </body>
 </html>
