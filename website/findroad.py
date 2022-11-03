@@ -45,7 +45,6 @@ def resetDijkstraTable():
 
 
 def realDistanceP_P(p1, p2):
-    # between 2 direct places on map
     mycursor.execute("select `distance` from `distance` where `id1`=%s and `id2`=%s", (p1, p2))
     data = mycursor.fetchone()
     if not data:
@@ -189,11 +188,12 @@ def havePointInDB(p):
 # Find route nearest point
 def nearestRoad(newpos):
     disToPoint = []
-    mycursor.execute("SELECT `id` FROM `points`")
+    mycursor.execute("SELECT * FROM `points`")
     points = mycursor.fetchall()
     for p in points:
-        kc = (newpos[0] - posX[p[0]]) * (newpos[0] - posX[p[0]]) + (newpos[1] - posY[p[0]]) * (newpos[1] - posY[p[0]])
-        heapq.heappush(disToPoint, (kc, p[0]))
+        if p[2] != 1:
+            kc = (newpos[0] - posX[p[0]]) * (newpos[0] - posX[p[0]]) + (newpos[1] - posY[p[0]]) * (newpos[1] - posY[p[0]])
+            heapq.heappush(disToPoint, (kc, p[0]))
 
     neareastPoints = []
     roadlimit = 10
@@ -201,14 +201,13 @@ def nearestRoad(newpos):
     ida = 0
     idb = 0
     roadVuong = []  # road vuong goc voi nearest road
-    road = []
 
     while len(disToPoint):
         t = heapq.heappop(disToPoint)
         for p in neareastPoints:
             if roadlimit == 0:
                 addNewPointsIntoDB(ida, idb, roadVuong[0], roadVuong[1])
-                return road, roadVuong
+                return
 
             mycursor.execute("SELECT * FROM `distance` WHERE `id1`=%s AND `id2`=%s", (p[1], t[1]))
             existRoad1 = mycursor.fetchone()
@@ -225,7 +224,6 @@ def nearestRoad(newpos):
                     minDis = curdis
                     ida = p[1]
                     idb = t[1]
-                    road = [pa, pb]
                     roadVuong = [newpos, shadowP]
                 continue
 

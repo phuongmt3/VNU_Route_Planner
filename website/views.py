@@ -47,8 +47,6 @@ def home():
 
     idStartPlace = idEndPlace = 1
     posList = []
-    newpos = []
-    phu = [[], []]
 
     if request.method == 'POST':
         if request.form['submit_button'] == 'Search' and request.form['startPlace'] and request.form['endPlace']:
@@ -71,12 +69,12 @@ def home():
         elif request.form['submit_button'] == 'Add Location' and request.form['pos1'] and request.form['pos2']:
             newpos = [float(request.form['pos1']), float(request.form['pos2'])]
             if not havePointInDB(newpos):
-                phu = nearestRoad(newpos)
+                nearestRoad(newpos)
 
     bdListSelect = getBuildingList(idStartPlace, idEndPlace)
 
     return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList,
-                           distance=round(findroad.distance, 3), newpos=newpos, road=phu[0], roadVuong=phu[1],
+                           distance=round(findroad.distance, 3),
                            posList=json.dumps(posList, cls=DecimalEncoder), bdListSelect=json.dumps(bdListSelect))
 
 # @views.route('/', methods=['GET', 'POST'])
