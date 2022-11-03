@@ -239,6 +239,10 @@ function renderRoad(posList) {
     lineGroup.addTo(map).snakeIn();
 }
 
+// Test add location
+line.addTo(map);
+road.addTo(map);
+roadVuong.addTo(map);
 
 // Testing
 

@@ -178,6 +178,14 @@ def removePlace(removeId):
     placesByTime.remove(removeId)
 
 
+def havePointInDB(p):
+    mycursor.execute("SELECT * FROM `points` WHERE `posY`=%s AND `posX`=%s", (p[0], p[1]))
+    point = mycursor.fetchone()
+    if not point:
+        return False
+    return True
+
+
 # Find route nearest point
 def nearestRoad(newpos):
     disToPoint = []
@@ -188,18 +196,19 @@ def nearestRoad(newpos):
         heapq.heappush(disToPoint, (kc, p[0]))
 
     neareastPoints = []
-    roadlimit = 5
+    roadlimit = 10
     minDis = 100000
     ida = 0
     idb = 0
     roadVuong = []  # road vuong goc voi nearest road
+    road = []
 
     while len(disToPoint):
         t = heapq.heappop(disToPoint)
         for p in neareastPoints:
             if roadlimit == 0:
                 addNewPointsIntoDB(ida, idb, roadVuong[0], roadVuong[1])
-                return
+                return road, roadVuong
 
             mycursor.execute("SELECT * FROM `distance` WHERE `id1`=%s AND `id2`=%s", (p[1], t[1]))
             existRoad1 = mycursor.fetchone()
@@ -216,6 +225,7 @@ def nearestRoad(newpos):
                     minDis = curdis
                     ida = p[1]
                     idb = t[1]
+                    road = [pa, pb]
                     roadVuong = [newpos, shadowP]
                 continue
 
@@ -225,9 +235,6 @@ def nearestRoad(newpos):
 def addNewPointsIntoDB(ida, idb, pc, ph):
     disAB = realDistanceP_P(ida, idb)
     kcDonVi = disAB / coorDistanceP_P([posX[ida], posY[ida]], [posX[idb], posY[idb]])
-
-    mycursor.execute("DELETE FROM `distance` WHERE `id1`=%s AND `id2`=%s", (ida, idb))
-    mycursor.execute("DELETE FROM `distance` WHERE `id1`=%s AND `id2`=%s", (idb, ida))
 
     mycursor.execute("SELECT MAX(`id`) FROM `points`")
     newid = mycursor.fetchone()[0] + 1
