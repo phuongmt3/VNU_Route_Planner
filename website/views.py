@@ -1,4 +1,3 @@
-from dis import dis
 from flask import Blueprint, render_template, request, flash
 
 from . import findroad
@@ -6,17 +5,10 @@ from .findroad import *
 from .vnubuilding import getBuildingList
 from .models import mycursor
 import json
-import decimal
-
-
-class DecimalEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, decimal.Decimal):
-            return str(o)
-        return super(DecimalEncoder, self).default(o)
 
 
 views = Blueprint('views', __name__)
+
 
 @views.route('/post_place/<name>', methods=['POST'])
 def postPlace(name):
@@ -42,7 +34,7 @@ def postPlace(name):
     mycursor.execute("select Count(*) from `dijkstra`")
     dbSize = mycursor.fetchone()[0]
 
-    return json.dumps([posList, findroad.distance, dbSize], cls=DecimalEncoder)
+    return json.dumps([posList, round(findroad.distance, 3), dbSize], cls=DecimalEncoder)
 
 
 @views.route('/', methods=['GET', 'POST'])
@@ -62,7 +54,7 @@ def home():
             idEndPlace = int(request.form['endPlace'])
 
             findroad.placesByTime = [idStartPlace, idEndPlace]
-            findroad.distance = getDistanceBetween2Points(idStartPlace, idEndPlace)
+            findroad.distance = dijkstra(idStartPlace, idEndPlace)
 
             # Find posList
             trackingList = [idEndPlace]
@@ -73,12 +65,17 @@ def home():
         elif request.form['submit_button'] == 'Reset Dijkstra database':
             resetDijkstraTable()
             flash('Reset Dijkstra database successfully!')
-    
+
+        elif request.form['submit_button'] == 'Add Location' and request.form['pos1'] and request.form['pos2']:
+            newpos = [float(request.form['pos1']), float(request.form['pos2'])]
+            if not havePointInDB(newpos):
+                nearestRoad(newpos)
+
     bdListSelect = getBuildingList(idStartPlace, idEndPlace)
 
-    return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList, distance=findroad.distance,
-                            posList=json.dumps(posList, cls=DecimalEncoder), bdListSelect=json.dumps(bdListSelect))
-
+    return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList,
+                           distance=round(findroad.distance, 3),
+                           posList=json.dumps(posList, cls=DecimalEncoder), bdListSelect=json.dumps(bdListSelect))
 
 # @views.route('/', methods=['GET', 'POST'])
 # def oldHome():

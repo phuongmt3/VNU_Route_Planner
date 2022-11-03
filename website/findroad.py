@@ -1,13 +1,24 @@
+import math
 from queue import PriorityQueue
+import heapq
 from .models import mycursor, db
+import json
+import decimal
+
+
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, decimal.Decimal):
+            return float(o)
+        return super(DecimalEncoder, self).default(o)
 
 
 def initGlobal():
     global placesByTime, distance, posX, posY
     placesByTime = []
     distance = 0
-    posX = [0]
-    posY = [0]
+    posX = [0.0]
+    posY = [0.0]
 
 
 def initRoad(showedPlaceList, placeNames):
@@ -18,8 +29,8 @@ def initRoad(showedPlaceList, placeNames):
         if d[2] > 0:
             showedPlaceList.append(d[0])
         placeNames.append(d[1])
-        posX.append(d[3])
-        posY.append(d[4])
+        posX.append(float(json.dumps(d[3], cls=DecimalEncoder)))
+        posY.append(float(json.dumps(d[4], cls=DecimalEncoder)))
 
 
 def resetDijkstraTable():
@@ -33,8 +44,7 @@ def resetDijkstraTable():
     db.commit()
 
 
-def getDistance(p1, p2):
-    # between 2 direct places on map
+def realDistanceP_P(p1, p2):
     mycursor.execute("select `distance` from `distance` where `id1`=%s and `id2`=%s", (p1, p2))
     data = mycursor.fetchone()
     if not data:
@@ -43,7 +53,7 @@ def getDistance(p1, p2):
     return data[0]
 
 
-def getDistanceBetween2Points(id1, id2):
+def dijkstra(id1, id2):
     if id1 == id2:
         return 0
     mycursor.execute("select `minDistance` from `dijkstra` where `id1`=(%s) and `id2`=(%s)", (id1, id2))
@@ -82,7 +92,7 @@ def getDistanceBetween2Points(id1, id2):
             aim = cur[2]
             minkc = 0
             while aim != 0:
-                minkc += getDistance(aim, oldaim)
+                minkc += realDistanceP_P(aim, oldaim)
                 mycursor.execute("insert ignore into `dijkstra` value (%s, %s, %s, %s)",
                                  (cur[1], aim, minkc, oldaim))
                 mycursor.execute("insert ignore into `dijkstra` value (%s, %s, %s, %s)",
@@ -137,14 +147,14 @@ def getTrackingList():
 def addPlace(addedId):
     global distance, placesByTime
 
-    distanceAns = distance - getDistanceBetween2Points(placesByTime[0], placesByTime[1]) \
-                  + getDistanceBetween2Points(placesByTime[0], addedId) \
-                  + getDistanceBetween2Points(addedId, placesByTime[1])
+    distanceAns = distance - dijkstra(placesByTime[0], placesByTime[1]) \
+                  + dijkstra(placesByTime[0], addedId) \
+                  + dijkstra(addedId, placesByTime[1])
     posToAdd = 1
     for i in range(1, len(placesByTime) - 1):
-        newDistance = distance - getDistanceBetween2Points(placesByTime[i], placesByTime[i + 1]) \
-                      + getDistanceBetween2Points(placesByTime[i], addedId) \
-                      + getDistanceBetween2Points(addedId, placesByTime[i + 1])
+        newDistance = distance - dijkstra(placesByTime[i], placesByTime[i + 1]) \
+                      + dijkstra(placesByTime[i], addedId) \
+                      + dijkstra(addedId, placesByTime[i + 1])
         if newDistance < distanceAns:
             distanceAns = newDistance
             posToAdd = i + 1
@@ -160,8 +170,107 @@ def removePlace(removeId):
     index = placesByTime.index(removeId)
     if index == 0 or index == len(placesByTime) - 1:
         return
-    distance = distance + getDistanceBetween2Points(placesByTime[index - 1], placesByTime[index + 1]) \
-               - getDistanceBetween2Points(placesByTime[index - 1], removeId) \
-               - getDistanceBetween2Points(removeId, placesByTime[index + 1])
+    distance = distance + dijkstra(placesByTime[index - 1], placesByTime[index + 1]) \
+               - dijkstra(placesByTime[index - 1], removeId) \
+               - dijkstra(removeId, placesByTime[index + 1])
 
     placesByTime.remove(removeId)
+
+
+def havePointInDB(p):
+    mycursor.execute("SELECT * FROM `points` WHERE `posY`=%s AND `posX`=%s", (p[0], p[1]))
+    point = mycursor.fetchone()
+    if not point:
+        return False
+    return True
+
+
+# Find route nearest point
+def nearestRoad(newpos):
+    disToPoint = []
+    mycursor.execute("SELECT * FROM `points`")
+    points = mycursor.fetchall()
+    for p in points:
+        if p[2] != 1:
+            kc = (newpos[0] - posX[p[0]]) * (newpos[0] - posX[p[0]]) + (newpos[1] - posY[p[0]]) * (newpos[1] - posY[p[0]])
+            heapq.heappush(disToPoint, (kc, p[0]))
+
+    neareastPoints = []
+    roadlimit = 10
+    minDis = 100000
+    ida = 0
+    idb = 0
+    roadVuong = []  # road vuong goc voi nearest road
+
+    while len(disToPoint):
+        t = heapq.heappop(disToPoint)
+        for p in neareastPoints:
+            if roadlimit == 0:
+                addNewPointsIntoDB(ida, idb, roadVuong[0], roadVuong[1])
+                return
+
+            mycursor.execute("SELECT * FROM `distance` WHERE `id1`=%s AND `id2`=%s", (p[1], t[1]))
+            existRoad1 = mycursor.fetchone()
+            mycursor.execute("SELECT * FROM `distance` WHERE `id1`=%s AND `id2`=%s", (t[1], p[1]))
+            existRoad2 = mycursor.fetchone()
+
+            if existRoad1 or existRoad2:
+                roadlimit -= 1
+                pa = [posX[p[1]], posY[p[1]]]
+                pb = [posX[t[1]], posY[t[1]]]
+                curdis = coorDistanceP_Road(pa, pb, newpos)
+                shadowP = shadowPoint(pa, pb, newpos)
+                if curdis < minDis and pointBetween2Points(pa, pb, shadowP):
+                    minDis = curdis
+                    ida = p[1]
+                    idb = t[1]
+                    roadVuong = [newpos, shadowP]
+                continue
+
+        neareastPoints.append(t)
+
+
+def addNewPointsIntoDB(ida, idb, pc, ph):
+    disAB = realDistanceP_P(ida, idb)
+    kcDonVi = disAB / coorDistanceP_P([posX[ida], posY[ida]], [posX[idb], posY[idb]])
+
+    mycursor.execute("SELECT MAX(`id`) FROM `points`")
+    newid = mycursor.fetchone()[0] + 1
+    mycursor.execute("INSERT INTO `points` VALUE (%s, %s, %s, %s, %s)", (newid, "New Place", 1, pc[0], pc[1]))
+    mycursor.execute("INSERT INTO `points` VALUE (%s, %s, %s, %s, %s)", (newid + 1, "", 0, ph[0], ph[1]))
+    db.commit()
+
+    disAH = kcDonVi * coorDistanceP_P([posX[ida], posY[ida]], ph)
+    disCH = kcDonVi * coorDistanceP_P(pc, ph)
+
+    mycursor.execute("INSERT INTO `distance` VALUE (%s, %s, %s)", (ida, newid + 1, disAH))
+    mycursor.execute("INSERT INTO `distance` VALUE (%s, %s, %s)", (idb, newid + 1, disAB - disAH))
+    mycursor.execute("INSERT INTO `distance` VALUE (%s, %s, %s)", (newid, newid + 1, disCH))
+    db.commit()
+
+    resetDijkstraTable()
+
+
+def coorDistanceP_Road(pa, pb, pc):
+    a = pa[1] - pb[1]
+    b = pb[0] - pa[0]
+    c = pa[0] * pb[1] - pb[0] * pa[1]
+    return math.fabs(a * pc[0] + b * pc[1] + c) / math.sqrt(a * a + b * b)
+
+
+def coorDistanceP_P(pa, pb):
+    return math.sqrt((pa[0] - pb[0]) * (pa[0] - pb[0]) + (pa[1] - pb[1]) * (pa[1] - pb[1]))
+
+
+def shadowPoint(pa, pb, pc):
+    t = ((pa[1] - pc[1]) * (pa[1] - pb[1]) - (pa[0] - pc[0]) * (pb[0] - pa[0])) \
+        / ((pb[0] - pa[0]) * (pb[0] - pa[0]) + (pb[1] - pa[1]) * (pb[1] - pa[1]))
+    x = pa[0] + (pb[0] - pa[0]) * t
+    y = pa[1] + (pb[1] - pa[1]) * t
+    return [x, y]
+
+
+def pointBetween2Points(pa, pb, checkp):
+    test1 = (checkp[0] - pa[0]) * (checkp[0] - pb[0])
+    test2 = (checkp[1] - pa[1]) * (checkp[1] - pb[1])
+    return test1 <= 0 and test2 <= 0
