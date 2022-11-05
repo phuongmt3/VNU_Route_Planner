@@ -30,91 +30,73 @@
         var bdListSelect = {{ bdListSelect| safe }};
         var posList = {{ posList| safe }};
     </script>
-    
-    <style>
-        table, th, td {
-            border: 2px solid black;
-            border-collapse: collapse;
-        }
-        table {
-            width: 100%;
-        }
-    </style>
 </head>
 <body>
-    <nav>
-        <ul>
-            <li><a href="http://127.0.0.1:5000/"> View by day</a></li>
-            <li><a href="http://127.0.0.1:5000/viewbyweek"> View by week</a></li>
-        </ul>
-    </nav>
-    <form action="http://127.0.0.1:5000/" method="POST">
-        <label for="msv">MSV</label><br>
-        <input type="text" name="msv" id="msv">
-        <input type="submit" value="Search">
-    </form>
-    <br>
-    <h2>{{ hello }}</h2>
-    <br>
-    <h2>{{ timestamp }}</h2>
-    <br>
-    <table>
-        <tr>
-            <th colspan="2">Thời khóa biểu</th>
-        </tr>
-        <tr>
-            <th>Tiết</th>
-            <th>Môn học</th>
-        </tr>
-        {% for i in range(12) %}
-        <tr>
-            <td>{{ i + 1 }}</td>
-            <td>{{ arr[curWeek][i][curDay] }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    
-    
-    
-    {% for message in get_flashed_messages() %}
-        <p>{{ message }}</p>
-    {% endfor %}
-    <br>
+    <div class="main-wrapper h-100">
+        <div class="row">
+            <form action="http://127.0.0.1:5000/" method="POST" id="my-form">
+                <label for="msv">MSV</label><br>
+                <input type="text" name="msv" id="msv">
+                <input type="submit" name="submit_button" value="Search">
+                <br><br>
 
-    <form action="http://127.0.0.1:5000/" method="POST" id="my-form">
-        <label>From </label>
-        <select name="startPlace">
-            <option value=""></option>
-            {% for i in showedPlaceList: %}
-            <option value={{i}}>{{placeNames[i]}}</option>
-            {% endfor %}
-        </select>
+                <label>From </label>
+                <select name="startPlace">
+                    <option value=""></option>
+                    {% for i in showedPlaceList: %}
+                    <option value={{i}}>{{placeNames[i]}}</option>
+                    {% endfor %}
+                </select>
 
-        <label>To </label>
-        <select name="endPlace">
-            <option value=""></option>
-            {% for i in showedPlaceList: %}
-            <option value={{i}}>{{placeNames[i]}}</option>
-            {% endfor %}
-        </select>
-        <br><br>
+                <label>To </label>
+                <select name="endPlace">
+                    <option value=""></option>
+                    {% for i in showedPlaceList: %}
+                    <option value={{i}}>{{placeNames[i]}}</option>
+                    {% endfor %}
+                </select>
 
-        <input type="submit" name="submit_button" value="Search">
-        <input type="submit" name="submit_button" value="Reset Dijkstra database">
-        <br><br>
+                <input type="submit" name="submit_button" value="Find path">
+                <input type="submit" name="submit_button" value="Reset Dijkstra database">
+                <br><br>
 
-        <label>Added location coordinates: </label>
-        <input type="number" name="pos1" min="21.036483" max="21.0419" step="0.000001">
-        <input type="number" name="pos2" min="105.780971" max="105.786121" step="0.000001">
-        <input type="submit" name="submit_button" value="Add Location">
-        <br><br>
+                <label>Added location coordinates: </label>
+                <input type="number" name="pos1" min="21.036483" max="21.0419" step="0.000001">
+                <input type="number" name="pos2" min="105.780971" max="105.786121" step="0.000001">
+                <input type="submit" name="submit_button" value="Add Location">
+                <br><br>
 
-    </form>
+            </form>
+        </div>
+        <div class="row h-75">
+          <div class="col-9">
+            <div id="map"></div>
+            <script type="module" src="../static/index.js"></script>
+          </div>
+          <div class="col">
+            <table>
+                <tr>
+                    <th colspan="2">Thời khóa biểu</th>
+                </tr>
+                <tr>
+                    <th>Tiết</th>
+                    <th>Môn học</th>
+                </tr>
+                
+                {% if timeTable != [] %}
+                    {% for i in range(12) %}
+                    <tr>
+                        <td>{{ i + 1 }}</td>
+                        <td>{{ timeTable[curWeek][i][curDay] }}</td>
+                    </tr>
+                    {% endfor %}
+                {% endif %}
+            </table>
+          </div>
+        </div>
+      </div>
 
-    <div id="map"></div>
-    <script type="module" src="../static/index.js"></script>
-
-    <footer class="fixed-bottom bg-light p-2">Distance: <u id="distance">{{distance}}</u> </footer>
+    <footer class="fixed-bottom bg-light p-2 bg-opacity-50">Distance: <u id="distance">{{distance}}</u> </footer>
 
 </body>
 </html>

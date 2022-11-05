@@ -6,9 +6,8 @@
 html,
 body,
 #map {
-    height: 94%;
-    width: 92%;
-    margin: 0px;
+    height: 100%;
+    width: 100%;
 }
 
 .leaflet-tooltip.my-labels {
@@ -24,4 +23,12 @@ body,
 
 ::-webkit-scrollbar {
     width: 0px;
+}
+
+table, th, td {
+    border: 2px solid black;
+    border-collapse: collapse;
+}
+table {
+    width: 100%;
 }
