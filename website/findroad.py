@@ -21,7 +21,7 @@ def initGlobal():
     posY = [0.0]
 
 
-def initRoad(showedPlaceList, placeNames):
+def initRoad(showedPlaceList=[], placeNames=[""]):
     global posX, posY
     mycursor.execute("select * from `points`")
     data = mycursor.fetchall()

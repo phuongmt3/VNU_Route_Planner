@@ -12,12 +12,51 @@ from .findschedule import getSubjectList, getTimeTable
 views = Blueprint('views', __name__)
 
 
+@views.route('/find_path/', methods=['POST'])
+def findPath():
+    name1, name2 = request.json['name1'], request.json['name2']
+
+    # Get id from name
+    mycursor.execute("select `id` from `points` where `name` = %s", (name1,))
+    data = mycursor.fetchone()
+    if not data:
+        return []
+    startId = int(str(data[0]))
+
+    mycursor.execute("select `id` from `points` where `name` = %s", (name2,))
+    data = mycursor.fetchone()
+    if not data:
+        return []
+    endId = int(str(data[0]))
+
+    posList = []
+
+    initGlobal()
+    initRoad()
+
+    findroad.placesByTime = [startId, endId]
+    findroad.distance = dijkstra(findroad.placesByTime[0], endId)
+
+    trackingList = [endId]
+    trackingList.extend(getTrackingList())
+    trackingList.reverse()
+    posList = [[findroad.posX[i], findroad.posY[i]] for i in trackingList]
+
+    mycursor.execute("select Count(*) from `dijkstra`")
+    dbSize = mycursor.fetchone()[0]
+
+    return json.dumps([posList, round(findroad.distance, 3), dbSize], cls=DecimalEncoder)
+
+
 @views.route('/post_place/<name>', methods=['POST'])
 def postPlace(name):
     # Get id from name
     mycursor.execute("select `id` from `points` where `name` = %s", (name,))
     thisPlaceId = int(str(mycursor.fetchone()[0]))
 
+    posList = []
+
+    # Add visit site
     if thisPlaceId is findroad.placesByTime[0] or thisPlaceId is findroad.placesByTime[len(findroad.placesByTime) - 1]:
         return json.dumps([])
 
@@ -43,18 +82,13 @@ def postPlace(name):
 def home():
     initGlobal()
 
-    d1 = datetime.strptime("2022/08/29", "%Y/%m/%d")
-    d2 = datetime.now()
-    curWeek = int((d2 - d1).days / 7) 
-    curDay = (d2 - d1).days % 7
-    timeTable = []
-
     showedPlaceList = []
     placeNames = [""]
     initRoad(showedPlaceList, placeNames)
 
     idStartPlace = idEndPlace = 1
     posList = []
+    timeTable = []
 
     if request.method == 'POST':
         if request.form['submit_button'] == 'Search':
@@ -94,7 +128,8 @@ def home():
     return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList,
                            distance=round(findroad.distance, 3),
                            posList=json.dumps(posList, cls=DecimalEncoder), bdListSelect=json.dumps(bdListSelect),
-                           timeTable=timeTable, curWeek=curWeek, curDay=curDay)
+                           timeTable=json.dumps(timeTable))
+
 
 # @views.route('/', methods=['GET', 'POST'])
 # def oldHome():

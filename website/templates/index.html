@@ -29,13 +29,14 @@
     <script>
         var bdListSelect = {{ bdListSelect| safe }};
         var posList = {{ posList| safe }};
+        var timeTable = {{ timeTable| safe }}
     </script>
 </head>
 <body>
     <div class="main-wrapper h-100">
         <div class="row">
             <form action="http://127.0.0.1:5000/" method="POST" id="my-form">
-                <label for="msv">MSV</label><br>
+                <label for="msv">MSV</label>
                 <input type="text" name="msv" id="msv">
                 <input type="submit" name="submit_button" value="Search">
                 <br><br>
@@ -74,29 +75,33 @@
             <script type="module" src="../static/index.js"></script>
           </div>
           <div class="col">
-            <table>
+            <button class="btn" id="btn-today">
+                <b style="color: blue;">Today</b>
+            </button>
+            <button class="btn" id="btn-backward">
+                <span class="material-symbols-outlined">arrow_back_ios</span>
+            </button>
+            <button class="btn" id="btn-forward">
+                <span class="material-symbols-outlined">arrow_forward_ios</span>
+            </button>
+
+            <table class="table table-striped" id="time-table">
                 <tr>
-                    <th colspan="2">Thời khóa biểu</th>
+                    <th colspan="2" id="weekNum"></th>
                 </tr>
-                <tr>
-                    <th>Tiết</th>
-                    <th>Môn học</th>
+                {% for i in range(12) %}
+                <tr id="lesson{{i + 1}}">
+                    <th>{{ i + 1 }}</td>
+                    <td></td>
                 </tr>
-                
-                {% if timeTable != [] %}
-                    {% for i in range(12) %}
-                    <tr>
-                        <td>{{ i + 1 }}</td>
-                        <td>{{ timeTable[curWeek][i][curDay] }}</td>
-                    </tr>
-                    {% endfor %}
-                {% endif %}
+                {% endfor %}
             </table>
+            <script type="module" src="../static/timetable.js"></script>
           </div>
         </div>
       </div>
 
-    <footer class="fixed-bottom bg-light p-2 bg-opacity-50">Distance: <u id="distance">{{distance}}</u> </footer>
+    <!-- <footer class="fixed-bottom bg-light p-2 bg-opacity-50">Distance: <u id="distance">{{distance}}</u> </footer> -->
 
 </body>
 </html>

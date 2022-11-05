@@ -61,6 +61,8 @@ map.on('click', onMapClick);
 
 // Render
 
+const buildingLayers = new Map();
+
 var lineGroup = L.layerGroup([], { snakingPause: 0 })
 renderRoad(posList);
 
@@ -71,6 +73,8 @@ for (let i = 0; i < bdListSelect.length; i++) {
             return feature.properties.name.toLowerCase() == bdListSelect[i][0].toLowerCase();
         },
         onEachFeature: function (feature, layer) {
+            buildingLayers.set(feature.properties.name, layer);
+
             var centerPosition = calculateCenter(feature.geometry.coordinates[0][0]);
 
             // Building's info
@@ -130,13 +134,6 @@ for (let i = 0; i < bdListSelect.length; i++) {
 
                 layer.openPopup();
             });
-
-            // Default
-            if (bdListSelect[i][2]) {
-                mark(layer);
-            } else {
-                unMark(layer);
-            }
         },
         // Default style (unMark)
         style: {
@@ -148,7 +145,7 @@ for (let i = 0; i < bdListSelect.length; i++) {
     }).addTo(map);
 }
 
-// Add place and update path, distance
+// Add place and update path, distance when click "visit"
 $(document).on('click','.postPlace',function() {
     let bdIndex = this.id
 
@@ -168,10 +165,32 @@ $(document).on('click','.postPlace',function() {
             map.closePopup();
 
             renderRoad(response[0]);
-            document.getElementById("distance").textContent = response[1];
+            // document.getElementById("distance").textContent = response[1];
             console.log("Database' size = " + response[2]);
         });
 });
+
+function renderRoad(posList) {
+    lineGroup.clearLayers()
+
+    for (let i = 0; i < posList.length - 1; i++) {
+        var latlngs = [
+            [parseFloat(posList[i][0]), parseFloat(posList[i][1])], [parseFloat(posList[i + 1][0]), parseFloat(posList[i + 1][1])]
+        ];
+        var line = L.polyline(latlngs, { color: 'red' });
+
+        // Check if latlngs is overlapping lines in lineGroup
+        for (const layer of Object.values(lineGroup._layers).reverse()) {
+            if (latlngs.toString() === [Object.values(layer._latlngs[1]), Object.values(layer._latlngs[0])].toString()) {
+                line.setStyle({ weight: 6 })
+                break;
+            }
+        }
+
+        lineGroup.addLayer(line);
+    }
+    lineGroup.addTo(map).snakeIn();
+}
 
 // Hide building's name
 map.on('baselayerchange', function (e) {
@@ -217,29 +236,6 @@ function calculateCenter(coordinate) {
     return [long, lat];
 }
 
-function renderRoad(posList) {
-    lineGroup.clearLayers()
-
-    for (let i = 0; i < posList.length - 1; i++) {
-        var latlngs = [
-            [parseFloat(posList[i][0]), parseFloat(posList[i][1])], [parseFloat(posList[i + 1][0]), parseFloat(posList[i + 1][1])]
-        ];
-        var line = L.polyline(latlngs, { color: 'red' });
-
-        // Check if latlngs is overlapping lines in lineGroup
-        for (const layer of Object.values(lineGroup._layers).reverse()) {
-            if (latlngs.toString() === [Object.values(layer._latlngs[1]), Object.values(layer._latlngs[0])].toString()) {
-                line.setStyle({ weight: 6 })
-                break;
-            }
-        }
-
-        lineGroup.addLayer(line);
-    }
-    lineGroup.addTo(map).snakeIn();
-}
-
-
 // Testing
 
 // roadData.features.forEach(feature => {
@@ -250,3 +246,50 @@ function renderRoad(posList) {
 // });
 
 $('.leaflet-container').css('cursor', 'crosshair');
+
+
+// Select named building and unselect others
+export function selectPlace(name) {
+    if (name.includes("-")) name = name.split("-")[1];
+    // Todo: Marker for other places
+
+    bdListSelect.forEach(bd => {
+        bd[2] = (bd[0] == name) ? true : false;
+    })
+    buildingLayers.forEach(layer => {
+        unMark(layer)
+    })
+
+    let layer = buildingLayers.get(name);
+    if (layer) mark(layer);
+}
+
+export function findPath(name1, name2) {
+    name1 = name1.includes("-") ? name1.split("-")[1] : name1;
+    name2 = name2.includes("-") ? name2.split("-")[1] : name2;
+
+    lineGroup.clearLayers();
+
+    var data = {
+        "name1": name1,
+        "name2": name2,
+    };
+
+    fetch(`/find_path/`, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    })
+        .then(function (response) {
+            return response.json();
+        }).then(function (response) {
+            if (response.length == 0) {
+                return 0;
+            }
+
+            map.closePopup();
+            renderRoad(response[0]);
+            // document.getElementById("distance").textContent = response[1];
+            console.log("Database' size = " + response[2]);
+        });
+}

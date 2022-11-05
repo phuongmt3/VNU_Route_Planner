@@ -51,13 +51,13 @@ def getSubjectList(msv):
 
 
 def getTimeTable(subjectList):
-    totWeeks, rows, cols = (15, 12, 6)
-    timeTable = [[[' ' for j in range(cols)] for i in range(rows)] for k in range(totWeeks)]
+    totWeek, totDayOfWeek, totLesson = (15, 7, 12)
+    timeTable = [[[{"subjectName": "", "place": ""} for j in range(totLesson)] for i in range(totDayOfWeek)] for k in range(totWeek)]
 
     for item in subjectList:
-        day = item.day - 2
+        day = item.day - 1
         start, end = (int(s) for s in item.time.split('-'))
-        subjectID = item.LMH
+        subjectName = item.LMHName
         place = item.place
         if (place[0] == '-'):
             place = place[1:]
@@ -65,14 +65,14 @@ def getTimeTable(subjectList):
             weekStart, weekEnd = (int(s) for s in item.week.split('-'))
             for week in range(weekStart - 1, weekEnd):
                 for i in range(start - 1, end):
-                    timeTable[week][i][day] = subjectID + " - " + place
+                    timeTable[week][day][i] = {"subjectName": subjectName, "place": place}
         elif ',' in item.week:
             studyWeeks = (int(s) for s in item.week.split(','))
             for week in studyWeeks:
                 for i in range(start - 1, end):
-                    timeTable[week][i][day] = subjectID + " - " + place
+                    timeTable[week][day][i] = {"subjectName": subjectName, "place": place}
         else:
             for week in range(15):
                 for i in range(start - 1, end):
-                    timeTable[week][i][day] = subjectID + " - " + place
+                    timeTable[week][day][i] = {"subjectName": subjectName, "place": place}
     return timeTable
