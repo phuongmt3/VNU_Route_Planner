@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Main Page</title>
+
     <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
 
     <!-- Bootstrap 5 -->
@@ -29,8 +30,52 @@
         var bdListSelect = {{ bdListSelect| safe }};
         var posList = {{ posList| safe }};
     </script>
+    
+    <style>
+        table, th, td {
+            border: 2px solid black;
+            border-collapse: collapse;
+        }
+        table {
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
+    <nav>
+        <ul>
+            <li><a href="http://127.0.0.1:5000/"> View by day</a></li>
+            <li><a href="http://127.0.0.1:5000/viewbyweek"> View by week</a></li>
+        </ul>
+    </nav>
+    <form action="http://127.0.0.1:5000/" method="POST">
+        <label for="msv">MSV</label><br>
+        <input type="text" name="msv" id="msv">
+        <input type="submit" value="Search">
+    </form>
+    <br>
+    <h2>{{ hello }}</h2>
+    <br>
+    <h2>{{ timestamp }}</h2>
+    <br>
+    <table>
+        <tr>
+            <th colspan="2">Thời khóa biểu</th>
+        </tr>
+        <tr>
+            <th>Tiết</th>
+            <th>Môn học</th>
+        </tr>
+        {% for i in range(12) %}
+        <tr>
+            <td>{{ i + 1 }}</td>
+            <td>{{ arr[curWeek][i][curDay] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    
+    
+    
     {% for message in get_flashed_messages() %}
         <p>{{ message }}</p>
     {% endfor %}
