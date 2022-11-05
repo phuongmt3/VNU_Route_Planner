@@ -1,8 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Main Page</title>
+
+    <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Icon -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css"
+        integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.1/dist/leaflet.js"
+        integrity="sha256-NDI0K41gVbWqfkkaHj15IzU7PtMoelkzyKp8TOaFQ3s=" crossorigin=""></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="../static/styles.css">
+
+    <script src="../static/plugins/L.Polyline.SnakeAnim.js"></script>
+    <script>
+        var bdListSelect = {{ bdListSelect| safe }};
+        var posList = {{ posList| safe }};
+    </script>
+    
     <style>
         table, th, td {
             border: 2px solid black;
@@ -45,5 +73,48 @@
         </tr>
         {% endfor %}
     </table>
+    
+    
+    
+    {% for message in get_flashed_messages() %}
+        <p>{{ message }}</p>
+    {% endfor %}
+    <br>
+
+    <form action="http://127.0.0.1:5000/" method="POST" id="my-form">
+        <label>From </label>
+        <select name="startPlace">
+            <option value=""></option>
+            {% for i in showedPlaceList: %}
+            <option value={{i}}>{{placeNames[i]}}</option>
+            {% endfor %}
+        </select>
+
+        <label>To </label>
+        <select name="endPlace">
+            <option value=""></option>
+            {% for i in showedPlaceList: %}
+            <option value={{i}}>{{placeNames[i]}}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+
+        <input type="submit" name="submit_button" value="Search">
+        <input type="submit" name="submit_button" value="Reset Dijkstra database">
+        <br><br>
+
+        <label>Added location coordinates: </label>
+        <input type="number" name="pos1" min="21.036483" max="21.0419" step="0.000001">
+        <input type="number" name="pos2" min="105.780971" max="105.786121" step="0.000001">
+        <input type="submit" name="submit_button" value="Add Location">
+        <br><br>
+
+    </form>
+
+    <div id="map"></div>
+    <script type="module" src="../static/index.js"></script>
+
+    <footer class="fixed-bottom bg-light p-2">Distance: <u id="distance">{{distance}}</u> </footer>
+
 </body>
 </html>
