@@ -35,6 +35,7 @@ L.control.layers(baseMaps).addTo(map);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Add a site on click
+
 var popup = L.popup();
 
 function onMapClick(e) {
@@ -65,30 +66,7 @@ $(document).on('click','.newPlace',function() {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
-    })
-
-
-    // fetch(`/post_place/${placeName}`, {
-    //     method: "POST",
-    //     headers: { 'Content-Type': 'application/json' },
-    // })
-    //     .then(function (response) {
-    //         return response.json();
-    //     }).then(function (response) {
-    //         // Selecting default buildings
-    //         if (response.length == 0) {
-    //             return 0;
-    //         }
-
-    //         for (let i = 0; i < bdListSelect.length; i++) {
-    //             if (bdListSelect[i][0] == placeName) bdListSelect[i][2] = !bdListSelect[i][2];
-    //         }
-    //         map.closePopup();
-
-    //         renderRoad(response[0]);
-    //         // document.getElementById("distance").textContent = response[1];
-    //         console.log("Database' size = " + response[2]);
-    //     });
+    });
 });
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -99,7 +77,6 @@ const lineGroup = L.layerGroup([], { snakingPause: 0 })
 const buildingLayers = new Map();
 
 renderMarkers(markerList, map);
-renderRoad(posList);
 
 // Render buildings and add selecting events
 for (let i = 0; i < bdListSelect.length; i++) {
@@ -207,6 +184,39 @@ $(document).on('click','.postPlace',function() {
         });
 });
 
+// Change start/ end point when input text-box change
+$(document).on('change', '#startPlace, #endPlace', function() {
+    var options = $('datalist')[0].options;
+    var startPlace = document.querySelector("#startPlace").value;
+    var endPlace = document.querySelector("#endPlace").value;
+
+    selectPlace(endPlace)
+
+    for (var i = 0; i < options.length; i++) {
+      if (options[i].value === startPlace) {
+        findPath(startPlace, endPlace ? endPlace : "Cổng chính ĐHQGHN")
+        break;
+      }
+    }
+});
+
+// Hide building's name
+map.on('baselayerchange', function (e) {
+    if (e.name == "OpenStreetMap") {
+        $(".leaflet-tooltip").css("display", "none")
+    } else {
+        $(".leaflet-tooltip").css("display", "block")
+
+        map.on('zoomend', function () {
+            if (map.getZoom() < 16) {
+                $(".leaflet-tooltip").css("display", "none")
+            } else {
+                $(".leaflet-tooltip").css("display", "block")
+            }
+        })
+    }
+});
+
 function renderRoad(posList) {
     lineGroup.clearLayers()
 
@@ -228,23 +238,6 @@ function renderRoad(posList) {
     }
     lineGroup.addTo(map).snakeIn();
 }
-
-// Hide building's name
-map.on('baselayerchange', function (e) {
-    if (e.name == "OpenStreetMap") {
-        $(".leaflet-tooltip").css("display", "none")
-    } else {
-        $(".leaflet-tooltip").css("display", "block")
-
-        map.on('zoomend', function () {
-            if (map.getZoom() < 16) {
-                $(".leaflet-tooltip").css("display", "none")
-            } else {
-                $(".leaflet-tooltip").css("display", "block")
-            }
-        })
-    }
-});
 
 function mark(layer) {
     layer.setStyle({
@@ -273,19 +266,7 @@ function calculateCenter(coordinate) {
     return [long, lat];
 }
 
-// Testing
-
-// roadData.features.forEach(feature => {
-//     feature.geometry.coordinates.forEach(coordinate => {
-//         var marker = L.marker(L.latLng(coordinate[1], coordinate[0])).addTo(map);
-//         marker.bindPopup("[" + coordinate[1] + ", " + coordinate[0] + "]").openPopup();
-//     });
-// });
-
-$('.leaflet-container').css('cursor', 'crosshair');
-
-
-// Select named building and unselect others
+// Select a named building and unselect others
 export function selectPlace(name) {
     if (name.includes("-")) name = name.split("-")[1];
     // Todo: Marker for other places
@@ -331,23 +312,6 @@ export function findPath(name1, name2) {
         });
 }
 
-function updateTipPoints() {
-    var options = $('datalist')[0].options;
-    var startPlace = document.querySelector("#startPlace").value;
-    var endPlace = document.querySelector("#endPlace").value;
-
-    for (var i = 0; i < options.length; i++) {
-      if (options[i].value === startPlace) {
-        findPath(startPlace, endPlace ? endPlace : "Cong vao DHQG")
-        break;
-      }
-    }
-}
-
-$(document).on('change', '#startPlace, #endPlace', function() {
-    updateTipPoints();
-});
-
 $(document).keypress(
     function(event){
       if (event.which == '13') {
@@ -355,3 +319,6 @@ $(document).keypress(
         event.preventDefault();
       }
 });
+
+$('.leaflet-container').css('cursor', 'crosshair');
+

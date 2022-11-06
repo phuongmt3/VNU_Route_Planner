@@ -28,7 +28,6 @@
     <script src="../static/plugins/L.Polyline.SnakeAnim.js"></script>
     <script>
         var bdListSelect = {{ bdListSelect| safe }};
-        var posList = {{ posList| safe }};
         var timeTable = {{ timeTable| safe }};
         var markerList = {{ markerList| safe }};
     </script>
@@ -40,6 +39,7 @@
                 <label for="msv">MSV</label>
                 <input type="text" name="msv" id="msv">
                 <input type="submit" name="submit_button" value="Search">
+                <input type="submit" name="submit_button" value="Reset Dijkstra database">
                 <br><br>
                 
                 <input list="startPlaces" name="startPlace" id="startPlace">
@@ -56,17 +56,6 @@
                     <option value="{{placeNames[i]}}"></option>
                     {% endfor %}
                 </datalist>
-
-                <!-- <input type="submit" name="submit_button" value="Find path">
-                <input type="submit" name="submit_button" value="Reset Dijkstra database">
-                <br><br> -->
-
-                <!-- <label>Added location coordinates: </label>
-                <input type="number" name="pos1" min="21.036483" max="21.0419" step="0.000001">
-                <input type="number" name="pos2" min="105.780971" max="105.786121" step="0.000001">
-                <input type="submit" name="submit_button" value="Add Location">
-                <br><br> -->
-
             </form>
         </div>
 
@@ -77,7 +66,7 @@
           </div>
           <div class="col">
             <button class="btn" id="btn-today">
-                <b style="color: blue;">Today</b>
+                <b style="color: lightblue;">Today</b>
             </button>
             <button class="btn" id="btn-backward">
                 <span class="material-symbols-outlined">arrow_back_ios</span>

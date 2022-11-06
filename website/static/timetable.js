@@ -14,11 +14,11 @@ if (timeTable.length > 0) {
 
     selectPlace(endPlace)
 
-    findPath(startPlace ? startPlace : "Cong vao DHQG", endPlace ? endPlace : "Cong vao DHQG")
+    findPath(startPlace ? startPlace : "Cổng chính ĐHQGHN", endPlace ? endPlace : "Cổng chính ĐHQGHN")
     updateTimeTable();
 
-    $("#startPlace").val(startPlace ? startPlace : "Cong vao DHQG")
-    $("#endPlace").val(endPlace ? endPlace : "Cong vao DHQG")
+    $("#startPlace").val(startPlace ? startPlace : "Cổng chính ĐHQGHN")
+    $("#endPlace").val(endPlace ? endPlace : "Cổng chính ĐHQGHN")
 }
 
 function updateTimeTable() {
@@ -51,11 +51,11 @@ function addRowHandlers() {
 
                 selectPlace(endPlace)
 
-                findPath(startPlace ? startPlace : "Cong vao DHQG", endPlace ? endPlace : "Cong vao DHQG")
+                findPath(startPlace ? startPlace : "Cổng chính ĐHQGHN", endPlace ? endPlace : "Cổng chính ĐHQGHN")
                 updateTimeTable();
 
-                $("#startPlace").val(startPlace ? startPlace : "Cong vao DHQG")
-                $("#endPlace").val(endPlace ? endPlace : "Cong vao DHQG")
+                $("#startPlace").val(startPlace ? startPlace : "Cổng chính ĐHQGHN")
+                $("#endPlace").val(endPlace ? endPlace : "Cổng chính ĐHQGHN")
             };
         };
         currentRow.onclick = createClickHandler(currentRow);
