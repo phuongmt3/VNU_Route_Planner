@@ -20,6 +20,7 @@ var map = L.map('map', {
     zoom: 17,
     zoomSnap: 0.25,
     wheelPxPerZoomLevel: 120,
+    zoomControl: false,
     layers: [mb]
 });
 
@@ -33,18 +34,63 @@ L.control.layers(baseMaps).addTo(map);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Todo: add a site on click
+// Add a site on click
 var popup = L.popup();
 
 function onMapClick(e) {
     popup
         .setLatLng(e.latlng)
-        .setContent("You clicked the map at " + e.latlng.toString())
-        .openOn(map);
+        .setContent(`
+                <button type="button" class="newPlace btn btn-outline-success">` + e.latlng.toString() + `</button>
+            `);
+    
+    popup.openOn(map);
 }
 
 map.on('click', onMapClick);
 
+$(document).on('click','.newPlace',function() {
+    let posX = parseFloat(this.textContent.split('(')[1]);
+    let posY = parseFloat(this.textContent.split(' ')[1]);
+
+    console.log(posX)
+    console.log(posY)
+
+    var data = {
+        "posX": posX,
+        "posY": posY,
+    };
+
+    fetch(`/add_place/`, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    })
+
+
+    // fetch(`/post_place/${placeName}`, {
+    //     method: "POST",
+    //     headers: { 'Content-Type': 'application/json' },
+    // })
+    //     .then(function (response) {
+    //         return response.json();
+    //     }).then(function (response) {
+    //         // Selecting default buildings
+    //         if (response.length == 0) {
+    //             return 0;
+    //         }
+
+    //         for (let i = 0; i < bdListSelect.length; i++) {
+    //             if (bdListSelect[i][0] == placeName) bdListSelect[i][2] = !bdListSelect[i][2];
+    //         }
+    //         map.closePopup();
+
+    //         renderRoad(response[0]);
+    //         // document.getElementById("distance").textContent = response[1];
+    //         console.log("Database' size = " + response[2]);
+    //     });
+});
+    
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Render

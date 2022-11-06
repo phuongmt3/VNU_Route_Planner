@@ -9,8 +9,8 @@ var curWeek = Math.ceil((pickedDay - startSemester)/(24*3600*1000) / 7 )
 var curDayOfWeek = pickedDay.getDay()
 
 if (timeTable.length > 0) {
-    var startPlace = (curLesson >= 1 && curLesson <= 12) ? timeTable[curWeek-1][curDayOfWeek][curLesson-1].place : "";
-    var endPlace = (curLesson >= 1 && curLesson <= 12) ? timeTable[curWeek-1][curDayOfWeek][curLesson].place : "";
+    var startPlace = (curLesson >= 0 && curLesson < 12) ? timeTable[curWeek-1][curDayOfWeek][curLesson-1].place : "";
+    var endPlace = (curLesson >= 0 && curLesson < 12) ? timeTable[curWeek-1][curDayOfWeek][curLesson].place : "";
 
     selectPlace(endPlace)
 

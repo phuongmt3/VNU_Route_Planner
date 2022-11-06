@@ -11,16 +11,28 @@ views = Blueprint('views', __name__)
 road = Road()
 
 
+@views.route('/add_place/', methods=['POST'])
+def addPlace():
+    posX, posY = request.json['posX'], request.json['posY']
+
+    newpos = [float(posX), float(posY)]
+    if not havePointInDB(newpos):
+        initGlobal()
+        nearestRoad(newpos)
+
+    return []
+
+
 @views.route('/find_path/', methods=['POST'])
 def findPath():
     name1, name2 = request.json['name1'], request.json['name2']
 
     # Get id from name
-    mycursor.execute("select `id` from `points` where `name` = %s", (name1,))
+    mycursor.execute("select `id` from `points` where `main` > 0 and `name` = %s", (name1,))
     data = mycursor.fetchone()
     startID = int(str(data[0]))
 
-    mycursor.execute("select `id` from `points` where `name` = %s", (name2,))
+    mycursor.execute("select `id` from `points` where `main` > 0 and `name` = %s", (name2,))
     data = mycursor.fetchone()
     endID = int(str(data[0]))
 
@@ -36,7 +48,7 @@ def findPath():
 @views.route('/post_place/<name>', methods=['POST'])
 def postPlace(name):
     # Get id from name
-    mycursor.execute("select `id`, `main` from `points` where `name` = %s", (name,))
+    mycursor.execute("select `id`, `main` from `points` where `main` > 0 and `name` = %s", (name,))
     data = mycursor.fetchone()
     thisPlaceId = int(str(data[0]))
 

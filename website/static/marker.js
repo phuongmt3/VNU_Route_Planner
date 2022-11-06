@@ -12,8 +12,8 @@ export function renderMarkers(markerList, map) {
     markerList.forEach(marker => {
         var thisMarker = L.marker([marker[1], marker[2]], {icon: T_waypoint}).addTo(map);
     
-        var smallPopup = L.popup()
-                .setLatLng([marker[1] + 0.0003, marker[2]])
+        var smallPopup = L.popup({ offset: [0, -20] })
+                .setLatLng([marker[1], marker[2]])
                 .setContent(marker[0]);
     
         thisMarker.bindPopup(L.popup({autoClose: false})

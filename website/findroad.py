@@ -94,8 +94,8 @@ def initGlobal():
     posX = [0.0]
     posY = [0.0]
     for d in data:
-        posX.append(float(json.dumps(d[3], cls=DecimalEncoder)))
-        posY.append(float(json.dumps(d[4], cls=DecimalEncoder)))
+        posX.append(float(d[3]))
+        posY.append(float(d[4]))
 
 
 def initRoad(showedPlaceList=[], placeNames=[""]):
