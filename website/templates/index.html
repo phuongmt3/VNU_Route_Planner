@@ -29,7 +29,8 @@
     <script>
         var bdListSelect = {{ bdListSelect| safe }};
         var posList = {{ posList| safe }};
-        var timeTable = {{ timeTable| safe }}
+        var timeTable = {{ timeTable| safe }};
+        var markerList = {{ markerList| safe }};
     </script>
 </head>
 <body>
@@ -40,8 +41,8 @@
                 <input type="text" name="msv" id="msv">
                 <input type="submit" name="submit_button" value="Search">
                 <br><br>
-
-                <label>From </label>
+                
+                <!-- <label>From </label>
                 <select name="startPlace">
                     <option value=""></option>
                     {% for i in showedPlaceList: %}
@@ -59,7 +60,7 @@
 
                 <input type="submit" name="submit_button" value="Find path">
                 <input type="submit" name="submit_button" value="Reset Dijkstra database">
-                <br><br>
+                <br><br> -->
 
                 <label>Added location coordinates: </label>
                 <input type="number" name="pos1" min="21.036483" max="21.0419" step="0.000001">
