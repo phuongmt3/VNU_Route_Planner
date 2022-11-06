@@ -82,6 +82,9 @@ class Road:
         trackingList = self.getTrackingList()
         self.posList = [[posX[i], posY[i]] for i in trackingList]
 
+    def reset(self):
+        self.placesByTime = []
+
 
 def initGlobal():
     global posX, posY

@@ -24,6 +24,7 @@ def findPath():
     data = mycursor.fetchone()
     endID = int(str(data[0]))
 
+    road.reset()
     road.calculate(startID, endID)
 
     mycursor.execute("select Count(*) from `dijkstra`")

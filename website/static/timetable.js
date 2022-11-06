@@ -16,6 +16,9 @@ if (timeTable.length > 0) {
 
     findPath(startPlace ? startPlace : "Cong vao DHQG", endPlace ? endPlace : "Cong vao DHQG")
     updateTimeTable();
+
+    $("#startPlace").val(startPlace ? startPlace : "Cong vao DHQG")
+    $("#endPlace").val(endPlace ? endPlace : "Cong vao DHQG")
 }
 
 function updateTimeTable() {
@@ -50,6 +53,9 @@ function addRowHandlers() {
 
                 findPath(startPlace ? startPlace : "Cong vao DHQG", endPlace ? endPlace : "Cong vao DHQG")
                 updateTimeTable();
+
+                $("#startPlace").val(startPlace ? startPlace : "Cong vao DHQG")
+                $("#endPlace").val(endPlace ? endPlace : "Cong vao DHQG")
             };
         };
         currentRow.onclick = createClickHandler(currentRow);

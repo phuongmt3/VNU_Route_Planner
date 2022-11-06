@@ -28,3 +28,8 @@ body,
 td {
     cursor: pointer;
 }
+
+#startPlace,
+#endPlace {
+    border: 0;
+}

@@ -42,34 +42,34 @@
                 <input type="submit" name="submit_button" value="Search">
                 <br><br>
                 
-                <!-- <label>From </label>
-                <select name="startPlace">
-                    <option value=""></option>
+                <input list="startPlaces" name="startPlace" id="startPlace">
+                <datalist id="startPlaces">
                     {% for i in showedPlaceList: %}
-                    <option value={{i}}>{{placeNames[i]}}</option>
+                    <option value="{{placeNames[i]}}"></option>
                     {% endfor %}
-                </select>
+                </datalist>
 
-                <label>To </label>
-                <select name="endPlace">
-                    <option value=""></option>
+                <label> --> </label>
+                <input list="endPlaces" name="endPlace" id="endPlace">
+                <datalist id="endPlaces">
                     {% for i in showedPlaceList: %}
-                    <option value={{i}}>{{placeNames[i]}}</option>
+                    <option value="{{placeNames[i]}}"></option>
                     {% endfor %}
-                </select>
+                </datalist>
 
-                <input type="submit" name="submit_button" value="Find path">
-                <input type="submit" name="submit_button" value="Reset Dijkstra database">
-                <br><br> -->
+                <!-- <input type="submit" name="submit_button" value="Find path">
+                <input type="submit" name="submit_button" value="Reset Dijkstra database"> -->
+                <br><br>
 
-                <label>Added location coordinates: </label>
+                <!-- <label>Added location coordinates: </label>
                 <input type="number" name="pos1" min="21.036483" max="21.0419" step="0.000001">
                 <input type="number" name="pos2" min="105.780971" max="105.786121" step="0.000001">
                 <input type="submit" name="submit_button" value="Add Location">
-                <br><br>
+                <br><br> -->
 
             </form>
         </div>
+
         <div class="row h-75">
           <div class="col-9">
             <div id="map"></div>

@@ -284,3 +284,28 @@ export function findPath(name1, name2) {
             console.log("Database' size = " + response[2]);
         });
 }
+
+function updateTipPoints() {
+    var options = $('datalist')[0].options;
+    var startPlace = document.querySelector("#startPlace").value;
+    var endPlace = document.querySelector("#endPlace").value;
+
+    for (var i = 0; i < options.length; i++) {
+      if (options[i].value === startPlace) {
+        findPath(startPlace, endPlace ? endPlace : "Cong vao DHQG")
+        break;
+      }
+    }
+}
+
+$(document).on('change', '#startPlace, #endPlace', function() {
+    updateTipPoints();
+});
+
+$(document).keypress(
+    function(event){
+      if (event.which == '13') {
+        $('#map').focus()
+        event.preventDefault();
+      }
+});
