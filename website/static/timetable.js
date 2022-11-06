@@ -6,27 +6,29 @@ const startSemester = new Date("2022/08/29")
 var pickedDay = new Date();
 var curLesson = Math.floor(pickedDay.getHours() - 6)
 var curWeek = Math.ceil((pickedDay - startSemester)/(24*3600*1000) / 7 )
-var curDay = pickedDay.getDay()
+var curDayOfWeek = pickedDay.getDay()
 
 if (timeTable.length > 0) {
-    var startPlace = (curLesson >= 1 && curLesson <= 12) ? timeTable[curWeek-1][curDay][curLesson-1].place : "";
-    var endPlace = (curLesson >= 1 && curLesson <= 12) ? timeTable[curWeek-1][curDay][curLesson].place : "";
+    var startPlace = (curLesson >= 1 && curLesson <= 12) ? timeTable[curWeek-1][curDayOfWeek][curLesson-1].place : "";
+    var endPlace = (curLesson >= 1 && curLesson <= 12) ? timeTable[curWeek-1][curDayOfWeek][curLesson].place : "";
 
-    selectPlace(startPlace)
     selectPlace(endPlace)
 
     findPath(startPlace ? startPlace : "Cong vao DHQG", endPlace ? endPlace : "Cong vao DHQG")
     updateTimeTable();
+
+    $("#startPlace").val(startPlace ? startPlace : "Cong vao DHQG")
+    $("#endPlace").val(endPlace ? endPlace : "Cong vao DHQG")
 }
 
 function updateTimeTable() {
     curWeek = Math.ceil((pickedDay - startSemester)/(24*3600*1000) / 7 )
-    curDay = pickedDay.getDay()
+    curDayOfWeek = pickedDay.getDay()
 
     document.getElementById("weekNum").textContent = "Tuần " + curWeek;
 
     for (let i = 1; i <= 12; i++) {
-        document.querySelector("#lesson"+i+">td").textContent = timeTable[curWeek-1][curDay][i-1].subjectName;
+        document.querySelector("#lesson"+i+">td").textContent = timeTable[curWeek-1][curDayOfWeek][i-1].subjectName;
         if (i == curLesson+1) 
             document.querySelector("#lesson"+i).style = "background: lightblue;";
         else 
@@ -44,13 +46,16 @@ function addRowHandlers() {
             return function() {
                 curLesson = row.getElementsByTagName("th")[0].textContent - 1;
 
-                var startPlace = (curLesson > 0) ? timeTable[curWeek-1][curDay][curLesson-1].place : "";
-                var endPlace = timeTable[curWeek-1][curDay][curLesson].place;
+                var startPlace = (curLesson > 0) ? timeTable[curWeek-1][curDayOfWeek][curLesson-1].place : "";
+                var endPlace = timeTable[curWeek-1][curDayOfWeek][curLesson].place;
 
                 selectPlace(endPlace)
 
                 findPath(startPlace ? startPlace : "Cong vao DHQG", endPlace ? endPlace : "Cong vao DHQG")
                 updateTimeTable();
+
+                $("#startPlace").val(startPlace ? startPlace : "Cong vao DHQG")
+                $("#endPlace").val(endPlace ? endPlace : "Cong vao DHQG")
             };
         };
         currentRow.onclick = createClickHandler(currentRow);

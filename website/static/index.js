@@ -1,4 +1,5 @@
 import { geojsonFeature as buildings } from '../static/geoData/buildingData.js'
+import { renderMarkers } from './marker.js';
 
 // Map layer
 
@@ -29,19 +30,6 @@ var baseMaps = {
 
 L.control.layers(baseMaps).addTo(map);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Icons stuff
-
-// var T_waypoint = L.icon({
-//     iconUrl: 'https://preview.redd.it/2yv5x9hto5f61.png?width=341&format=png&auto=webp&s=eccf34f646917d5a7c0196de5c2fc2e7ef3e2427',
-//     // shadowUrl: '',
-//     iconSize:     [34, 34], // size of the icon
-//     // shadowSize:   [50, 64], // size of the shadow
-//     iconAnchor:   [17, 34], // point of the icon which will correspond to marker's location
-//     // shadowAnchor: [4, 62],  // the same for the shadow
-//     popupAnchor:  [0, -34] // point from which the popup should open relative to the iconAnchor
-// });
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -61,9 +49,10 @@ map.on('click', onMapClick);
 
 // Render
 
+const lineGroup = L.layerGroup([], { snakingPause: 0 })
 const buildingLayers = new Map();
 
-var lineGroup = L.layerGroup([], { snakingPause: 0 })
+renderMarkers(markerList, map);
 renderRoad(posList);
 
 // Render buildings and add selecting events
@@ -93,7 +82,7 @@ for (let i = 0; i < bdListSelect.length; i++) {
                         <div class="modal-content overflow-auto" style="height: 200px">
                             <div class="modal-header">
                                 <h5 class="modal-title">` + bdListSelect[i][1] + `</h5>
-                                <button type="button" id="` + i + `" class="postPlace btn btn-outline-success">Visit</button>
+                                <button type="button" id="` + bdListSelect[i][0] + `" class="postPlace btn btn-outline-success">Visit</button>
                             </div>
                             <div class="modal-body">
                                 <p>` + `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.` + `</p>
@@ -128,7 +117,7 @@ for (let i = 0; i < bdListSelect.length; i++) {
                 // Displace unvisit if building's visiting
                 if (bdListSelect[i][2]) {
                     $(document).ready(function(){
-                        $(".postPlace").replaceWith(`<button type="button" id="` + i + `" class="postPlace btn btn-outline-danger">Unvisit</button>`);
+                        $(".postPlace").replaceWith(`<button type="button" id="` + bdListSelect[i][0] + `" class="postPlace btn btn-outline-danger">Unvisit</button>`);
                     })
                 }
 
@@ -147,9 +136,9 @@ for (let i = 0; i < bdListSelect.length; i++) {
 
 // Add place and update path, distance when click "visit"
 $(document).on('click','.postPlace',function() {
-    let bdIndex = this.id
+    let placeName = this.id
 
-    fetch(`/post_place/${bdListSelect[bdIndex][0]}`, {
+    fetch(`/post_place/${placeName}`, {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
     })
@@ -161,7 +150,9 @@ $(document).on('click','.postPlace',function() {
                 return 0;
             }
 
-            bdListSelect[bdIndex][2] = !bdListSelect[bdIndex][2];
+            for (let i = 0; i < bdListSelect.length; i++) {
+                if (bdListSelect[i][0] == placeName) bdListSelect[i][2] = !bdListSelect[i][2];
+            }
             map.closePopup();
 
             renderRoad(response[0]);
@@ -293,3 +284,28 @@ export function findPath(name1, name2) {
             console.log("Database' size = " + response[2]);
         });
 }
+
+function updateTipPoints() {
+    var options = $('datalist')[0].options;
+    var startPlace = document.querySelector("#startPlace").value;
+    var endPlace = document.querySelector("#endPlace").value;
+
+    for (var i = 0; i < options.length; i++) {
+      if (options[i].value === startPlace) {
+        findPath(startPlace, endPlace ? endPlace : "Cong vao DHQG")
+        break;
+      }
+    }
+}
+
+$(document).on('change', '#startPlace, #endPlace', function() {
+    updateTipPoints();
+});
+
+$(document).keypress(
+    function(event){
+      if (event.which == '13') {
+        $('#map').focus()
+        event.preventDefault();
+      }
+});

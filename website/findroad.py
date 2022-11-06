@@ -5,7 +5,6 @@ from .models import mycursor, db
 import json
 import decimal
 
-
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, decimal.Decimal):
@@ -13,24 +12,99 @@ class DecimalEncoder(json.JSONEncoder):
         return super(DecimalEncoder, self).default(o)
 
 
+class Road:
+    def __init__(self):
+        self.placesByTime = []
+        self.distance = 0
+        self.posList = []
+    
+    # Update placesByTime, calculate distance, posList
+    def calculate(self, startID, endID):
+        if len(self.placesByTime) < 2:
+            self.placesByTime = [startID, endID]
+            self.distance = dijkstra(startID, endID)
+        else:
+            visitList = self.placesByTime[1:-1]
+            
+            self.placesByTime = [startID, endID]
+            self.distance = dijkstra(startID, endID)
+
+            for visit in visitList:
+                self.addPlace(visit)
+
+        trackingList = self.getTrackingList()
+        self.posList = [[posX[i], posY[i]] for i in trackingList]
+
+    # Get Id of places from start to end
+    def getTrackingList(self):
+        trackingList = [self.placesByTime[-1]]
+        for i in range(len(self.placesByTime) - 1, 0, -1):
+            aim = self.placesByTime[i]
+            while aim != self.placesByTime[i - 1]:
+                mycursor.execute("select * from `dijkstra` where id1=%s and id2=%s", (self.placesByTime[i - 1], aim))
+                data = mycursor.fetchone()
+                trackingList.append(data[3])
+                aim = data[3]
+        trackingList.reverse()
+        return trackingList
+
+    # Add place to placesByTime and update distance, posList
+    def addPlace(self, addedId):
+        distanceAns = self.distance - dijkstra(self.placesByTime[0], self.placesByTime[1]) \
+                    + dijkstra(self.placesByTime[0], addedId) \
+                    + dijkstra(addedId, self.placesByTime[1])
+        posToAdd = 1
+        for i in range(1, len(self.placesByTime) - 1):
+            newDistance = self.distance - dijkstra(self.placesByTime[i], self.placesByTime[i + 1]) \
+                        + dijkstra(self.placesByTime[i], addedId) \
+                        + dijkstra(addedId, self.placesByTime[i + 1])
+            if newDistance < distanceAns:
+                distanceAns = newDistance
+                posToAdd = i + 1
+
+        self.distance = distanceAns
+        self.placesByTime.insert(posToAdd, addedId)
+
+        trackingList = self.getTrackingList()
+        self.posList = [[posX[i], posY[i]] for i in trackingList]
+
+    # Remove place from placesByTime and update distance, posList
+    def removePlace(self, removeId):
+        index = self.placesByTime.index(removeId)
+        if index == 0 or index == len(self.placesByTime) - 1:
+            return
+        self.distance = self.distance + dijkstra(self.placesByTime[index - 1], self.placesByTime[index + 1]) \
+                - dijkstra(self.placesByTime[index - 1], removeId) \
+                - dijkstra(removeId, self.placesByTime[index + 1])
+
+        self.placesByTime.remove(removeId)
+
+        trackingList = self.getTrackingList()
+        self.posList = [[posX[i], posY[i]] for i in trackingList]
+
+    def reset(self):
+        self.placesByTime = []
+
+
 def initGlobal():
-    global placesByTime, distance, posX, posY
-    placesByTime = []
-    distance = 0
+    global posX, posY
+    mycursor.execute("select * from `points`")
+    data = mycursor.fetchall()
+    
     posX = [0.0]
     posY = [0.0]
+    for d in data:
+        posX.append(float(json.dumps(d[3], cls=DecimalEncoder)))
+        posY.append(float(json.dumps(d[4], cls=DecimalEncoder)))
 
 
 def initRoad(showedPlaceList=[], placeNames=[""]):
-    global posX, posY
     mycursor.execute("select * from `points`")
     data = mycursor.fetchall()
     for d in data:
         if d[2] > 0:
             showedPlaceList.append(d[0])
         placeNames.append(d[1])
-        posX.append(float(json.dumps(d[3], cls=DecimalEncoder)))
-        posY.append(float(json.dumps(d[4], cls=DecimalEncoder)))
 
 
 def resetDijkstraTable():
@@ -128,53 +202,6 @@ def dijkstra(id1, id2):
 
     # if answer is already existed
     return ans[0]
-
-
-def getTrackingList():
-    global placesByTime
-    trackingList = []
-    for i in range(len(placesByTime) - 1, 0, -1):
-        aim = placesByTime[i]
-        while aim != placesByTime[i - 1]:
-            mycursor.execute("select * from `dijkstra` where id1=%s and id2=%s", (placesByTime[i - 1], aim))
-            data = mycursor.fetchone()
-            trackingList.append(data[3])
-            aim = data[3]
-    return trackingList
-
-
-# Add place to placesByTime and update distance
-def addPlace(addedId):
-    global distance, placesByTime
-
-    distanceAns = distance - dijkstra(placesByTime[0], placesByTime[1]) \
-                  + dijkstra(placesByTime[0], addedId) \
-                  + dijkstra(addedId, placesByTime[1])
-    posToAdd = 1
-    for i in range(1, len(placesByTime) - 1):
-        newDistance = distance - dijkstra(placesByTime[i], placesByTime[i + 1]) \
-                      + dijkstra(placesByTime[i], addedId) \
-                      + dijkstra(addedId, placesByTime[i + 1])
-        if newDistance < distanceAns:
-            distanceAns = newDistance
-            posToAdd = i + 1
-
-    distance = distanceAns
-    placesByTime.insert(posToAdd, addedId)
-
-
-# Remove place from placesByTime and update distance
-def removePlace(removeId):
-    global distance, placesByTime
-
-    index = placesByTime.index(removeId)
-    if index == 0 or index == len(placesByTime) - 1:
-        return
-    distance = distance + dijkstra(placesByTime[index - 1], placesByTime[index + 1]) \
-               - dijkstra(placesByTime[index - 1], removeId) \
-               - dijkstra(removeId, placesByTime[index + 1])
-
-    placesByTime.remove(removeId)
 
 
 def havePointInDB(p):
