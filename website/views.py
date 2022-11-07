@@ -3,7 +3,6 @@ from .models import mycursor
 import json
 
 from .findroad import *
-from .findbuilding import getBuildingList
 from .findschedule import getSubjectList, getTimeTable
 
 
@@ -86,10 +85,12 @@ def home():
 
     timeTable = []
 
-    mycursor.execute("SELECT name, posY, posX FROM points WHERE main = 2")
+    mycursor.execute("SELECT name, posY, posX, main FROM points WHERE main > 1")
     markerList = mycursor.fetchall()
 
-    bdListSelect = getBuildingList()
+    mycursor.execute("SELECT * FROM diadiem")
+    data = mycursor.fetchall()
+    placeList = [x + (False,) for x in data]
 
     if request.method == 'POST':
         if request.form['submit_button'] == 'Search':
@@ -108,7 +109,7 @@ def home():
 
 
     return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList,
-                           bdListSelect=json.dumps(bdListSelect),
+                           placeList=json.dumps(placeList),
                            timeTable=json.dumps(timeTable), 
                            markerList=json.dumps(markerList, cls=DecimalEncoder))
 
