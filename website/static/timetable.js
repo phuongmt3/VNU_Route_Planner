@@ -9,16 +9,16 @@ var curWeek = Math.ceil((pickedDay - startSemester)/(24*3600*1000) / 7 )
 var curDayOfWeek = pickedDay.getDay()
 
 if (timeTable.length > 0) {
-    var startPlace = (curLesson >= 1 && curLesson <= 12) ? timeTable[curWeek-1][curDayOfWeek][curLesson-1].place : "";
-    var endPlace = (curLesson >= 1 && curLesson <= 12) ? timeTable[curWeek-1][curDayOfWeek][curLesson].place : "";
+    var startPlace = (curLesson >= 0 && curLesson < 12) ? timeTable[curWeek-1][curDayOfWeek][curLesson-1].place : "";
+    var endPlace = (curLesson >= 0 && curLesson < 12) ? timeTable[curWeek-1][curDayOfWeek][curLesson].place : "";
 
     selectPlace(endPlace)
 
-    findPath(startPlace ? startPlace : "Cong vao DHQG", endPlace ? endPlace : "Cong vao DHQG")
+    findPath(startPlace ? startPlace : "Cổng chính ĐHQGHN", endPlace ? endPlace : "Cổng chính ĐHQGHN")
     updateTimeTable();
 
-    $("#startPlace").val(startPlace ? startPlace : "Cong vao DHQG")
-    $("#endPlace").val(endPlace ? endPlace : "Cong vao DHQG")
+    $("#startPlace").val(startPlace ? startPlace : "Cổng chính ĐHQGHN")
+    $("#endPlace").val(endPlace ? endPlace : "Cổng chính ĐHQGHN")
 }
 
 function updateTimeTable() {
@@ -51,11 +51,11 @@ function addRowHandlers() {
 
                 selectPlace(endPlace)
 
-                findPath(startPlace ? startPlace : "Cong vao DHQG", endPlace ? endPlace : "Cong vao DHQG")
+                findPath(startPlace ? startPlace : "Cổng chính ĐHQGHN", endPlace ? endPlace : "Cổng chính ĐHQGHN")
                 updateTimeTable();
 
-                $("#startPlace").val(startPlace ? startPlace : "Cong vao DHQG")
-                $("#endPlace").val(endPlace ? endPlace : "Cong vao DHQG")
+                $("#startPlace").val(startPlace ? startPlace : "Cổng chính ĐHQGHN")
+                $("#endPlace").val(endPlace ? endPlace : "Cổng chính ĐHQGHN")
             };
         };
         currentRow.onclick = createClickHandler(currentRow);
