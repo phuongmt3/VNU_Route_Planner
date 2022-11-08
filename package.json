@@ -1,0 +1,6 @@
+{
+  "main": "/website/static/javascript/map.js",
+  "dependencies": {
+    "leaflet-easybutton": "^2.4.0"
+  }
+}

@@ -77,6 +77,17 @@ function setBuildingEvent(placeList, map) {
     }
 }
 
+export function selectAllBuilding() {
+    for (const buildingInfo of placeList) {
+        buildingInfo[4] = true;
+
+        let buildingData = buildingMap.get(buildingInfo[0]);
+        if (!buildingData) continue;
+
+        mark(buildingData.layer);
+    }
+}
+
 function calculateCenter(coordinate) {
     let lat = 0;
     let long = 0;

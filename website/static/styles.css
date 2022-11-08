@@ -60,3 +60,15 @@ td {
   padding: 0 2.3rem;
 }
 
+.widget-code {
+  display: block;
+  position: absolute;
+  font-size: 36px;
+  left: -1px;
+  top: 3px;
+}
+
+.leaflet-touch .leaflet-bar button {
+  width: 44px;
+  height: 44px;
+}

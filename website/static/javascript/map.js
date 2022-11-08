@@ -1,6 +1,6 @@
 import { renderMarkers } from './marker.js';
 import { onMapClick } from './addPlace.js';
-import { renderBuilding, selectPlace, clearPlaceSelect } from './building.js';
+import { renderBuilding, selectPlace, clearPlaceSelect, selectAllBuilding } from './building.js';
 import { renderRoad } from './road.js';
 
 var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -30,7 +30,7 @@ var baseMaps = {
 };
 
 L.Control.textbox = L.Control.extend({
-    onAdd: function(map) {
+    onAdd: function() {
         var text = L.DomUtil.create('div');
         text.id = "info_text";
         text.innerHTML = `
@@ -46,10 +46,11 @@ L.Control.textbox = L.Control.extend({
                 <input class="input" list="endPlaces" name="endPlace" id="endPlace">
             </span>
             `;
+        
         return text;
     },
 
-    onRemove: function(map) {
+    onRemove: function() {
         // Nothing to do here
     }
 });
@@ -61,7 +62,6 @@ const lineGroup = L.layerGroup([], { snakingPause: 0 })
 const foodGroup = L.layerGroup([])
 const souvenirGroup = L.layerGroup([])
 
-// onMapClick(map); // Add new place
 renderBuilding(map, placeList, buildingNameGroup);
 renderMarkers(map, markerList, placeList, foodGroup, souvenirGroup);
 
@@ -74,9 +74,26 @@ var overlayMaps = {
 
 var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 
+var developMode = L.easyButton({
+    position: 'topright',
+    states: [{
+            stateName: 'toggle_develop_mode',       
+            icon:      '<span class="material-symbols-outlined widget-code">build</span>',            
+            title:     'toggle develop mode',     
+            onClick: function(btn, map) {     
+                onMapClick(map);    // Add new place
+
+                selectAllBuilding();
+                lineGroup.addTo(map);
+                buildingNameGroup.addTo(map);
+                foodGroup.addTo(map);
+                souvenirGroup.addTo(map);
+            }
+        }]
+}).addTo(map);
+
 // Add place and update path, distance when click "visit"
 $(document).on('click','.postPlace',function() {
-    map.closePopup();
 
     let placeName = this.id
     fetch(`/post_place/${placeName}`, {
@@ -88,6 +105,8 @@ $(document).on('click','.postPlace',function() {
         }).then(function (response) {
             if (response.length == 0) 
                 return;
+                
+            map.closePopup();
 
             renderRoad(map, response[0], lineGroup);
             selectPlace(placeName);
