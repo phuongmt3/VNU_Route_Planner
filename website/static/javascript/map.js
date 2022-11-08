@@ -29,18 +29,45 @@ var baseMaps = {
     "ESRI satellite": mb
 };
 
-const buildingNameGroup = L.layerGroup([]).addTo(map)
+L.Control.textbox = L.Control.extend({
+    onAdd: function(map) {
+        var text = L.DomUtil.create('div');
+        text.id = "info_text";
+        text.innerHTML = `
+            <span class="material-symbols-outlined">assistant_direction</span>
+            
+            <span class="input-wrap"><span class="width-machine" style="opacity: 0;">Cổng chính ĐHQGHN</span>
+                <input class="input" list="startPlaces" name="startPlace" id="startPlace">
+            </span>
+            
+            <span class="col-auto material-symbols-outlined">arrow_right</span>
+            
+            <span class="input-wrap"><span class="width-machine" style="opacity: 0;">Cổng chính ĐHQGHN</span>
+                <input class="input" list="endPlaces" name="endPlace" id="endPlace">
+            </span>
+            `;
+        return text;
+    },
+
+    onRemove: function(map) {
+        // Nothing to do here
+    }
+});
+L.control.textbox = function(opts) { return new L.Control.textbox(opts);}
+L.control.textbox({ position: 'topleft' }).addTo(map);
+
+const buildingNameGroup = L.layerGroup([])
 const lineGroup = L.layerGroup([], { snakingPause: 0 })
 const foodGroup = L.layerGroup([])
 const souvenirGroup = L.layerGroup([])
 
-onMapClick(map); // Add new place
+// onMapClick(map); // Add new place
 renderBuilding(map, placeList, buildingNameGroup);
 renderMarkers(map, markerList, placeList, foodGroup, souvenirGroup);
 
 var overlayMaps = {
-    "Building's name": buildingNameGroup,
     "Path": lineGroup,
+    "Building's name": buildingNameGroup,
     "Food": foodGroup,
     "Souvenir": souvenirGroup
 };
@@ -131,6 +158,13 @@ $(document).keypress(
         $('#map').focus()
         event.preventDefault();
       }
+});
+
+// Dealing with Input width
+let el = document.querySelector(".input-wrap .input");
+let widthMachine = document.querySelector(".input-wrap .width-machine");
+el.addEventListener("keyup", () => {
+  widthMachine.innerHTML = el.value;
 });
 
 $('.leaflet-container').css('cursor', 'crosshair');

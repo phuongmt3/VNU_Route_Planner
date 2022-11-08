@@ -36,30 +36,30 @@
 </head>
 <body>
     <div class="main-wrapper h-100">
-        <div class="row">
-            <form action="http://127.0.0.1:5000/" method="POST" id="my-form">
-                <label for="msv">MSV</label>
-                <input type="text" name="msv" id="msv">
-                <input type="submit" name="submit_button" value="Search">
-                <input type="submit" name="submit_button" value="Reset Dijkstra database">
-                <br><br>
-                
-                <input list="startPlaces" name="startPlace" id="startPlace">
-                <datalist id="startPlaces">
-                    {% for i in showedPlaceList: %}
-                    <option value="{{placeNames[i]}}"></option>
-                    {% endfor %}
-                </datalist>
+        <form class="row pt-3 ps-3" action="http://127.0.0.1:5000/" method="POST" id="my-form">
+            <div class="col-auto">
+                <label for="msv" class="visually-hidden">Password</label>
+                <input type="text" class="form-control" id="msv" name="msv" placeholder="MSV">
+            </div>
+            <div class="col-auto">
+                <button type="submit" name="submit_button" class="btn btn-primary mb-3" value="Search">Search</button>
+            </div>
+            <div class="col-auto">
+                <button type="submit" name="submit_button" class="btn btn-primary mb-3" value="Reset Dijkstra database">Reset Dijkstra database</button>
+            </div>
 
-                <label> --> </label>
-                <input list="endPlaces" name="endPlace" id="endPlace">
-                <datalist id="endPlaces">
-                    {% for i in showedPlaceList: %}
-                    <option value="{{placeNames[i]}}"></option>
-                    {% endfor %}
-                </datalist>
-            </form>
-        </div>
+            <datalist id="startPlaces">
+                {% for i in showedPlaceList: %}
+                <option value="{{placeNames[i]}}"></option>
+                {% endfor %}
+            </datalist>
+
+            <datalist id="endPlaces">
+                {% for i in showedPlaceList: %}
+                <option value="{{placeNames[i]}}"></option>
+                {% endfor %}
+            </datalist>
+        </form>
 
         <div class="row h-100">
           <div class="col-9">

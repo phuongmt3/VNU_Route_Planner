@@ -6,8 +6,7 @@ export function renderBuilding(map, placeList, buildingNameGroup) {
     L.geoJSON(buildings, {
         onEachFeature: function (feature, layer) {
             const centerPosition = calculateCenter(feature.geometry.coordinates[0][0]);
-            buildingNameGroup.addLayer(L.tooltip(centerPosition, { content: feature.properties.name, permanent: true, direction: 'center', className: "my-labels" })
-                    .addTo(map));
+            buildingNameGroup.addLayer(L.tooltip(centerPosition, { content: feature.properties.name, permanent: true, direction: 'center', className: "my-labels" }));
             const smallPopup = L.popup()
                     .setLatLng(centerPosition);
     
