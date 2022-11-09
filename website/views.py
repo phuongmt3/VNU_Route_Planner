@@ -1,11 +1,8 @@
 from flask import Blueprint, render_template, request
-from .models import mycursor
-import json
 
 from .findroad import *
 from .findbuilding import getBuildingList
 from .findschedule import getSubjectList, getTimeTable
-
 
 views = Blueprint('views', __name__)
 road = Road()
@@ -56,7 +53,7 @@ def postPlace(name):
         return []
 
     # Switch gate start/ end
-    if (data[1] == 2):
+    if data[1] == 2:
         mycursor.execute("select `main` from `points` where `id` = %s", (road.placesByTime[0],))
         if mycursor.fetchone()[0] == 2:
             road.calculate(thisPlaceId, road.placesByTime[-1])
@@ -75,7 +72,7 @@ def postPlace(name):
 
     return json.dumps([road.posList, round(road.distance, 3), dbSize], cls=DecimalEncoder)
 
-    
+
 @views.route('/', methods=['GET', 'POST'])
 def home():
     initGlobal()
@@ -106,9 +103,7 @@ def home():
             resetDijkstraTable()
             print('Reset Dijkstra database successfully!')
 
-
     return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList,
                            bdListSelect=json.dumps(bdListSelect),
-                           timeTable=json.dumps(timeTable), 
+                           timeTable=json.dumps(timeTable),
                            markerList=json.dumps(markerList, cls=DecimalEncoder))
-

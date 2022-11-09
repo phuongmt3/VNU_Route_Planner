@@ -5,6 +5,7 @@ from .models import mycursor, db
 import json
 import decimal
 
+
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, decimal.Decimal):
@@ -17,18 +18,14 @@ class Road:
         self.placesByTime = []
         self.distance = 0
         self.posList = []
-    
+
     # Update placesByTime, calculate distance, posList
     def calculate(self, startID, endID):
-        if len(self.placesByTime) < 2:
-            self.placesByTime = [startID, endID]
-            self.distance = dijkstra(startID, endID)
-        else:
-            visitList = self.placesByTime[1:-1]
-            
-            self.placesByTime = [startID, endID]
-            self.distance = dijkstra(startID, endID)
+        self.placesByTime = [startID, endID]
+        self.distance = dijkstra(startID, endID)
 
+        if len(self.placesByTime) >= 2: # nếu placesByTime đã đc update, phải addPlace lại để làm gì????
+            visitList = self.placesByTime[1:-1]
             for visit in visitList:
                 self.addPlace(visit)
 
@@ -51,13 +48,13 @@ class Road:
     # Add place to placesByTime and update distance, posList
     def addPlace(self, addedId):
         distanceAns = self.distance - dijkstra(self.placesByTime[0], self.placesByTime[1]) \
-                    + dijkstra(self.placesByTime[0], addedId) \
-                    + dijkstra(addedId, self.placesByTime[1])
+                      + dijkstra(self.placesByTime[0], addedId) \
+                      + dijkstra(addedId, self.placesByTime[1])
         posToAdd = 1
         for i in range(1, len(self.placesByTime) - 1):
             newDistance = self.distance - dijkstra(self.placesByTime[i], self.placesByTime[i + 1]) \
-                        + dijkstra(self.placesByTime[i], addedId) \
-                        + dijkstra(addedId, self.placesByTime[i + 1])
+                          + dijkstra(self.placesByTime[i], addedId) \
+                          + dijkstra(addedId, self.placesByTime[i + 1])
             if newDistance < distanceAns:
                 distanceAns = newDistance
                 posToAdd = i + 1
@@ -74,8 +71,8 @@ class Road:
         if index == 0 or index == len(self.placesByTime) - 1:
             return
         self.distance = self.distance + dijkstra(self.placesByTime[index - 1], self.placesByTime[index + 1]) \
-                - dijkstra(self.placesByTime[index - 1], removeId) \
-                - dijkstra(removeId, self.placesByTime[index + 1])
+                        - dijkstra(self.placesByTime[index - 1], removeId) \
+                        - dijkstra(removeId, self.placesByTime[index + 1])
 
         self.placesByTime.remove(removeId)
 
@@ -90,7 +87,7 @@ def initGlobal():
     global posX, posY
     mycursor.execute("select * from `points`")
     data = mycursor.fetchall()
-    
+
     posX = [0.0]
     posY = [0.0]
     for d in data:
@@ -219,7 +216,8 @@ def nearestRoad(newpos):
     points = mycursor.fetchall()
     for p in points:
         if p[2] != 1:
-            kc = (newpos[0] - posX[p[0]]) * (newpos[0] - posX[p[0]]) + (newpos[1] - posY[p[0]]) * (newpos[1] - posY[p[0]])
+            kc = (newpos[0] - posX[p[0]]) * (newpos[0] - posX[p[0]]) + (newpos[1] - posY[p[0]]) * (
+                        newpos[1] - posY[p[0]])
             heapq.heappush(disToPoint, (kc, p[0]))
 
     neareastPoints = []

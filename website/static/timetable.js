@@ -1,9 +1,7 @@
 import { findPath, selectPlace } from '../static/index.js'
 
-console.log(timeTable)
-
 const startSemester = new Date("2022/08/29")
-var pickedDay = new Date();
+var pickedDay = new Date("2022/08/30");
 var curLesson = Math.floor(pickedDay.getHours() - 6)
 var curWeek = Math.ceil((pickedDay - startSemester)/(24*3600*1000) / 7 )
 var curDayOfWeek = pickedDay.getDay()
@@ -41,7 +39,7 @@ function addRowHandlers() {
     var table = document.getElementById("time-table");
     var rows = table.getElementsByTagName("tr");
     for (let i = 0; i < rows.length; i++) {
-        var currentRow = table.rows[i];
+        var currentRow = rows[i];
         var createClickHandler = function(row) {
             return function() {
                 curLesson = row.getElementsByTagName("th")[0].textContent - 1;
