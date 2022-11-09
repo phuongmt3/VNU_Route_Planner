@@ -90,7 +90,7 @@ function selectTimeSlot(event) {
     var prevEvent = getEventFromTime(new Date(event.start), new Date(event.end));
 
     var startPlace = "Cổng chính ĐHQGHN"
-    if (prevEvent != null && new Date(event.start) - new Date(prevEvent.end) <= 1000*60*60)
+    if (prevEvent != null && new Date(event.start) - new Date(prevEvent.end) <= 1000*60*45)
         startPlace = prevEvent.extendedProps.place;
     var endPlace = event.extendedProps.place;
 

@@ -19,7 +19,7 @@ $(document).on("click", ".addEvent", function() {
 
     var startTime = new Date(day.getFullYear(), day.getMonth(), day.getDate(), startHour, startMinute);
     var endTime = checkValidHour(endHour) && checkValidMin(endMinute) ? new Date(day.getFullYear(), day.getMonth(), day.getDate(), endHour, endMinute)
-                                    : new Date("1990/01/01");
+                                    : new Date(startTime.getTime() + 30*60*1000);
 
     calendar.addEvent({
         title: title,
@@ -40,5 +40,5 @@ $(document).on("click", ".addEvent", function() {
     document.querySelector("#place").value = "";
 });
 
-function checkValidHour(hour) { return hour >= 0 && hour < 24; }
-function checkValidMin(min) { return min >= 0 && min < 60 && min % 15 == 0; }
+function checkValidHour(hour) { return hour != "" && hour >= 0 && hour < 24; }
+function checkValidMin(min) { return min != "" && min >= 0 && min < 60 && min % 15 == 0; }
