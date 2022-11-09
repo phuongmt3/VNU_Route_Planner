@@ -21,11 +21,15 @@ class Road:
 
     # Update placesByTime, calculate distance, posList
     def calculate(self, startID, endID):
-        self.placesByTime = [startID, endID]
-        self.distance = dijkstra(startID, endID)
-
-        if len(self.placesByTime) >= 2: # nếu placesByTime đã đc update, phải addPlace lại để làm gì????
+        if len(self.placesByTime) < 2:
+            self.placesByTime = [startID, endID]
+            self.distance = dijkstra(startID, endID)
+        else:
             visitList = self.placesByTime[1:-1]
+
+            self.placesByTime = [startID, endID]
+            self.distance = dijkstra(startID, endID)
+
             for visit in visitList:
                 self.addPlace(visit)
 
