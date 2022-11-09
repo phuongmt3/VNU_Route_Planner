@@ -94,6 +94,10 @@ function selectTimeSlot(event) {
         startPlace = prevEvent.extendedProps.place;
     var endPlace = event.extendedProps.place;
 
+    startPlace = startPlace.includes("-") ? startPlace.split("-")[1] : startPlace;
+    endPlace = endPlace.includes("-") ? endPlace.split("-")[1] : endPlace;
+
+    clearPlaceSelect()
     selectPlace(endPlace);
     findPath(startPlace, endPlace);
     $("#startPlace").val(startPlace);

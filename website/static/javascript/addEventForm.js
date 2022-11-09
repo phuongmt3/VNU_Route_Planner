@@ -1,4 +1,4 @@
-import { calendar } from '../static/calendar.js'
+import { calendar } from './calendar.js'
 
 $(document).on("click", ".addEvent", function() {
     var title = document.querySelector("#title").value;
