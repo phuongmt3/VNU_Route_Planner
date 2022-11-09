@@ -9,7 +9,7 @@ export function renderRoad(map, posList, lineGroup) {
 
         // Check if latlngs is overlapping lines in lineGroup
         for (const layer of Object.values(lineGroup._layers).reverse()) {
-            if (latlngs[1].toString() === Object.values(layer._latlngs[0]).toString()) {
+            if (latlngs.toString() === [Object.values(layer._latlngs[1]), Object.values(layer._latlngs[0])].toString()) {
                 line.setStyle({ weight: 6 })
                 break;
             }

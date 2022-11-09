@@ -74,6 +74,11 @@ function setBuildingEvent(placeList, map) {
 
             buildingData.layer.openPopup();
         });
+
+        // Close popup when click visit/unvisit
+        $(document).on('click','.postPlace',function() {
+            buildingData.layer.closePopup();
+        });
     }
 }
 

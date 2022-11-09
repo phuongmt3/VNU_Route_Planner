@@ -26,7 +26,7 @@ var map = L.map('map', {
 
 var baseMaps = {
     "OpenStreetMap": osm,
-    "ESRI satellite": mb
+    "ESRI satellite": mb,
 };
 
 L.Control.textbox = L.Control.extend({
@@ -57,9 +57,10 @@ L.Control.textbox = L.Control.extend({
 L.control.textbox = function(opts) { return new L.Control.textbox(opts);}
 L.control.textbox({ position: 'topleft' }).addTo(map);
 
-const buildingNameGroup = L.layerGroup([])
-const foodGroup = L.layerGroup([])
-const souvenirGroup = L.layerGroup([])
+const buildingNameGroup = L.layerGroup()
+const foodGroup = L.layerGroup()
+const souvenirGroup = L.layerGroup()
+const parkingGroup = L.layerGroup()
 
 const lineGroup = L.featureGroup([], { snakingPause: 0 })
 const distancePopup = L.popup()
@@ -72,13 +73,14 @@ lineGroup.on('mouseout', function () {
 });
 
 renderBuilding(map, placeList, buildingNameGroup);
-renderMarkers(map, markerList, placeList, foodGroup, souvenirGroup);
+renderMarkers(map, markerList, placeList, foodGroup, souvenirGroup, parkingGroup);
 
 var overlayMaps = {
     "Path": lineGroup,
     "Building's name": buildingNameGroup,
     "Food": foodGroup,
-    "Souvenir": souvenirGroup
+    "Souvenir": souvenirGroup,
+    "Parking": parkingGroup,
 };
 
 var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
@@ -97,13 +99,13 @@ var developMode = L.easyButton({
                 buildingNameGroup.addTo(map);
                 foodGroup.addTo(map);
                 souvenirGroup.addTo(map);
+                parkingGroup.addTo(map);
             }
         }]
 }).addTo(map);
 
 // Add place and update path, distance when click "visit"
 $(document).on('click','.postPlace',function() {
-
     let placeName = this.id
     fetch(`/post_place/${placeName}`, {
         method: "POST",
@@ -115,8 +117,6 @@ $(document).on('click','.postPlace',function() {
             if (response.length == 0) 
                 return;
                 
-            map.closePopup();
-
             renderRoad(map, response[0], lineGroup);
             selectPlace(placeName);
 
@@ -172,9 +172,7 @@ export function findPath(name1, name2) {
                 return 0;
             }
 
-            map.closePopup();
             renderRoad(map, response[0], lineGroup);
-
             distancePopup.setContent("Khoảng cách ~ " + response[1] + " mét");
             console.log("Database' size = " + response[2]);
         });
