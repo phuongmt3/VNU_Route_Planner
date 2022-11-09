@@ -58,9 +58,18 @@ L.control.textbox = function(opts) { return new L.Control.textbox(opts);}
 L.control.textbox({ position: 'topleft' }).addTo(map);
 
 const buildingNameGroup = L.layerGroup([])
-const lineGroup = L.layerGroup([], { snakingPause: 0 })
 const foodGroup = L.layerGroup([])
 const souvenirGroup = L.layerGroup([])
+
+const lineGroup = L.featureGroup([], { snakingPause: 0 })
+const distancePopup = L.popup()
+
+lineGroup.on('mouseover', function (e) {
+    distancePopup.setLatLng(e.latlng).openOn(map);
+});
+lineGroup.on('mouseout', function () {
+    distancePopup.close();
+});
 
 renderBuilding(map, placeList, buildingNameGroup);
 renderMarkers(map, markerList, placeList, foodGroup, souvenirGroup);
@@ -111,7 +120,7 @@ $(document).on('click','.postPlace',function() {
             renderRoad(map, response[0], lineGroup);
             selectPlace(placeName);
 
-            console.log("Distance = " + response[1]);
+            distancePopup.setContent("Khoảng cách ~ " + response[1] + " mét");
             console.log("Database' size = " + response[2]);
         });
 });
@@ -165,8 +174,8 @@ export function findPath(name1, name2) {
 
             map.closePopup();
             renderRoad(map, response[0], lineGroup);
-            
-            console.log("Distance = " + response[1]);
+
+            distancePopup.setContent("Khoảng cách ~ " + response[1] + " mét");
             console.log("Database' size = " + response[2]);
         });
 }

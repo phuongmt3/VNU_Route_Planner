@@ -17,5 +17,7 @@ export function renderRoad(map, posList, lineGroup) {
 
         lineGroup.addLayer(line);
     }
+
     lineGroup.addTo(map).snakeIn();
 }
+    
