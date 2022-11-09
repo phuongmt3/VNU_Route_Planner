@@ -1,4 +1,5 @@
-import { findPath, selectPlace } from '../static/index.js'
+import { selectPlace, clearPlaceSelect } from './building.js'
+import { findPath } from './map.js'
 
 var clickedEvent = null;
 var calendarEl = document.getElementById('calendar');
