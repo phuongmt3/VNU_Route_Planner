@@ -35,16 +35,9 @@ L.Control.textbox = L.Control.extend({
         text.id = "info_text";
         text.innerHTML = `
             <span class="material-symbols-outlined">assistant_direction</span>
-            
-            <span class="input-wrap"><span class="width-machine" style="opacity: 0;">Cổng chính ĐHQGHN</span>
-                <input class="input" list="startPlaces" name="startPlace" id="startPlace">
-            </span>
-            
-            <span class="col-auto material-symbols-outlined">arrow_right</span>
-            
-            <span class="input-wrap"><span class="width-machine" style="opacity: 0;">Cổng chính ĐHQGHN</span>
-                <input class="input" list="endPlaces" name="endPlace" id="endPlace">
-            </span>
+            <input list="places" name="startPlace" id="startPlace">
+            <span class="material-symbols-outlined">arrow_right</span>
+            <input list="places" name="endPlace" id="endPlace">
             `;
         
         return text;
@@ -184,13 +177,6 @@ $(document).keypress(
         $('#map').focus()
         event.preventDefault();
       }
-});
-
-// Dealing with Input width
-let el = document.querySelector(".input-wrap .input");
-let widthMachine = document.querySelector(".input-wrap .width-machine");
-el.addEventListener("keyup", () => {
-  widthMachine.innerHTML = el.value;
 });
 
 $('.leaflet-container').css('cursor', 'crosshair');

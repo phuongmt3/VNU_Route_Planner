@@ -61,31 +61,25 @@
           Dijkstra database</button>
       </div>
 
-      <datalist id="startPlaces">
-        {% for i in showedPlaceList: %}
-        <option value="{{placeNames[i]}}"></option>
-        {% endfor %}
-      </datalist>
-
-      <datalist id="endPlaces">
+      <datalist id="places">
         {% for i in showedPlaceList: %}
         <option value="{{placeNames[i]}}"></option>
         {% endfor %}
       </datalist>
     </form>
 
-    <div class="row h-100">
-      <div class="col-9">
+    <div class="row h-100 gx-0">
+      <div class="col">
         <div id="map"></div>
         <script type="module" src="../static/javascript/map.js"></script>
       </div>
 
-      <div class="col-3" id='calendar'>
+      <div class="col" id='calendar' style="max-width: 300px;">
         <script type="module" src="../static/javascript/calendar.js"></script>
       </div>
     </div>
 
-    <div class="col-3 form-popup" id="myForm">
+    <div class="col form-popup" id="myForm" style="max-width: 300px;">
       <form class="form-container">
         <div class="mb-3">
           <input type="text" placeholder="Thêm tiêu đề" id="title" required>
