@@ -1,5 +1,6 @@
 from .models import mycursor
 
+
 class ClassInfor:
     def __init__(self, LMH, LMHName, group, TC, note, week, day, time, place, svCnt, lecturer):
         self.LMH = LMH
@@ -14,6 +15,7 @@ class ClassInfor:
         self.svCnt = svCnt
         self.lecturer = lecturer
 
+
 def getSubjectList(msv):
     mycursor.execute("SELECT * FROM dangky WHERE MSV = (%s)", (msv,))
     dataFromDangky = mycursor.fetchall()
@@ -21,7 +23,7 @@ def getSubjectList(msv):
     for itemDangky in dataFromDangky:
         HP = itemDangky[1]
         LHP = itemDangky[2]
-        LMH = HP + ' ' + LHP 
+        LMH = HP + ' ' + LHP
         group = itemDangky[3]
         note = itemDangky[4]
         mycursor.execute("SELECT * FROM monhoc WHERE Mã_HP = (%s)", (HP,))
@@ -29,11 +31,11 @@ def getSubjectList(msv):
         LMHName = dataFromMonhoc[1]
         TC = dataFromMonhoc[2]
         mycursor.execute("SELECT * FROM lopmonhoc WHERE Mã_HP = (%s) AND Mã_LHP = (%s) AND (Nhóm = 'CL' OR Nhóm = (%s))"
-                            , (HP, LHP, group))
+                         , (HP, LHP, group))
         dataFromLopmonhoc = mycursor.fetchall()
         for itemLopmonhoc in dataFromLopmonhoc:
             mycursor.execute("SELECT * FROM giangvien WHERE ID_Giangvien = (%s) OR ID_Giangvien = (%s)"
-                            , (itemLopmonhoc[-1], itemLopmonhoc[-2]))
+                             , (itemLopmonhoc[-1], itemLopmonhoc[-2]))
             dataFromGiangvien = mycursor.fetchall()
             lecturers = ""
             group = itemLopmonhoc[2]
@@ -46,20 +48,21 @@ def getSubjectList(msv):
                 lecturers += itemGiangvien[1]
                 lecturers += "\n"
             subjectList.append(ClassInfor(LMH, LMHName, group, TC, note, week, day
-                                , time, place, totStudents, lecturers))
+                                          , time, place, totStudents, lecturers))
     return subjectList
 
 
 def getTimeTable(subjectList):
     totWeek, totDayOfWeek, totLesson = (15, 7, 12)
-    timeTable = [[[{"subjectName": "", "place": ""} for j in range(totLesson)] for i in range(totDayOfWeek)] for k in range(totWeek)]
+    timeTable = [[[{"subjectName": "", "place": ""} for j in range(totLesson)] for i in range(totDayOfWeek)] for k in
+                 range(totWeek)]
 
     for item in subjectList:
         day = item.day - 1
         start, end = (int(s) for s in item.time.split('-'))
         subjectName = item.LMHName
         place = item.place
-        if (place[0] == '-'):
+        if place[0] == '-':
             place = place[1:]
         if '-' in item.week:
             weekStart, weekEnd = (int(s) for s in item.week.split('-'))
