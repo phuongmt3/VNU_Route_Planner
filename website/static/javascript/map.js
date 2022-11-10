@@ -3,6 +3,57 @@ import { onMapClick } from './addPlace.js';
 import { renderBuilding, selectPlace, clearPlaceSelect, selectAllBuilding } from './building.js';
 import { renderRoad } from './road.js';
 
+// Input MSV box
+L.Control.inputBox = L.Control.extend({
+    onAdd: function() {
+        var text = L.DomUtil.create('div');
+        text.id = "inputBox";
+        text.innerHTML = `
+            <form class="row" action="http://127.0.0.1:5000/" method="POST" id="my-form">
+                <div class="col-auto">
+                    <label for="msv" class="visually-hidden">MSV</label>
+                    <input type="text" class="form-control" id="msv" name="msv" placeholder="MSV">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" name="submit_button" class="btn btn-primary mb-3" value="Search">Search</button>
+                </div>
+                <!-- <div class="col-auto">
+                    <button type="submit" name="submit_button" class="btn btn-primary mb-3" value="Reset Dijkstra database">Reset
+                    Dijkstra database</button>
+                </div> -->
+            </form>
+            `;
+        
+        return text;
+    },
+
+    onRemove: function() {
+        // Nothing to do here
+    }
+});
+L.control.inputBox = function(opts) { return new L.Control.inputBox(opts);}
+
+// // Show start and end place
+// L.Control.locationBox = L.Control.extend({
+//     onAdd: function() {
+//         var text = L.DomUtil.create('div');
+//         text.id = "info_text";
+//         text.innerHTML = `
+//             <span class="material-symbols-outlined">assistant_direction</span>
+//             <input list="places" name="startPlace" id="startPlace">
+//             <span class="material-symbols-outlined">arrow_right</span>
+//             <input list="places" name="endPlace" id="endPlace">
+//             `;
+        
+//         return text;
+//     },
+
+//     onRemove: function() {
+//         // Nothing to do here
+//     }
+// });
+// L.control.locationBox = function(opts) { return new L.Control.locationBox(opts);}
+
 var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     id: "osm",
     maxZoom: 19,
@@ -12,7 +63,7 @@ var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 var mb = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     id: "mb",
     maxZoom: 19,
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    attribution: 'Tiles &copy; Esri &mdash'
 });
 
 var map = L.map('map', {
@@ -29,27 +80,6 @@ var baseMaps = {
     "ESRI satellite": mb,
 };
 
-L.Control.textbox = L.Control.extend({
-    onAdd: function() {
-        var text = L.DomUtil.create('div');
-        text.id = "info_text";
-        text.innerHTML = `
-            <span class="material-symbols-outlined">assistant_direction</span>
-            <input list="places" name="startPlace" id="startPlace">
-            <span class="material-symbols-outlined">arrow_right</span>
-            <input list="places" name="endPlace" id="endPlace">
-            `;
-        
-        return text;
-    },
-
-    onRemove: function() {
-        // Nothing to do here
-    }
-});
-L.control.textbox = function(opts) { return new L.Control.textbox(opts);}
-L.control.textbox({ position: 'topleft' }).addTo(map);
-
 const buildingNameGroup = L.layerGroup()
 const foodGroup = L.layerGroup()
 const souvenirGroup = L.layerGroup()
@@ -58,15 +88,12 @@ const parkingGroup = L.layerGroup()
 const lineGroup = L.featureGroup([], { snakingPause: 0 })
 const distancePopup = L.popup()
 
-lineGroup.on('mouseover', function (e) {
-    distancePopup.setLatLng(e.latlng).openOn(map);
-});
-lineGroup.on('mouseout', function () {
-    distancePopup.close();
-});
-
 renderBuilding(map, placeList, buildingNameGroup);
 renderMarkers(map, markerList, placeList, foodGroup, souvenirGroup, parkingGroup);
+
+foodGroup.addTo(map);
+souvenirGroup.addTo(map);
+parkingGroup.addTo(map);
 
 var overlayMaps = {
     "Path": lineGroup,
@@ -76,13 +103,11 @@ var overlayMaps = {
     "Parking": parkingGroup,
 };
 
-var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
-
 var developMode = L.easyButton({
     position: 'topright',
     states: [{
             stateName: 'toggle_develop_mode',       
-            icon:      '<span class="material-symbols-outlined widget-code">build</span>',            
+            icon:      '<span class="material-symbols-outlined widget-code" style="opacity: 0.5;">build</span>',            
             title:     'toggle develop mode',     
             onClick: function(btn, map) {     
                 onMapClick(map);    // Add new place
@@ -93,9 +118,18 @@ var developMode = L.easyButton({
                 foodGroup.addTo(map);
                 souvenirGroup.addTo(map);
                 parkingGroup.addTo(map);
+
+                $('.leaflet-container').css('cursor', 'crosshair');
             }
         }]
 }).addTo(map);
+
+var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+L.control.slideMenu('<h2>VNU Route Planner</h2>').addTo(map);
+
+var inputBox = L.control.inputBox({ position: 'topleft' }).addTo(map);
+// var locationBox = L.control.locationBox({ position: 'topleft' }).addTo(map);
 
 // Add place and update path, distance when click "visit"
 $(document).on('click','.postPlace',function() {
@@ -145,6 +179,30 @@ map.on('zoomend', function () {
     }
 })
 
+$(document).keypress(
+    function(event){
+      if (event.which == '13') {
+        $('#map').focus()
+        event.preventDefault();
+      }
+});
+
+lineGroup.on('mouseover', function (e) {
+    distancePopup.setLatLng(e.latlng).openOn(map);
+});
+
+lineGroup.on('mouseout', function () {
+    distancePopup.close();
+});
+
+inputBox.getContainer().addEventListener('mouseover', function () {
+    map.dragging.disable();
+});
+
+inputBox.getContainer().addEventListener('mouseout', function () {
+    map.dragging.enable();
+});
+
 export function findPath(name1, name2) {
     lineGroup.clearLayers();
 
@@ -170,14 +228,4 @@ export function findPath(name1, name2) {
             console.log("Database' size = " + response[2]);
         });
 }
-
-$(document).keypress(
-    function(event){
-      if (event.which == '13') {
-        $('#map').focus()
-        event.preventDefault();
-      }
-});
-
-$('.leaflet-container').css('cursor', 'crosshair');
 

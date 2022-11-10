@@ -1,5 +1,5 @@
 body {
-  overflow: hidden;
+    overflow: hidden;
 }
 
 html,
@@ -7,11 +7,6 @@ body,
 #map {
     height: 100%;
     width: 100%;
-}
-
-.leaflet-tooltip {
-    padding: 0;
-    margin: 0;
 }
 
 .leaflet-tooltip.my-labels {
@@ -38,8 +33,8 @@ body,
 }
 
 #info_text span {
-  font-size: 32px;
-  margin-right: 5px;
+    font-size: 32px;
+    margin-right: 5px;
 }
 
 #startPlace,
@@ -63,12 +58,11 @@ body,
   height: 44px;
 }
 
-
 .form-popup {
   display: none;
   position: absolute;
   width: 100%;
-  bottom: 0px;
+  bottom: 38px;
   right: 0px;
   border: 3px solid #f1f1f1;
   z-index: 10;
@@ -111,3 +105,7 @@ body,
   display: block !important; 
   padding: 16px;
 } 
+
+.leaflet-top {
+  display: flex !important; 
+}
