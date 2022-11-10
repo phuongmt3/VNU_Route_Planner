@@ -28,7 +28,8 @@ export var calendar = new FullCalendar.Calendar(calendarEl, {
     editable: true,
     selectable: true,
     allDaySlot: false,
-    defaultTimedEventDuration: '00:30'
+    defaultTimedEventDuration: '00:30',
+    snapDuration: '00:15'
 });
 
 function onAddEventButtonClick(e) {
