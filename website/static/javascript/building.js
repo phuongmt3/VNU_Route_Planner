@@ -6,8 +6,7 @@ export function renderBuilding(map, placeList, buildingNameGroup) {
     L.geoJSON(buildings, {
         onEachFeature: function (feature, layer) {
             const centerPosition = calculateCenter(feature.geometry.coordinates[0][0]);
-            buildingNameGroup.addLayer(L.tooltip(centerPosition, { content: feature.properties.name, permanent: true, direction: 'center', className: "my-labels" })
-                    .addTo(map));
+            buildingNameGroup.addLayer(L.tooltip(centerPosition, { content: feature.properties.name, permanent: true, direction: 'center', className: "my-labels" }));
             const smallPopup = L.popup()
                     .setLatLng(centerPosition);
     
@@ -75,6 +74,22 @@ function setBuildingEvent(placeList, map) {
 
             buildingData.layer.openPopup();
         });
+
+        // Close popup when click visit/unvisit
+        $(document).on('click','.postPlace',function() {
+            buildingData.layer.closePopup();
+        });
+    }
+}
+
+export function selectAllBuilding() {
+    for (const buildingInfo of placeList) {
+        buildingInfo[4] = true;
+
+        let buildingData = buildingMap.get(buildingInfo[0]);
+        if (!buildingData) continue;
+
+        mark(buildingData.layer);
     }
 }
 

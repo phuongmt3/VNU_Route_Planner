@@ -1,6 +1,6 @@
 import { renderMarkers } from './marker.js';
 import { onMapClick } from './addPlace.js';
-import { renderBuilding, selectPlace, clearPlaceSelect } from './building.js';
+import { renderBuilding, selectPlace, clearPlaceSelect, selectAllBuilding } from './building.js';
 import { renderRoad } from './road.js';
 
 var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -26,31 +26,86 @@ var map = L.map('map', {
 
 var baseMaps = {
     "OpenStreetMap": osm,
-    "ESRI satellite": mb
+    "ESRI satellite": mb,
 };
 
-const buildingNameGroup = L.layerGroup([]).addTo(map)
-const lineGroup = L.layerGroup([], { snakingPause: 0 })
-const foodGroup = L.layerGroup([])
-const souvenirGroup = L.layerGroup([])
+L.Control.textbox = L.Control.extend({
+    onAdd: function() {
+        var text = L.DomUtil.create('div');
+        text.id = "info_text";
+        text.innerHTML = `
+            <span class="material-symbols-outlined">assistant_direction</span>
+            
+            <span class="input-wrap"><span class="width-machine" style="opacity: 0;">Cổng chính ĐHQGHN</span>
+                <input class="input" list="startPlaces" name="startPlace" id="startPlace">
+            </span>
+            
+            <span class="col-auto material-symbols-outlined">arrow_right</span>
+            
+            <span class="input-wrap"><span class="width-machine" style="opacity: 0;">Cổng chính ĐHQGHN</span>
+                <input class="input" list="endPlaces" name="endPlace" id="endPlace">
+            </span>
+            `;
+        
+        return text;
+    },
 
-onMapClick(map); // Add new place
+    onRemove: function() {
+        // Nothing to do here
+    }
+});
+L.control.textbox = function(opts) { return new L.Control.textbox(opts);}
+L.control.textbox({ position: 'topleft' }).addTo(map);
+
+const buildingNameGroup = L.layerGroup()
+const foodGroup = L.layerGroup()
+const souvenirGroup = L.layerGroup()
+const parkingGroup = L.layerGroup()
+
+const lineGroup = L.featureGroup([], { snakingPause: 0 })
+const distancePopup = L.popup()
+
+lineGroup.on('mouseover', function (e) {
+    distancePopup.setLatLng(e.latlng).openOn(map);
+});
+lineGroup.on('mouseout', function () {
+    distancePopup.close();
+});
+
 renderBuilding(map, placeList, buildingNameGroup);
-renderMarkers(map, markerList, placeList, foodGroup, souvenirGroup);
+renderMarkers(map, markerList, placeList, foodGroup, souvenirGroup, parkingGroup);
 
 var overlayMaps = {
-    "Building's name": buildingNameGroup,
     "Path": lineGroup,
+    "Building's name": buildingNameGroup,
     "Food": foodGroup,
-    "Souvenir": souvenirGroup
+    "Souvenir": souvenirGroup,
+    "Parking": parkingGroup,
 };
 
 var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 
+var developMode = L.easyButton({
+    position: 'topright',
+    states: [{
+            stateName: 'toggle_develop_mode',       
+            icon:      '<span class="material-symbols-outlined widget-code">build</span>',            
+            title:     'toggle develop mode',     
+            onClick: function(btn, map) {     
+                onMapClick(map);    // Add new place
+
+                selectAllBuilding();
+                lineGroup.addTo(map);
+                buildingNameGroup.addTo(map);
+                foodGroup.addTo(map);
+                souvenirGroup.addTo(map);
+                parkingGroup.addTo(map);
+            }
+        }]
+}).addTo(map);
+
 // Add place and update path, distance when click "visit"
 $(document).on('click','.postPlace',function() {
-    map.closePopup();
-
     let placeName = this.id
     fetch(`/post_place/${placeName}`, {
         method: "POST",
@@ -61,11 +116,11 @@ $(document).on('click','.postPlace',function() {
         }).then(function (response) {
             if (response.length == 0) 
                 return;
-
+                
             renderRoad(map, response[0], lineGroup);
             selectPlace(placeName);
 
-            console.log("Distance = " + response[1]);
+            distancePopup.setContent("Khoảng cách ~ " + response[1] + " mét");
             console.log("Database' size = " + response[2]);
         });
 });
@@ -117,10 +172,8 @@ export function findPath(name1, name2) {
                 return 0;
             }
 
-            map.closePopup();
             renderRoad(map, response[0], lineGroup);
-            
-            console.log("Distance = " + response[1]);
+            distancePopup.setContent("Khoảng cách ~ " + response[1] + " mét");
             console.log("Database' size = " + response[2]);
         });
 }
@@ -131,6 +184,13 @@ $(document).keypress(
         $('#map').focus()
         event.preventDefault();
       }
+});
+
+// Dealing with Input width
+let el = document.querySelector(".input-wrap .input");
+let widthMachine = document.querySelector(".input-wrap .width-machine");
+el.addEventListener("keyup", () => {
+  widthMachine.innerHTML = el.value;
 });
 
 $('.leaflet-container').css('cursor', 'crosshair');

@@ -26,12 +26,20 @@ var Restaurant = L.icon({
 var Special_Souvenir = L.icon({
     iconUrl: '../static/icon/Icon_Special_Souvenir.svg',
     iconSize:     [20, 20], // size of the icon
-    iconAnchor:   [13, 10], // point of the icon which will correspond to marker's location
+    iconAnchor:   [10, 10], // point of the icon which will correspond to marker's location
     popupAnchor:  [0, -10] // point from which the popup should open relative to the iconAnchor
 });
 
+// ID: 5
+var Domain = L.icon({
+    iconUrl: '../static/icon/UI_Domains.png',
+    iconSize:     [24, 24], // size of the icon
+    iconAnchor:   [12, 12], // point of the icon which will correspond to marker's location
+    popupAnchor:  [0, -12] // point from which the popup should open relative to the iconAnchor
+});
 
-export function renderMarkers(map, markerList, placeList, foodGroup, souvenirGroup) {
+
+export function renderMarkers(map, markerList, placeList, foodGroup, souvenirGroup, parkingGroup) {
     // markerList: name, posY, posX, main
     // placeList: name, description, details, ...
 
@@ -53,6 +61,9 @@ export function renderMarkers(map, markerList, placeList, foodGroup, souvenirGro
         } else if (marker[3] == 4) {
             thisMarker.setIcon(Special_Souvenir);
             souvenirGroup.addLayer(thisMarker);
+        } else if (marker[3] == 5) {
+            thisMarker.setIcon(Domain);
+            parkingGroup.addLayer(thisMarker);
         }
 
         if (marker[3] == 2) {
@@ -99,5 +110,9 @@ export function renderMarkers(map, markerList, placeList, foodGroup, souvenirGro
         thisMarker.on('click', function () {
             thisMarker.openPopup();
         });
+        $(document).on('click','.postPlace',function() {
+            thisMarker.closePopup();
+        });
     });
 }
+

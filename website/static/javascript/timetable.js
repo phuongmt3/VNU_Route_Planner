@@ -42,7 +42,7 @@ function updateTimeTable() {
 
 // Base on timetable and the chosen time (curLesson)
 function updatePath() {
-    var startPlace = (curLesson >= 0 && curLesson < 12) ? timeTable[curWeek-1][curDayOfWeek][curLesson-1].place : "";
+    var startPlace = (curLesson > 0 && curLesson <= 12) ? timeTable[curWeek-1][curDayOfWeek][curLesson-1].place : "";
     var endPlace = (curLesson >= 0 && curLesson < 12) ? timeTable[curWeek-1][curDayOfWeek][curLesson].place : "";
 
     startPlace = startPlace ? startPlace : "Cổng chính ĐHQGHN";

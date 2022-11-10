@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main Page</title>
+    <title>VNU Route Planner</title>
+    <link rel="icon" type="image/x-icon" href="https://preview.redd.it/2yv5x9hto5f61.png?width=341&format=png&auto=webp&s=eccf34f646917d5a7c0196de5c2fc2e7ef3e2427">
 
     <!-- jquery -->
     <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
@@ -26,6 +27,8 @@
 
     <!-- Plugin -->
     <script src="../static/plugins/L.Polyline.SnakeAnim.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
 
     <link rel="stylesheet" href="../static/styles.css">
     <script>
@@ -36,30 +39,30 @@
 </head>
 <body>
     <div class="main-wrapper h-100">
-        <div class="row">
-            <form action="http://127.0.0.1:5000/" method="POST" id="my-form">
-                <label for="msv">MSV</label>
-                <input type="text" name="msv" id="msv">
-                <input type="submit" name="submit_button" value="Search">
-                <input type="submit" name="submit_button" value="Reset Dijkstra database">
-                <br><br>
-                
-                <input list="startPlaces" name="startPlace" id="startPlace">
-                <datalist id="startPlaces">
-                    {% for i in showedPlaceList: %}
-                    <option value="{{placeNames[i]}}"></option>
-                    {% endfor %}
-                </datalist>
+        <form class="row pt-3 ps-3" action="http://127.0.0.1:5000/" method="POST" id="my-form">
+            <div class="col-auto">
+                <label for="msv" class="visually-hidden">Password</label>
+                <input type="text" class="form-control" id="msv" name="msv" placeholder="MSV">
+            </div>
+            <div class="col-auto">
+                <button type="submit" name="submit_button" class="btn btn-primary mb-3" value="Search">Search</button>
+            </div>
+            <div class="col-auto">
+                <button type="submit" name="submit_button" class="btn btn-primary mb-3" value="Reset Dijkstra database">Reset Dijkstra database</button>
+            </div>
 
-                <label> --> </label>
-                <input list="endPlaces" name="endPlace" id="endPlace">
-                <datalist id="endPlaces">
-                    {% for i in showedPlaceList: %}
-                    <option value="{{placeNames[i]}}"></option>
-                    {% endfor %}
-                </datalist>
-            </form>
-        </div>
+            <datalist id="startPlaces">
+                {% for i in showedPlaceList: %}
+                <option value="{{placeNames[i]}}"></option>
+                {% endfor %}
+            </datalist>
+
+            <datalist id="endPlaces">
+                {% for i in showedPlaceList: %}
+                <option value="{{placeNames[i]}}"></option>
+                {% endfor %}
+            </datalist>
+        </form>
 
         <div class="row h-100">
           <div class="col-9">
