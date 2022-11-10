@@ -166,12 +166,18 @@ def dijkstra(id1, id2):
             oldaim = cur[1]
             aim = cur[2]
             minkc = 0
+            mycursor.execute("select `main` from `points` where `id` = %s", (cur[1],))
+            cur1id = mycursor.fetchone()[0]
             while aim != 0:
                 minkc += realDistanceP_P(aim, oldaim)
-                mycursor.execute("insert ignore into `dijkstra` value (%s, %s, %s, %s)",
-                                 (cur[1], aim, minkc, oldaim))
-                mycursor.execute("insert ignore into `dijkstra` value (%s, %s, %s, %s)",
-                                 (aim, cur[1], minkc, cur[2]))
+                mycursor.execute("select `main` from `points` where `id` = %s", (aim,))
+                aimid = mycursor.fetchone()[0]
+                if cur1id > 0:
+                    mycursor.execute("insert ignore into `dijkstra` value (%s, %s, %s, %s)",
+                                     (cur[1], aim, minkc, oldaim))
+                if aimid > 0:
+                    mycursor.execute("insert ignore into `dijkstra` value (%s, %s, %s, %s)",
+                                     (aim, cur[1], minkc, cur[2]))
                 oldaim = aim
                 aim = kc[aim][2]
             db.commit()
@@ -221,7 +227,7 @@ def nearestRoad(newpos):
     for p in points:
         if p[2] != 1:
             kc = (newpos[0] - posX[p[0]]) * (newpos[0] - posX[p[0]]) + (newpos[1] - posY[p[0]]) * (
-                        newpos[1] - posY[p[0]])
+                    newpos[1] - posY[p[0]])
             heapq.heappush(disToPoint, (kc, p[0]))
 
     neareastPoints = []
