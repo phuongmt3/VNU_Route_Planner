@@ -10,15 +10,17 @@ L.Control.inputBox = L.Control.extend({
         text.id = "inputBox";
         text.innerHTML = `
             <form class="row" action="http://127.0.0.1:5000/" method="POST" id="my-form">
-                <div class="col-auto">
+                <div class="col-11">
                     <label for="msv" class="visually-hidden">MSV</label>
                     <input type="text" class="form-control" id="msv" name="msv" placeholder="MSV" style="height: 38px;">
                 </div>
-                <div class="col-auto">
-                    <button type="submit" name="submit_button" class="btn btn-primary mb-3" value="Search" style="height: 38px;">Search</button>
+                <div class="col-1" style="padding-left: 0;">
+                    <button type="submit" name="submit_button" class="btn btn-primary" value="Search" style="height: 38px;">
+                        <span class="material-symbols-outlined">search</span>
+                    </button>
                 </div>
                 <!-- <div class="col-auto">
-                    <button type="submit" name="submit_button" class="btn btn-primary mb-3" value="Reset Dijkstra database">Reset
+                    <button type="submit" name="submit_button" class="btn btn-primary" value="Reset Dijkstra database">Reset
                     Dijkstra database</button>
                 </div> -->
             </form>
@@ -178,14 +180,6 @@ map.on('zoomend', function () {
         $(".leaflet-tooltip").css("display", "block")
     }
 })
-
-$(document).keypress(
-    function(event){
-      if (event.which == '13') {
-        $('#map').focus()
-        event.preventDefault();
-      }
-});
 
 lineGroup.on('mouseover', function (e) {
     distancePopup.setLatLng(e.latlng).openOn(map);

@@ -23,3 +23,19 @@ bar.addEventListener('mousedown', () => {
 bar.addEventListener('mouseup', () => {
   document.removeEventListener('mousemove', drag);
 });
+
+left.addEventListener('mouseup', () => {
+  document.removeEventListener('mousemove', drag);
+});
+
+right.addEventListener('mouseup', () => {
+  document.removeEventListener('mousemove', drag);
+});
+
+$(document).keypress(
+  function(event){
+    if (event.which == '13') {
+      $('#map').focus()
+      // event.preventDefault();
+    }
+});
