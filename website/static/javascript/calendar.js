@@ -34,7 +34,14 @@ export var calendar = new FullCalendar.Calendar(calendarEl, {
     weekNumberCalculation: calWeekNumber,
     defaultTimedEventDuration: '00:30',
     snapDuration: '00:15',
-    firstDay: 1
+    firstDay: 1,
+    eventDidMount: function(info) {
+        let descriptionText = document.createElement("div");
+        descriptionText.style = "font-size: 12px";
+        descriptionText.textContent = info.event.extendedProps.place;
+        
+        info.el.querySelector(".fc-event-title-container").append(descriptionText);
+    }
 });
 
 function onAddEventButtonClick(e) {
@@ -74,12 +81,13 @@ function initEvents() {
         for (var day = 0; day < 7; day++) {
             var curday = timer.getDay();
             for (var tiet = 0; tiet < 12; tiet++) {
-                if (timeTable[week][curday][tiet].subjectName == "")
-                    continue;
+                var subject = timeTable[week][curday][tiet];
 
+                if (subject.subjectName == "")
+                    continue;
+                
                 var tietEnd = tiet + 1;
-                while (tietEnd < 12 && timeTable[week][curday][tietEnd].subjectName ==
-                                        timeTable[week][curday][tiet].subjectName)
+                while (tietEnd < 12 && timeTable[week][curday][tietEnd].subjectName == subject.subjectName)
                     tietEnd++;
 
                 var startTime = new Date(timer);
@@ -88,11 +96,12 @@ function initEvents() {
                 endTime.setHours(tietEnd + 7);
 
                 calendar.addEvent({
-                  title: timeTable[week][curday][tiet].subjectName,
+                  title: subject.group + " - " + subject.subjectName,
+                  description: "description",
                   start: startTime.toISOString(),
                   end: endTime.toISOString(),
                   extendedProps: {
-                    place: timeTable[week][curday][tiet].place
+                    place: subject.place
                   },
                   color: 'red'
                 });
