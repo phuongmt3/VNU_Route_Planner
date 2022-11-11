@@ -12,10 +12,10 @@ L.Control.inputBox = L.Control.extend({
             <form class="row" action="http://127.0.0.1:5000/" method="POST" id="my-form">
                 <div class="col-auto">
                     <label for="msv" class="visually-hidden">MSV</label>
-                    <input type="text" class="form-control" id="msv" name="msv" placeholder="MSV">
+                    <input type="text" class="form-control" id="msv" name="msv" placeholder="MSV" style="height: 38px;">
                 </div>
                 <div class="col-auto">
-                    <button type="submit" name="submit_button" class="btn btn-primary mb-3" value="Search">Search</button>
+                    <button type="submit" name="submit_button" class="btn btn-primary mb-3" value="Search" style="height: 38px;">Search</button>
                 </div>
                 <!-- <div class="col-auto">
                     <button type="submit" name="submit_button" class="btn btn-primary mb-3" value="Reset Dijkstra database">Reset
@@ -66,7 +66,7 @@ var mb = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World
     attribution: 'Tiles &copy; Esri &mdash'
 });
 
-var map = L.map('map', {
+export var map = L.map('map', {
     center: [21.038965, 105.782375],
     zoom: 17,
     zoomSnap: 0.25,
@@ -228,4 +228,3 @@ export function findPath(name1, name2) {
             console.log("Database' size = " + response[2]);
         });
 }
-

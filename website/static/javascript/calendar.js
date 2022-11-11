@@ -2,7 +2,7 @@ import { selectPlace, clearPlaceSelect } from './building.js'
 import { findPath } from './map.js'
 
 var clickedEvent = null;
-var snapDur = 15*60*1000;
+var snapDur = 45*60*1000;
 var calendarEl = document.getElementById('calendar');
 export var calendar = new FullCalendar.Calendar(calendarEl, {
     themeSystem: 'bootstrap5',
@@ -33,7 +33,8 @@ export var calendar = new FullCalendar.Calendar(calendarEl, {
     weekNumberFormat: { week: 'narrow' },
     weekNumberCalculation: calWeekNumber,
     defaultTimedEventDuration: '00:30',
-    snapDuration: '00:15'
+    snapDuration: '00:15',
+    firstDay: 1
 });
 
 function onAddEventButtonClick(e) {

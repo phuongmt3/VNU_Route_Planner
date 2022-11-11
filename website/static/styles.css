@@ -1,5 +1,5 @@
-body {
-    overflow: hidden;
+* {
+  box-sizing: border-box;
 }
 
 html,
@@ -7,6 +7,28 @@ body,
 #map {
     height: 100%;
     width: 100%;
+}
+
+#container {
+    display: flex;
+    min-height: 100vh;
+}
+
+#map-container {
+    width: 79%;
+    min-width: 0;
+    min-height: 50%;
+}
+
+#calendar-container {
+    min-width: 0;
+    flex: 1;
+}
+
+.dragbar {
+  padding: 4px;
+  cursor: col-resize;
+  background-color: silver;
 }
 
 .leaflet-tooltip.my-labels {
