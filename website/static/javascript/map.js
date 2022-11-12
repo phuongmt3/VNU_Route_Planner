@@ -10,15 +10,15 @@ L.Control.inputBox = L.Control.extend({
         text.id = "inputBox";
         text.innerHTML = `
             <form class="row" action="http://127.0.0.1:5000/" method="POST" id="my-form">
-                <div class="col-11">
-                    <label for="msv" class="visually-hidden">MSV</label>
-                    <input type="text" class="form-control" id="msv" name="msv" placeholder="MSV" style="height: 38px;">
+                <div class="col-11 form-group">
+                    <input type="text" id="student_search" class="form-control" name="student_search" placeholder="MSV, Name, ..." style="height: 38px;">
                 </div>
                 <div class="col-1" style="padding-left: 0;">
                     <button type="submit" name="submit_button" class="btn btn-primary" value="Search" style="height: 38px;">
                         <span class="material-symbols-outlined">search</span>
                     </button>
                 </div>
+                <div class="col-11" id="match-list" style="height: 38px;"> 
                 <!-- <div class="col-auto">
                     <button type="submit" name="submit_button" class="btn btn-primary" value="Reset Dijkstra database">Reset
                     Dijkstra database</button>

@@ -36,11 +36,17 @@ export var calendar = new FullCalendar.Calendar(calendarEl, {
     snapDuration: '00:15',
     firstDay: 1,
     eventDidMount: function(info) {
-        let descriptionText = document.createElement("div");
-        descriptionText.style = "font-size: 12px";
-        descriptionText.textContent = info.event.extendedProps.place;
+        let placeText = document.createElement("div");
+        placeText.classList.add("description-text");
+        placeText.style = "font-size: 12px";
+        placeText.textContent = info.event.extendedProps.place;
+
+        let hiddenText = document.createElement("div");
+        hiddenText.classList.add("hidden");
+        hiddenText.textContent = info.event.extendedProps.description;
         
-        info.el.querySelector(".fc-event-title-container").append(descriptionText);
+        info.el.querySelector(".fc-event-title-container").append(placeText);
+        info.el.querySelector(".fc-event-title-container").append(hiddenText);
     }
 });
 
@@ -97,7 +103,7 @@ function initEvents() {
 
                 calendar.addEvent({
                   title: subject.group + " - " + subject.subjectName,
-                  description: "description",
+                  description: subject.subjectCode + ", " + subject.credits + ", " + subject.lecturer,
                   start: startTime.toISOString(),
                   end: endTime.toISOString(),
                   extendedProps: {
@@ -170,14 +176,18 @@ function getEventFromTime(startTime=0, endTime=0) {
     return null;
 }
 
-if (timeTable.length > 0) {
-    initEvents();
-    var curEvent = getEventFromTime();
-    if (curEvent != null) {
-        selectTimeSlot(curEvent);
-        clickedEvent = curEvent;
-        curEvent = curEvent[0];
+export function initCalendar() {
+    if (timeTable.length > 0) {
+        initEvents();
+        var curEvent = getEventFromTime();
+        if (curEvent != null) {
+            selectTimeSlot(curEvent);
+            clickedEvent = curEvent;
+            curEvent = curEvent[0];
+        }
     }
+
+    calendar.render();
 }
 
-calendar.render();
+initCalendar();

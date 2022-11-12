@@ -7,6 +7,27 @@ views = Blueprint('views', __name__)
 road = Road()
 
 
+@views.route('/get_student_schedule/<msv>', methods=['GET'])
+def getStudentSchedule(msv):
+    mycursor.execute("SELECT * FROM sinhvien WHERE MSV = (%s)", (msv,))
+    data = mycursor.fetchone()
+    if data:
+        subjectList = getSubjectList(msv)
+        timeTable = getTimeTable(subjectList)
+    else:
+        return []
+
+    return json.dumps(timeTable)
+
+
+@views.route('/list_student.json', methods=['GET'])
+def getListStudent():
+    mycursor.execute("select * from sinhvien")
+    data = mycursor.fetchall()
+
+    return json.dumps(data, default=str)
+
+
 @views.route('/add_place/', methods=['POST'])
 def addPlace():
     posX, posY = request.json['posX'], request.json['posY']
@@ -91,7 +112,7 @@ def home():
 
     if request.method == 'POST':
         if request.form['submit_button'] == 'Search':
-            msv = request.form['msv']
+            msv = request.form['student_search']
             mycursor.execute("SELECT * FROM sinhvien WHERE MSV = (%s)", (msv,))
             data = mycursor.fetchone()
             if data:
