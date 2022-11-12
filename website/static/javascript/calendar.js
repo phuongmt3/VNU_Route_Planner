@@ -2,7 +2,7 @@ import { selectPlace, clearPlaceSelect } from './building.js'
 import { findPath } from './map.js'
 
 var clickedEvent = null;
-var snapDur = 15*60*1000;
+var snapDur = 45*60*1000;
 var calendarEl = document.getElementById('calendar');
 export var calendar = new FullCalendar.Calendar(calendarEl, {
     themeSystem: 'bootstrap5',
@@ -33,7 +33,21 @@ export var calendar = new FullCalendar.Calendar(calendarEl, {
     weekNumberFormat: { week: 'narrow' },
     weekNumberCalculation: calWeekNumber,
     defaultTimedEventDuration: '00:30',
-    snapDuration: '00:15'
+    snapDuration: '00:15',
+    firstDay: 1,
+    eventDidMount: function(info) {
+        let placeText = document.createElement("div");
+        placeText.classList.add("description-text");
+        placeText.style = "font-size: 12px";
+        placeText.textContent = info.event.extendedProps.place;
+
+        let hiddenText = document.createElement("div");
+        hiddenText.classList.add("hidden");
+        hiddenText.textContent = info.event.extendedProps.description;
+        
+        info.el.querySelector(".fc-event-title-container").append(placeText);
+        info.el.querySelector(".fc-event-title-container").append(hiddenText);
+    }
 });
 
 function onAddEventButtonClick(e) {
@@ -73,12 +87,13 @@ function initEvents() {
         for (var day = 0; day < 7; day++) {
             var curday = timer.getDay();
             for (var tiet = 0; tiet < 12; tiet++) {
-                if (timeTable[week][curday][tiet].subjectName == "")
-                    continue;
+                var subject = timeTable[week][curday][tiet];
 
+                if (subject.subjectName == "")
+                    continue;
+                
                 var tietEnd = tiet + 1;
-                while (tietEnd < 12 && timeTable[week][curday][tietEnd].subjectName ==
-                                        timeTable[week][curday][tiet].subjectName)
+                while (tietEnd < 12 && timeTable[week][curday][tietEnd].subjectName == subject.subjectName)
                     tietEnd++;
 
                 var startTime = new Date(timer);
@@ -87,11 +102,12 @@ function initEvents() {
                 endTime.setHours(tietEnd + 7);
 
                 calendar.addEvent({
-                  title: timeTable[week][curday][tiet].subjectName,
+                  title: subject.group + " - " + subject.subjectName,
+                  description: subject.subjectCode + ", " + subject.credits + ", " + subject.lecturer,
                   start: startTime.toISOString(),
                   end: endTime.toISOString(),
                   extendedProps: {
-                    place: timeTable[week][curday][tiet].place
+                    place: subject.place
                   },
                   color: 'red'
                 });
@@ -160,14 +176,20 @@ function getEventFromTime(startTime=0, endTime=0) {
     return null;
 }
 
-if (timeTable.length > 0) {
-    initEvents();
-    var curEvent = getEventFromTime();
-    if (curEvent != null) {
-        selectTimeSlot(curEvent);
-        clickedEvent = curEvent;
-        curEvent = curEvent[0];
+export function initCalendar() {
+    calendar.removeAllEvents();
+    
+    if (timeTable.length > 0) {
+        initEvents();
+        var curEvent = getEventFromTime();
+        if (curEvent != null) {
+            selectTimeSlot(curEvent);
+            clickedEvent = curEvent;
+            curEvent = curEvent[0];
+        }
     }
+
+    calendar.render();
 }
 
-calendar.render();
+initCalendar();

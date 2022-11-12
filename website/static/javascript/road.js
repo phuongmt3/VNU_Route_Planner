@@ -1,5 +1,9 @@
 export function renderRoad(map, posList, lineGroup) {
-    lineGroup.clearLayers()
+    if (lineGroup._snaking) {
+        lineGroup._snaking = false;
+    }
+
+    lineGroup.clearLayers();
 
     for (let i = 0; i < posList.length - 1; i++) {
         var latlngs = [

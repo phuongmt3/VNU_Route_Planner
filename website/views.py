@@ -7,6 +7,27 @@ views = Blueprint('views', __name__)
 road = Road()
 
 
+@views.route('/get_student_schedule/<msv>', methods=['GET'])
+def getStudentSchedule(msv):
+    mycursor.execute("SELECT * FROM sinhvien WHERE MSV = (%s)", (msv,))
+    data = mycursor.fetchone()
+    if data:
+        subjectList = getSubjectList(msv)
+        timeTable = getTimeTable(subjectList)
+    else:
+        return []
+
+    return json.dumps(timeTable)
+
+
+@views.route('/list_student.json', methods=['GET'])
+def getListStudent():
+    mycursor.execute("select * from sinhvien")
+    data = mycursor.fetchall()
+
+    return json.dumps(data, default=str)
+
+
 @views.route('/add_place/', methods=['POST'])
 def addPlace():
     posX, posY = request.json['posX'], request.json['posY']
@@ -80,8 +101,6 @@ def home():
     placeNames = [""]
     initRoad(showedPlaceList, placeNames)
 
-    timeTable = []
-
     mycursor.execute("SELECT name, posY, posX, main FROM points WHERE main > 1")
     markerList = mycursor.fetchall()
 
@@ -90,21 +109,10 @@ def home():
     placeList = [x + (False,) for x in data]
 
     if request.method == 'POST':
-        if request.form['submit_button'] == 'Search':
-            msv = request.form['msv']
-            mycursor.execute("SELECT * FROM sinhvien WHERE MSV = (%s)", (msv,))
-            data = mycursor.fetchone()
-            if data:
-                # Render user's name
-                print(data[1])
-                subjectList = getSubjectList(msv)
-                timeTable = getTimeTable(subjectList)
-
-        elif request.form['submit_button'] == 'Reset Dijkstra database':
+        if request.form['submit_button'] == 'Reset Dijkstra database':
             resetDijkstraTable()
             print('Reset Dijkstra database successfully!')
 
     return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList,
                            placeList=json.dumps(placeList),
-                           timeTable=json.dumps(timeTable),
                            markerList=json.dumps(markerList, cls=DecimalEncoder))
