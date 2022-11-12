@@ -81,6 +81,7 @@ def home():
     initRoad(showedPlaceList, placeNames)
 
     timeTable = []
+    msv = 0
 
     mycursor.execute("SELECT name, posY, posX, main FROM points WHERE main > 1")
     markerList = mycursor.fetchall()
@@ -105,6 +106,6 @@ def home():
             print('Reset Dijkstra database successfully!')
 
     return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList,
-                           placeList=json.dumps(placeList),
+                           placeList=json.dumps(placeList), msv=msv,
                            timeTable=json.dumps(timeTable),
                            markerList=json.dumps(markerList, cls=DecimalEncoder))

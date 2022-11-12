@@ -35,6 +35,7 @@
   <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
 
   <!-- FullCalendar -->
+  <script type="module" src="../static/javascript/clientSideDB.js"></script>
   <link href='/static/plugins/fullcalendar/main.css' rel='stylesheet' />
   <script src='/static/plugins/fullcalendar/main.js'></script>
   <link href='https://bootswatch.com/5/minty/bootstrap.min.css' rel='stylesheet'>
@@ -44,6 +45,8 @@
     var placeList = {{ placeList| safe }};
     var timeTable = {{ timeTable| safe }};
     var markerList = {{ markerList| safe }};
+    var msv = {{ msv| safe }};
+    msv = msv.toString();
   </script>
 </head>
 
@@ -60,6 +63,10 @@
       <div class="col-auto">
         <button type="submit" name="submit_button" class="btn btn-primary mb-3" value="Reset Dijkstra database">Reset
           Dijkstra database</button>
+      </div>
+      <div class="col-auto">
+        <button type="button" class="btn btn-primary mb-3" id="resetDB">Reset
+          user database</button>
       </div>
 
       <datalist id="startPlaces">

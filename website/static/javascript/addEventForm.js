@@ -1,4 +1,5 @@
 import { calendar } from './calendar.js'
+import { addEventDB, lastID } from './clientSideDB.js'
 
 $(document).on("click", ".addEvent", function() {
     var title = document.querySelector("#title").value;
@@ -15,7 +16,9 @@ $(document).on("click", ".addEvent", function() {
     var end = checkValidEndTime(endTime, startTime[0], startTime[1]) ? new Date(day.getFullYear(), day.getMonth(), day.getDate(), endTime[0], endTime[1])
                                     : new Date(start.getTime() + 30*60*1000);
 
+    addEventDB(title, start.toISOString(), end.toISOString(), place);
     calendar.addEvent({
+        id: lastID,
         title: title,
         start: start.toISOString(),
         end: end.toISOString(),
