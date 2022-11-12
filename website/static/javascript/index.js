@@ -47,7 +47,10 @@ const searchStudent = async searchText => {
 
   let matches = listStudent.filter(student => {
     const regex = new RegExp(`^${searchText}`, 'gi');
-    return String(student[0]).match(regex) || student[1].match(regex);
+    for (let text of student[1].split(' ')) {
+      if (text.match(regex)) return text.match(regex);
+    }
+    return String(student[0]).match(regex);
   });
 
   if (searchText.length === 0) {
