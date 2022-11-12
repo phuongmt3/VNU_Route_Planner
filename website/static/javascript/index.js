@@ -1,4 +1,5 @@
 import { calendar } from './calendar.js'
+import { initCalendar } from './calendar.js';
 
 // Drag bar /////////////////////////////////////////////////////////////////////////////////////
 var left = document.getElementById('map-container');
@@ -77,7 +78,15 @@ studentSearchEl.addEventListener('input', () => searchStudent(studentSearchEl.va
 // Select student by click
 $(document).on('click','.match-search',function() {
   studentSearchEl.value = this.id;
-  searchStudent(studentSearchEl.value)
+  matchList.innerHTML = '';
+  $(this).blur();
+  updateSchedule();
+});
+
+$(document).on('click','#student_search_btn',function() {
+  matchList.innerHTML = '';
+  $(this).blur();
+  updateSchedule();
 });
 
 // Select student by key
@@ -92,17 +101,17 @@ studentSearchEl.addEventListener("keydown", function(e) {
     addActive(x);
   } else if (e.key == "Enter") {
     // e.preventDefault();
-    if (currentFocus > -1) {
-      if (x) {
-        studentSearchEl.value = x[currentFocus].id;
-        searchStudent(studentSearchEl.value);
-      }
+    if (currentFocus > -1 && x) {
+      studentSearchEl.value = x[currentFocus].id;
+      matchList.innerHTML = '';
+      $(this).blur();
+      updateSchedule();
     }
   }
 });
 
 function addActive(x) {
-  if (!x) return false;
+  if (!x) return;
 
   if (currentFocus >= x.length) currentFocus = 0;
   if (currentFocus < 0) currentFocus = (x.length - 1);
@@ -113,9 +122,9 @@ function addActive(x) {
   x[currentFocus].style.backgroundColor = "#e9e9e9";
 }
 
-function getStudentSchedule() {
+// Select different student and render
+function updateSchedule() {
   let msv = document.getElementById("student_search").value;
-  console.log(msv)
   fetch(`/get_student_schedule/${msv}`)
       .then(function (response) {
           return response.json();
@@ -124,16 +133,7 @@ function getStudentSchedule() {
             return 0;
           }
 
-          placeList = response;
-          console.log(placeList);
+          timeTable = response;
+          initCalendar();
       });
 }
-
-// Others /////////////////////////////////////////////////////////////////////////////////////
-$(document).keypress(
-  function(event){
-    if (event.which == '13') {
-      $('#map').focus()
-      // event.preventDefault();
-    }
-});

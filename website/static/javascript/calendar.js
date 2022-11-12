@@ -177,6 +177,8 @@ function getEventFromTime(startTime=0, endTime=0) {
 }
 
 export function initCalendar() {
+    calendar.removeAllEvents();
+    
     if (timeTable.length > 0) {
         initEvents();
         var curEvent = getEventFromTime();

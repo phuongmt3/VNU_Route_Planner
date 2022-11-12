@@ -32,6 +32,7 @@
   <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
   <link rel="stylesheet" href="../static/plugins/Leaflet.SlideMenu/L.Control.SlideMenu.css">
   <script src="../static/plugins/Leaflet.SlideMenu/L.Control.SlideMenu.js"></script>
+  <script src="../static/plugins/L.MyTextBox.js"></script>
 
   <!-- Style -->
   <link rel="stylesheet" href="../static/styles.css">
@@ -44,8 +45,8 @@
 
   <script>
     var placeList = {{ placeList| safe }};
-    var timeTable = {{ timeTable| safe }};
     var markerList = {{ markerList| safe }};
+    var timeTable = [];
   </script>
 </head>
 
