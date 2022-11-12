@@ -2,6 +2,7 @@ import { selectPlace, clearPlaceSelect } from './building.js'
 import { findPath } from './map.js'
 
 var clickedEvent = null;
+var rightClickedEle = null;
 var snapDur = 45*60*1000;
 var calendarEl = document.getElementById('calendar');
 export var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -9,19 +10,12 @@ export var calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'timeGridDay',
     aspectRatio: 3,
     footerToolbar: {
-      center: 'addEventButton delEventButton'
+      center: 'addEventButton'
     },
     customButtons: {
       addEventButton: {
         icon: 'calendar-plus',
         click: onAddEventButtonClick
-      },
-      delEventButton: {
-        icon: 'calendar-x',
-        click: function() {
-            if (clickedEvent && confirm('Delete this event?'))
-                clickedEvent.remove();
-        }
       }
     },
     eventClick: function(e) { selectTimeSlot(e.event) },
@@ -47,6 +41,46 @@ export var calendar = new FullCalendar.Calendar(calendarEl, {
         
         info.el.querySelector(".fc-event-title-container").append(placeText);
         info.el.querySelector(".fc-event-title-container").append(hiddenText);
+
+        info.el.addEventListener('contextmenu', e => {
+            e.preventDefault();
+            var delButton = info.el.parentElement.querySelector(".delBtn")
+            if (!delButton) {
+                let button = document.createElement("button");
+                button.classList.add("btn");
+                button.classList.add("btn-warning");
+                button.classList.add("delBtn");
+                button.classList.add("float-end");
+                button.textContent = "X";
+                button.onclick = () => {
+                    if (confirm('Delete this event?'))
+                        info.event.remove();
+                };
+
+                if (rightClickedEle) {
+                    rightClickedEle.style.width = "100%";
+                    rightClickedEle.parentElement.querySelector(".delBtn").style.display = "none";
+                }
+
+                rightClickedEle = info.el;
+                info.el.parentElement.append(button);
+                info.el.style.width = "85%";
+            }
+            else if (delButton.style.display == "none") {
+                if (rightClickedEle) {
+                    rightClickedEle.style.width = "100%";
+                    rightClickedEle.parentElement.querySelector(".delBtn").style.display = "none";
+                }
+                delButton.style.display = "block";
+                info.el.style.width = "85%";
+                rightClickedEle = info.el;
+            }
+            else {
+                delButton.style.display = "none";
+                info.el.style.width = "100%";
+                rightClickedEle = null;
+            }
+        });
     }
 });
 
@@ -128,6 +162,12 @@ function calWeekNumber() {
 }
 
 function selectTimeSlot(event) {
+    if (rightClickedEle) {
+        rightClickedEle.style.width = "100%";
+        rightClickedEle.parentElement.querySelector(".delBtn").style.display = "none";
+        rightClickedEle = null;
+    }
+
     if (clickedEvent != null)
         clickedEvent.setProp("color", 'red');
     event.setProp("color", 'lightblue');
