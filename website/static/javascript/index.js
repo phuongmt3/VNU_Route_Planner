@@ -92,7 +92,7 @@ $(document).on('click','#student_search_btn',function() {
   updateSchedule();
 });
 
-// Select student by key
+// Select student by enter
 studentSearchEl.addEventListener("keydown", function(e) {
   var x = document.getElementById("match-list");
   if (x) x = x.getElementsByTagName("div");
@@ -127,8 +127,10 @@ function addActive(x) {
 
 // Select different student and render
 function updateSchedule() {
-  let msv = document.getElementById("student_search").value;
-  fetch(`/get_student_schedule/${msv}`)
+  calendar.removeAllEvents();
+
+  let msvList = document.getElementById("student_search").value;
+  fetch(`/get_student_schedule/${msvList}`)
       .then(function (response) {
           return response.json();
       }).then(function (response) {
@@ -136,7 +138,11 @@ function updateSchedule() {
             return 0;
           }
 
-          timeTable = response;
-          initCalendar();
+          // 3 person max
+          const color = ['#f5511e', '#039be6', '#7db343'];
+          for (let i = 0; i < response.length; i++) {
+            timeTable = response[i].timeTable;
+            initCalendar(response[i].msv, color[i]);
+          }
       });
 }

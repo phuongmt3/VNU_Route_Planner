@@ -7,17 +7,21 @@ views = Blueprint('views', __name__)
 road = Road()
 
 
-@views.route('/get_student_schedule/<msv>', methods=['GET'])
-def getStudentSchedule(msv):
-    mycursor.execute("SELECT * FROM sinhvien WHERE MSV = (%s)", (msv,))
-    data = mycursor.fetchone()
-    if data:
-        subjectList = getSubjectList(msv)
-        timeTable = getTimeTable(subjectList)
-    else:
-        return []
+@views.route('/get_student_schedule/<msvList>', methods=['GET'])
+def getStudentSchedule(msvList):
+    timeTableData = []
 
-    return json.dumps(timeTable)
+    msvList = msvList.split(',')
+    for msv in msvList:
+        mycursor.execute("SELECT * FROM sinhvien WHERE MSV = (%s)", (msv,))
+        data = mycursor.fetchone()
+        if data:
+            subjectList = getSubjectList(msv)
+            timeTable = getTimeTable(subjectList)
+
+            timeTableData.append({"msv": msv, "timeTable": timeTable})
+
+    return json.dumps(timeTableData)
 
 
 @views.route('/list_student.json', methods=['GET'])

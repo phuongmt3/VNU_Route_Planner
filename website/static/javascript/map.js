@@ -40,10 +40,6 @@ const distancePopup = L.popup()
 renderBuilding(map, placeList, buildingNameGroup);
 renderMarkers(map, markerList, placeList, foodGroup, souvenirGroup, parkingGroup);
 
-foodGroup.addTo(map);
-souvenirGroup.addTo(map);
-parkingGroup.addTo(map);
-
 var overlayMaps = {
     "Path": lineGroup,
     "Building's name": buildingNameGroup,
@@ -144,7 +140,7 @@ inputBox.getContainer().addEventListener('mouseout', function () {
     map.dragging.enable();
 });
 
-export function findPath(name1, name2) {
+export async function findPath(name1, name2) {
     lineGroup.clearLayers();
 
     var data = {
@@ -152,20 +148,14 @@ export function findPath(name1, name2) {
         "name2": name2,
     };
 
-    fetch(`/find_path/`, {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-    })
-        .then(function (response) {
-            return response.json();
-        }).then(function (response) {
-            if (response.length == 0) {
-                return 0;
-            }
+    let response = await fetch("/find_path/", { method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+    response = await response.json();
 
-            renderRoad(map, response[0], lineGroup);
-            distancePopup.setContent("Khoảng cách ~ " + response[1] + " mét");
-            console.log("Database' size = " + response[2]);
-        });
+    if (response.length == 0) {
+        return 0;
+    }
+
+    renderRoad(map, response[0], lineGroup);
+    distancePopup.setContent("Khoảng cách ~ " + response[1] + " mét");
+    console.log("Database' size = " + response[2]);
 }
