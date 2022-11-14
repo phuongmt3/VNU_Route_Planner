@@ -44,6 +44,7 @@ export function addEventDB(Title, Start, End, Place, msv) {
                         start: Start,
                          end: End,
                          place: Place };
+                         console.log(msv, typeof(msv));
     let dbOpenRequest = db.transaction([msv], "readwrite")
         .objectStore(msv)
         .add(newEvent);
