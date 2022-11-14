@@ -4,8 +4,8 @@ import { db, getLastEvent, createNewTable, addEventDB, printAll, deleteEventDB }
 
 var t0, t2;
 var clickedEvent = null;
-var snapDur = 15*60*1000;
 const startSemester = new Date("2022/08/29 00:00");
+var snapDur = 45*60*1000;
 var calendarEl = document.getElementById('calendar');
 
 export var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -40,7 +40,21 @@ export var calendar = new FullCalendar.Calendar(calendarEl, {
     weekNumberFormat: { week: 'narrow' },
     weekNumberCalculation: calWeekNumber,
     defaultTimedEventDuration: '00:30',
-    snapDuration: '00:15'
+    snapDuration: '00:15',
+    firstDay: 1,
+    eventDidMount: function(info) {
+        let placeText = document.createElement("div");
+        placeText.classList.add("description-text");
+        placeText.style = "font-size: 12px";
+        placeText.textContent = info.event.extendedProps.place;
+
+        let hiddenText = document.createElement("div");
+        hiddenText.classList.add("hidden");
+        hiddenText.textContent = info.event.extendedProps.description;
+        
+        info.el.querySelector(".fc-event-title-container").append(placeText);
+        info.el.querySelector(".fc-event-title-container").append(hiddenText);
+    }
 });
 
 function onAddEventButtonClick(e) {
@@ -72,8 +86,8 @@ calendar.on('dateClick', function(info) {
     }
 });
 
-function initEventsInDB() {
-    console.log('initEventsInDB');
+function initEvents() {
+    console.log('initEvents');
     var promm = new Promise((resolve, reject) => {
         console.log('contained or not: ' + db.objectStoreNames.contains(msv))
         if (db.objectStoreNames.contains(msv)) {
@@ -217,17 +231,23 @@ function getEventFromTime(startTime=0, endTime=0) {
     return null;
 }
 
-if (timeTable.length > 0) {
-    t0 = performance.now();
-    console.log("start init calendar: " + t0)
-    initEventsInDB();
+export function initCalendar() {
+    calendar.removeAllEvents();
+    
+    if (timeTable.length > 0) {
+        t0 = performance.now();
+        console.log("start init calendar: " + t0)
 
-    var curEvent = getEventFromTime();
-    if (curEvent != null) {
-        selectTimeSlot(curEvent);
-        clickedEvent = curEvent;
-        curEvent = curEvent[0];
+        initEvents();
+        var curEvent = getEventFromTime();
+        if (curEvent != null) {
+            selectTimeSlot(curEvent);
+            clickedEvent = curEvent;
+            curEvent = curEvent[0];
+        }
     }
+
+    calendar.render();
 }
 
-calendar.render();
+initCalendar();

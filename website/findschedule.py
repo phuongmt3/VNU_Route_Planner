@@ -62,20 +62,24 @@ def getTimeTable(subjectList):
         start, end = (int(s) for s in item.time.split('-'))
         subjectName = item.LMHName
         place = item.place
+        group = item.group
+        subjectCode = item.LMH
+        credits = item.TC
+        lecturer = item.lecturer
         if place[0] == '-':
             place = place[1:]
         if '-' in item.week:
             weekStart, weekEnd = (int(s) for s in item.week.split('-'))
             for week in range(weekStart - 1, weekEnd):
                 for i in range(start - 1, end):
-                    timeTable[week][day][i] = {"subjectName": subjectName, "place": place}
+                    timeTable[week][day][i] = {"subjectName": subjectName, "place": place, "group": group, "subjectCode": subjectCode, "credits": credits, "lecturer": lecturer}
         elif ',' in item.week:
             studyWeeks = (int(s) for s in item.week.split(','))
             for week in studyWeeks:
                 for i in range(start - 1, end):
-                    timeTable[week][day][i] = {"subjectName": subjectName, "place": place}
+                    timeTable[week][day][i] = {"subjectName": subjectName, "place": place, "group": group, "subjectCode": subjectCode, "credits": credits, "lecturer": lecturer}
         else:
             for week in range(15):
                 for i in range(start - 1, end):
-                    timeTable[week][day][i] = {"subjectName": subjectName, "place": place}
+                    timeTable[week][day][i] = {"subjectName": subjectName, "place": place, "group": group, "subjectCode": subjectCode, "credits": credits, "lecturer": lecturer}
     return timeTable

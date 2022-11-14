@@ -1493,3 +1493,7 @@ A VERTICAL event
   background-color: var(--bs-gray-200);
 }
 
+.fc-event-title.fc-sticky {
+  font-weight: 500;
+}
+
