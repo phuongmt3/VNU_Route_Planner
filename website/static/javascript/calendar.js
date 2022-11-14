@@ -25,7 +25,7 @@ export var calendar = new FullCalendar.Calendar(calendarEl, {
         icon: 'calendar-x',
         click: function() {
             if (clickedEvent && confirm('Delete this event?')) {
-                deleteEventDB(clickedEvent.id);
+                deleteEventDB(clickedEvent.id, msv);
                 clickedEvent.remove();
             }
         }
@@ -137,7 +137,7 @@ function initEvents() {
                             addEventDB(timeTable[week][curday][tiet].subjectName,
                                         startTime.toISOString(),
                                         endTime.toISOString(),
-                                        timeTable[week][curday][tiet].place);
+                                        timeTable[week][curday][tiet].place, msv);
 
                             tiet = tietEnd - 1;
                         }

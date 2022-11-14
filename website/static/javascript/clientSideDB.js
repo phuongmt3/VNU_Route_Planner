@@ -1,5 +1,3 @@
-import { msv } from './index.js'
-
 export let db;
 export let lastID;
 var lastEvent = new Map();
@@ -11,7 +9,7 @@ function openReq(version) {
         openRequest.onupgradeneeded = e => {
             db = e.target.result;
 
-            const objStore = db.createObjectStore(msv, {
+            const objStore = db.createObjectStore('0', {
                 keyPath: "id",
                 autoIncrement: true,
             });
@@ -41,7 +39,7 @@ function openReq(version) {
 
 openReq(1);
 
-export function addEventDB(Title, Start, End, Place) {
+export function addEventDB(Title, Start, End, Place, msv) {
     const newEvent = { title: Title,
                         start: Start,
                          end: End,
@@ -119,7 +117,7 @@ export function printAll() {
     printTable(stores, 0);
 }
 
-export function deleteEventDB(id) {
+export function deleteEventDB(id, msv) {
     db.transaction([msv], "readwrite")
         .objectStore(msv)
         .delete(parseInt(id))
