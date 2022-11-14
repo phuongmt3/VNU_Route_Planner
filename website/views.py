@@ -117,5 +117,5 @@ def home():
             print('Reset Dijkstra database successfully!')
 
     return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList,
-                           placeList=json.dumps(placeList), msv=msv,
+                           placeList=json.dumps(placeList),
                            markerList=json.dumps(markerList, cls=DecimalEncoder))

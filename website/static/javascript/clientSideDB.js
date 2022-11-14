@@ -1,3 +1,5 @@
+import { msv } from './index.js'
+
 export let db;
 export let lastID;
 var lastEvent = new Map();

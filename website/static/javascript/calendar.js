@@ -1,6 +1,7 @@
 import { selectPlace, clearPlaceSelect } from './building.js'
 import { findPath } from './map.js'
 import { db, getLastEvent, createNewTable, addEventDB, printAll, deleteEventDB } from './clientSideDB.js'
+import { msv } from './index.js'
 
 var t0, t2;
 var clickedEvent = null;
@@ -110,7 +111,7 @@ function initEvents() {
         prom.then(data => {
                 console.log('getLastEvent: ' + (performance.now() - t1))
                 var lastEventInDB = data ? data.value : null;
-                //console.log(lastEventInDB);
+                console.log(lastEventInDB);
                 if (lastEventInDB && new Date(lastEventInDB.start) >= startSemester)
                     return;
 
