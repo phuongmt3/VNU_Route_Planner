@@ -1,8 +1,7 @@
-import { calendar } from './calendar.js'
+import { calendar, dayClicked } from './calendar.js'
 
 $(document).on("click", ".addEvent", function() {
     var title = $("#title").val();
-    var day = calendar.getDate();
     var place = $("#place").val();
     var startTime = $("#startTime").val().split(":");
     var endTime = $("#endTime").val().split(":");
@@ -11,8 +10,8 @@ $(document).on("click", ".addEvent", function() {
         return;
     }
 
-    var start = new Date(day.getFullYear(), day.getMonth(), day.getDate(), startTime[0], startTime[1]);
-    var end = checkValidEndTime(endTime, startTime[0], startTime[1]) ? new Date(day.getFullYear(), day.getMonth(), day.getDate(), endTime[0], endTime[1])
+    var start = new Date(dayClicked.getFullYear(), dayClicked.getMonth(), dayClicked.getDate(), startTime[0], startTime[1]);
+    var end = checkValidEndTime(endTime, startTime[0], startTime[1]) ? new Date(dayClicked.getFullYear(), dayClicked.getMonth(), dayClicked.getDate(), endTime[0], endTime[1])
                                     : new Date(start.getTime() + 30*60*1000);
 
     calendar.addEvent({

@@ -5,6 +5,7 @@ var clickedEvent = null;
 var rightClickedEle = null;
 var snapDur = 45*60*1000;
 var justClickDel = false;
+export var dayClicked;
 var calendarEl = document.getElementById('calendar');
 export var calendar = new FullCalendar.Calendar(calendarEl, {
     themeSystem: 'bootstrap5',
@@ -111,6 +112,7 @@ calendar.on('dateClick', function(info) {
         findRoute("Cổng chính ĐHQGHN", nearEvents[1].extendedProps.place);
 
     onAddEvent(t1, new Date(t1.getTime() + 30*60*1000));
+    dayClicked = t1;
 });
 
 const startSemester = new Date("2022/08/29 00:00");
