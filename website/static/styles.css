@@ -84,7 +84,7 @@ body,
   display: none;
   position: absolute;
   width: 100%;
-  bottom: 38px;
+  bottom: 0px;
   right: 0px;
   border: 3px solid #f1f1f1;
   z-index: 10;
@@ -96,7 +96,7 @@ body,
 }
 
 .form-container input[type=text], .form-container input[type=password] {
-  width: 100%;
+  width: 90%;
   padding: 15px;
   margin: 5px 0 22px 0;
   border: none;

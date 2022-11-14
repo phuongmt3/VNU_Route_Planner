@@ -4,21 +4,13 @@ import { findPath } from './map.js'
 var clickedEvent = null;
 var rightClickedEle = null;
 var snapDur = 45*60*1000;
+var justDel = false;
 var calendarEl = document.getElementById('calendar');
 export var calendar = new FullCalendar.Calendar(calendarEl, {
     themeSystem: 'bootstrap5',
     initialView: 'timeGridDay',
     aspectRatio: 3,
-    footerToolbar: {
-      center: 'addEventButton'
-    },
-    customButtons: {
-      addEventButton: {
-        icon: 'calendar-plus',
-        click: onAddEventButtonClick
-      }
-    },
-    eventClick: function(e) { selectTimeSlot(e.event) },
+    eventClick: function(e) { selectEvent(e.event) },
     nowIndicator: true,
     editable: true,
     selectable: true,
@@ -42,75 +34,84 @@ export var calendar = new FullCalendar.Calendar(calendarEl, {
         info.el.querySelector(".fc-event-title-container").append(placeText);
         info.el.querySelector(".fc-event-title-container").append(hiddenText);
 
-        info.el.addEventListener('contextmenu', e => {
-            e.preventDefault();
-            var delButton = info.el.parentElement.querySelector(".delBtn")
-            if (!delButton) {
-                let button = document.createElement("button");
-                button.classList.add("btn");
-                button.classList.add("btn-warning");
-                button.classList.add("delBtn");
-                button.classList.add("float-end");
-                button.textContent = "X";
-                button.onclick = () => {
-                    if (confirm('Delete this event?'))
-                        info.event.remove();
-                };
-
-                if (rightClickedEle) {
-                    rightClickedEle.style.width = "100%";
-                    rightClickedEle.parentElement.querySelector(".delBtn").style.display = "none";
-                }
-
-                rightClickedEle = info.el;
-                info.el.parentElement.append(button);
-                info.el.style.width = "85%";
-            }
-            else if (delButton.style.display == "none") {
-                if (rightClickedEle) {
-                    rightClickedEle.style.width = "100%";
-                    rightClickedEle.parentElement.querySelector(".delBtn").style.display = "none";
-                }
-                delButton.style.display = "block";
-                info.el.style.width = "85%";
-                rightClickedEle = info.el;
-            }
-            else {
-                delButton.style.display = "none";
-                info.el.style.width = "100%";
-                rightClickedEle = null;
-            }
-        });
+        info.el.addEventListener('contextmenu', e => onRightClickEvent(e, info));
     }
 });
 
-function onAddEventButtonClick(e) {
-    var btn = document.getElementById("myForm");
-    if (btn.style.display == "none") {
-        document.querySelector("#title").value = "";
-        document.querySelector("#startTime").value = "";
-        document.querySelector("#endTime").value = "";
-        document.querySelector("#place").value = "";
-        btn.style.display = "block";
+function onRightClickEvent(e, info) {
+    e.preventDefault();
+    var delButton = info.el.parentElement.querySelector(".delBtn")
+    if (!delButton) {
+        let button = document.createElement("button");
+        button.classList.add("btn");
+        button.classList.add("btn-warning");
+        button.classList.add("delBtn");
+        button.classList.add("float-end");
+        button.textContent = "X";
+        button.onclick = () => {
+            if (confirm('Delete this event?')) {
+                info.event.remove();
+                justDel = true;
+            }
+        };
+
+        if (rightClickedEle) {
+            rightClickedEle.style.width = "100%";
+            rightClickedEle.parentElement.querySelector(".delBtn").style.display = "none";
+        }
+
+        rightClickedEle = info.el;
+        info.el.parentElement.append(button);
+        info.el.style.width = "85%";
     }
-    else btn.style.display = "none";
+    else if (delButton.style.display == "none") {
+        if (rightClickedEle) {
+            rightClickedEle.style.width = "100%";
+            rightClickedEle.parentElement.querySelector(".delBtn").style.display = "none";
+        }
+        delButton.style.display = "block";
+        info.el.style.width = "85%";
+        rightClickedEle = info.el;
+    }
+    else {
+        delButton.style.display = "none";
+        info.el.style.width = "100%";
+        rightClickedEle = null;
+    }
+}
+
+function onAddEvent(start, end) {
+    if (justDel) {
+        justDel = false;
+        return;
+    }
+    var startH = start.getHours() < 10 ? '0' + start.getHours() : start.getHours();
+    var endH = end.getHours() < 10 ? '0' + end.getHours() : end.getHours();
+    var startM = start.getMinutes() < 10 ? '0' + start.getMinutes() : start.getMinutes();
+    var endM = end.getMinutes() < 10 ? '0' + end.getMinutes() : end.getMinutes();
+
+    $("#title").val("");
+    $("#startTime").val(startH + ":" + startM);
+    $("#endTime").val(endH + ":" + endM);
+    $("#place").val("");
+    $("#myForm").css("display", "block");
 }
 
 calendar.on('dateClick', function(info) {
     var t1 = new Date(info.date);
-    var t2 = new Date(info.date.getTime() + snapDur);
+    var t2 = new Date(info.date.getTime() + 15*60*1000);
     var nearEvents = getEventFromTime(t1, t2);
+    var prev = nearEvents[0] && t1 - nearEvents[0].end < snapDur;
+    var next = nearEvents[1] && nearEvents[1].start - t2 < snapDur;
 
-    if (nearEvents[0] && t1 - nearEvents[0].end < snapDur) {
-        var startPlace = nearEvents[0].extendedProps.place;
-        var endPlace = "Cổng chính ĐHQGHN";
-        findRoute(startPlace, endPlace);
-    }
-    else if (nearEvents[1] && nearEvents[1].start - t2 < snapDur) {
-        var startPlace = "Cổng chính ĐHQGHN";
-        var endPlace = nearEvents[1].extendedProps.place;
-        findRoute(startPlace, endPlace);
-    }
+    if (prev && next)
+        findRoute(nearEvents[0].extendedProps.place, nearEvents[1].extendedProps.place);
+    else if (prev)
+        findRoute(nearEvents[0].extendedProps.place, "Cổng chính ĐHQGHN");
+    else if (next)
+        findRoute("Cổng chính ĐHQGHN", nearEvents[1].extendedProps.place);
+
+    onAddEvent(t1, new Date(t1.getTime() + 30*60*1000));
 });
 
 const startSemester = new Date("2022/08/29 00:00");
@@ -161,7 +162,7 @@ function calWeekNumber() {
     return week;
 }
 
-function selectTimeSlot(event) {
+function selectEvent(event) {
     if (rightClickedEle) {
         rightClickedEle.style.width = "100%";
         rightClickedEle.parentElement.querySelector(".delBtn").style.display = "none";
@@ -223,9 +224,23 @@ export function initCalendar() {
         initEvents();
         var curEvent = getEventFromTime();
         if (curEvent != null) {
-            selectTimeSlot(curEvent);
+            selectEvent(curEvent);
             clickedEvent = curEvent;
             curEvent = curEvent[0];
+        }
+        else {
+            var t1 = new Date();
+            var t2 = new Date(t1.getTime() + snapDur);
+            var nearEvents = getEventFromTime(t1, t2);
+            var prev = nearEvents[0] && t1 - nearEvents[0].end < snapDur;
+            var next = nearEvents[1] && nearEvents[1].start - t2 < snapDur;
+
+            if (prev && next)
+                findRoute(nearEvents[0].extendedProps.place, nearEvents[1].extendedProps.place);
+            else if (prev)
+                findRoute(nearEvents[0].extendedProps.place, "Cổng chính ĐHQGHN");
+            else if (next)
+                findRoute("Cổng chính ĐHQGHN", nearEvents[1].extendedProps.place);
         }
     }
 

@@ -77,6 +77,7 @@
     <div class="col form-popup" id="myForm" style="max-width: 300px;">
       <form class="form-container">
         <div class="mb-3">
+          <button type="button" class="btn-close float-end" aria-label="Close" id="closeFormBtn"></button>
           <input type="text" placeholder="Thêm tiêu đề" id="title" required>
         </div>
         <div class="mb-3">
@@ -86,7 +87,7 @@
         </div>
         <div class="mb-3">
           <input list="places" name="endPlace" placeholder="Place..." id="place" required>
-          <datalist id="places">
+          <datalist>
             {% for i in showedPlaceList: %}
             <option value="{{placeNames[i]}}"></option>
             {% endfor %}

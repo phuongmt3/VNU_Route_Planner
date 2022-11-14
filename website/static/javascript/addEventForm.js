@@ -1,13 +1,13 @@
 import { calendar } from './calendar.js'
 
 $(document).on("click", ".addEvent", function() {
-    var title = document.querySelector("#title").value;
+    var title = $("#title").val();
     var day = calendar.getDate();
-    var place = document.querySelector("#place").value;
-    var startTime = document.querySelector("#startTime").value.split(":");
-    var endTime = document.querySelector("#endTime").value.split(":");
-    if (!title || !place || startTime.length < 2) {
-        alert("Please enter event's title, start time and place!");
+    var place = $("#place").val();
+    var startTime = $("#startTime").val().split(":");
+    var endTime = $("#endTime").val().split(":");
+    if (!title || !place) {
+        alert("Please enter event's title and place!");
         return;
     }
 
@@ -25,7 +25,7 @@ $(document).on("click", ".addEvent", function() {
         color: 'red'
     });
 
-    document.getElementById("myForm").style.display = "none";
+    $("#myForm").css("display", "none");
 });
 
 function checkValidEndTime(endTime, startH, startM) {
@@ -33,3 +33,5 @@ function checkValidEndTime(endTime, startH, startM) {
         return false;
     return endTime[0] > startH || (endTime[0] == startM && endTime[1] > startM);
 }
+
+$("#closeFormBtn").click(e => $("#myForm").css("display", "none"));
