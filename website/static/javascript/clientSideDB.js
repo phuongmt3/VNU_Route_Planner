@@ -27,12 +27,12 @@ function openReq(version) {
 
     prom.then(e => {
         db = openRequest.result;
-        console.log("Database opened successfully " + performance.now());
+        console.log("Database opened successfully");
         var storeNames = db.objectStoreNames;
         for (var i = 0; i < storeNames.length; i++)
             lastEvent.set(storeNames[i], getLastEvent(storeNames[i]));
     }).catch(e => {
-        console.error(`indexedDB error: ${ e.target.errorCode }`);
+        // console.error(`indexedDB error: ${ e.target.errorCode }`);
         openReq(version + 1);
     });
 }
@@ -44,7 +44,6 @@ export function addEventDB(Title, Start, End, Place, msv) {
                         start: Start,
                          end: End,
                          place: Place };
-                         console.log(msv, typeof(msv));
     let dbOpenRequest = db.transaction([msv], "readwrite")
         .objectStore(msv)
         .add(newEvent);
@@ -61,7 +60,6 @@ export function getLastEvent(msv) {
         else {
             let cursor = objectStore.openCursor(null, 'prev');
             cursor.onsuccess = e => {
-                console.log('finished setup lastEvent for ' + msv, performance.now())
                 lastID = cursor.result ? cursor.result.value.id : 1;
                 resolve(cursor.result);
             };
@@ -71,8 +69,6 @@ export function getLastEvent(msv) {
 }
 
 export function createNewTable(msv) {
-    console.log("cur msv: ", msv);
-    console.log("create new table db");
     return new Promise((resolve, reject) => {
         var version =  parseInt(db.version);
         db.close();

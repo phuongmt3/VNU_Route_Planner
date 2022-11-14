@@ -37,7 +37,6 @@ export var calendar = new FullCalendar.Calendar(calendarEl, {
     selectable: true,
     allDaySlot: false,
     weekNumbers: true,
-    initialDate: '2022-11-10',
     weekNumberFormat: { week: 'narrow' },
     weekNumberCalculation: calWeekNumber,
     defaultTimedEventDuration: '00:30',
@@ -88,34 +87,24 @@ calendar.on('dateClick', function(info) {
 });
 
 function initEvents() {
-    console.log('initEvents');
     var promm = new Promise((resolve, reject) => {
-        console.log('contained or not: ' + db.objectStoreNames.contains(msv))
-        if (db.objectStoreNames.contains(msv)) {
-            console.log('contained ' + msv)
+        if (db.objectStoreNames.contains(msv))
             resolve();
-        }
         else {
             var tableProm = createNewTable(msv);
             tableProm.then(e => {
-                console.log(e.result);
                 resolve();
             }).catch(e => console.log(e.result));
         }
     });
 
     promm.then(() => {
-        var t1 = performance.now();
-        //console.log('create new table or not: ' + (t1 - t0));
         var prom = getLastEvent(msv);
         prom.then(data => {
-                console.log('getLastEvent: ' + (performance.now() - t1))
                 var lastEventInDB = data ? data.value : null;
-                console.log(lastEventInDB);
                 if (lastEventInDB && new Date(lastEventInDB.start) >= startSemester)
                     return;
 
-                console.log('start add events')
                 var timer = new Date(startSemester);
                 for (var week = 0; week < 15; week++) {
                     for (var day = 0; day < 7; day++) {
@@ -148,8 +137,6 @@ function initEvents() {
             })
             .catch(err => console.log(err))
             .finally(() => {
-                console.log('finally - add event to calendar');
-                var t2 =  performance.now();
                 //printAll();
 
                 const objectStore = db.transaction(msv).objectStore(msv);
@@ -170,8 +157,6 @@ function initEvents() {
                     }
                 };
                 myCursor.onerror = e => console.log('open cursor failed initCalendar');
-                console.log("initEvent took " + (performance.now() - t0) + " milliseconds.")
-                console.log("finish initEvent: " + performance.now())
             });
     })
 }
@@ -236,9 +221,6 @@ export function initCalendar() {
     calendar.removeAllEvents();
     
     if (timeTable.length > 0) {
-        t0 = performance.now();
-        console.log("start init calendar: " + t0)
-
         initEvents();
         var curEvent = getEventFromTime();
         if (curEvent != null) {
