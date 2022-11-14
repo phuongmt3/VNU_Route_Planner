@@ -2,6 +2,7 @@ import { selectPlace, clearPlaceSelect } from './building.js'
 import { findPath } from './map.js'
 import { db, getLastEvent, createNewTable, addEventDB, printAll, deleteEventDB } from './clientSideDB.js'
 
+var t0, t2;
 var clickedEvent = null;
 var snapDur = 15*60*1000;
 const startSemester = new Date("2022/08/29 00:00");
@@ -78,7 +79,7 @@ function initEventsInDB() {
         if (db.objectStoreNames.contains(msv)) {
             console.log('contained ' + msv)
             resolve();
-            }
+        }
         else {
             var tableProm = createNewTable(msv);
             tableProm.then(e => {
@@ -89,10 +90,13 @@ function initEventsInDB() {
     });
 
     promm.then(() => {
-        var prom = getLastEvent();
+        var t1 = performance.now();
+        //console.log('create new table or not: ' + (t1 - t0));
+        var prom = getLastEvent(msv);
         prom.then(data => {
+                console.log('getLastEvent: ' + (performance.now() - t1))
                 var lastEventInDB = data ? data.value : null;
-                console.log(lastEventInDB);
+                //console.log(lastEventInDB);
                 if (lastEventInDB && new Date(lastEventInDB.start) >= startSemester)
                     return;
 
@@ -129,36 +133,32 @@ function initEventsInDB() {
             })
             .catch(err => console.log(err))
             .finally(() => {
-                console.log("finally block")
-                printAll();
+                console.log('finally - add event to calendar');
+                var t2 =  performance.now();
+                //printAll();
 
                 const objectStore = db.transaction(msv).objectStore(msv);
-                var myCursor = objectStore.openCursor();
+                var myCursor = objectStore.getAll();
                 myCursor.onsuccess = e => {
-                    const cursor = e.target.result;
-                    if (cursor) {
+                    var events = e.target.result;
+                    for (var i = 0; i < events.length; i++) {
                         calendar.addEvent({
-                            id: cursor.value.id,
-                          title: cursor.value.title,
-                          start: cursor.value.start,
-                          end: cursor.value.end,
+                            id: events[i].id,
+                          title:events[i].title,
+                          start: events[i].start,
+                          end: events[i].end,
                           extendedProps: {
-                            place: cursor.value.place
+                            place: events[i].place
                           },
                           color: 'red'
                         });
-
-                        cursor.continue();
                     }
                 };
                 myCursor.onerror = e => console.log('open cursor failed initCalendar');
+                console.log("initEvent took " + (performance.now() - t0) + " milliseconds.")
+                console.log("finish initEvent: " + performance.now())
             });
     })
-
-
-
-
-
 }
 
 function calWeekNumber() {
@@ -218,7 +218,10 @@ function getEventFromTime(startTime=0, endTime=0) {
 }
 
 if (timeTable.length > 0) {
+    t0 = performance.now();
+    console.log("start init calendar: " + t0)
     initEventsInDB();
+
     var curEvent = getEventFromTime();
     if (curEvent != null) {
         selectTimeSlot(curEvent);
