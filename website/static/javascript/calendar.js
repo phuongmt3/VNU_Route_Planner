@@ -4,7 +4,7 @@ import { findPath } from './map.js'
 var clickedEvent = null;
 var rightClickedEle = null;
 var snapDur = 45*60*1000;
-var justDel = false;
+var justClickDel = false;
 var calendarEl = document.getElementById('calendar');
 export var calendar = new FullCalendar.Calendar(calendarEl, {
     themeSystem: 'bootstrap5',
@@ -49,10 +49,9 @@ function onRightClickEvent(e, info) {
         button.classList.add("float-end");
         button.textContent = "X";
         button.onclick = () => {
-            if (confirm('Delete this event?')) {
+            justClickDel = true;
+            if (confirm('Delete this event?'))
                 info.event.remove();
-                justDel = true;
-            }
         };
 
         if (rightClickedEle) {
@@ -81,8 +80,8 @@ function onRightClickEvent(e, info) {
 }
 
 function onAddEvent(start, end) {
-    if (justDel) {
-        justDel = false;
+    if (justClickDel) {
+        justClickDel = false;
         return;
     }
     var startH = start.getHours() < 10 ? '0' + start.getHours() : start.getHours();
