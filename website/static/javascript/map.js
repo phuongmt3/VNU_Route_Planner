@@ -159,3 +159,8 @@ export async function findPath(name1, name2) {
     distancePopup.setContent("Khoảng cách ~ " + response[1] + " mét");
     console.log("Database' size = " + response[2]);
 }
+
+export function clearMap() {
+    lineGroup.clearLayers();
+    clearPlaceSelect();
+}

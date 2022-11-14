@@ -1,5 +1,5 @@
 import { selectPlace, clearPlaceSelect } from './building.js'
-import { findPath } from './map.js'
+import { findPath, clearMap } from './map.js'
 
 const startSemester = new Date("2022/08/29 00:00");
 var clickedEvent = null;
@@ -25,7 +25,9 @@ export var calendar = new FullCalendar.Calendar(calendarEl, {
         }
       }
     },
-    eventClick: function(e) { selectTimeSlot(e.event) },
+    eventClick: function(info) { 
+        selectTimeSlot(info.event) 
+    },
     nowIndicator: true,
     editable: true,
     selectable: true,
@@ -128,9 +130,19 @@ function calWeekNumber() {
 }
 
 function selectTimeSlot(event) {
-    // if (clickedEvent != null)
-    //     clickedEvent.setProp("color", 'red');
-    // event.setProp("color", 'lightblue');
+    // Unselect event
+    if (clickedEvent != null && clickedEvent._instance.instanceId == event._instance.instanceId) {
+        clickedEvent.setProp("color", clickedEvent.backgroundColor.replace('0.69', '0.96'));
+        clickedEvent = null;
+        clearMap();
+
+        return;
+    }
+
+    if (clickedEvent != null)
+        clickedEvent.setProp("color", clickedEvent.backgroundColor.replace('0.69', '0.96'));
+    event.setProp("color", event.backgroundColor.replace('0.96', '0.69'));
+
     clickedEvent = event;
 
     var prevEvent = getEventFromTime(new Date(event.start), new Date(event.end), clickedEvent.extendedProps.owner)[0];

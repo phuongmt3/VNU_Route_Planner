@@ -7,6 +7,8 @@ var right = document.getElementById('calendar-container');
 var bar = document.getElementById('dragbar');
 
 const drag = (e) => {
+  left.style.transition = '0s';
+
   document.selection ? document.selection.empty() : window.getSelection().removeAllRanges();
   left.style.width = (e.pageX - bar.offsetWidth / 2) + 'px';
   
@@ -34,6 +36,36 @@ right.addEventListener('mouseup', () => {
   document.removeEventListener('mousemove', drag);
 });
 
+const minimize = (e) =>{
+  left.style.transition = '0.5s';
+
+  if (left.offsetWidth > 300) {
+    left.style.width = '300px';
+    setTimeout(() => {
+      calendar.changeView('timeGridWeek');
+    }, 500);
+  } else {
+    left.style.width = '100%';
+    setTimeout(() => {
+      calendar.changeView('timeGridDay');
+    }, 200);
+  }
+}
+
+bar.addEventListener('dblclick', minimize);
+
+calendar.on('eventClick', function(e) {
+  left.style.transition = '0.5s';
+
+  if (right.offsetWidth > 300) 
+    left.style.width = '100%';
+
+  if (calendar.view.type != 'timeGridDay') 
+    setTimeout(() => {
+      calendar.changeView('timeGridDay', e.event.start);
+    }, 200);
+});
+
 // Search student /////////////////////////////////////////////////////////////////////////////////////
 const studentSearchEl = document.getElementById("student_search");
 const matchList = document.getElementById("match-list");
@@ -45,10 +77,14 @@ const searchStudent = async searchText => {
   const res = await fetch("http://127.0.0.1:5000/list_student.json");
   const listStudent = await res.json();
 
+  // Todo: Use Regexp more efficient
   let matches = listStudent.filter(student => {
-    const regex = new RegExp(`^${searchText}`, 'gi');
+    let array = searchText.replaceAll(' ', '').split(',');
+    let element = array[array.length-1];
+
+    const regex = new RegExp(`^${element}`, 'gi');
     for (let text of student[1].split(' ')) {
-      if (text.match(regex)) return text.match(regex);
+      if (text.match(regex)) return true;
     }
     return String(student[0]).match(regex);
   });
@@ -80,9 +116,11 @@ studentSearchEl.addEventListener('input', () => searchStudent(studentSearchEl.va
 
 // Select student by click
 $(document).on('click','.match-search',function() {
-  studentSearchEl.value = this.id;
+  let array = studentSearchEl.value.replaceAll(' ', '').split(',');
+  array[array.length-1] = this.id;
+  studentSearchEl.value = array.join(', ');
+
   matchList.innerHTML = '';
-  $(this).blur();
   updateSchedule();
 });
 
@@ -105,9 +143,12 @@ studentSearchEl.addEventListener("keydown", function(e) {
   } else if (e.key == "Enter") {
     // e.preventDefault();
     if (currentFocus > -1 && x) {
-      studentSearchEl.value = x[currentFocus].id;
+      let array = studentSearchEl.value.replaceAll(' ', '').split(',');
+      array[array.length-1] = x[currentFocus].id;
+      studentSearchEl.value = array.join(', ');
+
       matchList.innerHTML = '';
-      $(this).blur();
+      // $(this).blur();
       updateSchedule();
     }
   }
@@ -138,8 +179,11 @@ function updateSchedule() {
             return 0;
           }
 
-          // 3 person max
-          const color = ['#f5511e', '#039be6', '#7db343'];
+          // Remove twice just in case 
+          calendar.removeAllEvents();
+          
+          // max 3 person 
+          const color = ['rgb(245, 81, 30, 0.96)', 'rgb(3, 155, 230, 0.96)', 'rgb(125, 179, 67, 0.96)'];
           for (let i = 0; i < response.length; i++) {
             timeTable = response[i].timeTable;
             initCalendar(response[i].msv, color[i]);
