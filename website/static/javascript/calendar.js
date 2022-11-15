@@ -1,9 +1,14 @@
 import { selectPlace, clearPlaceSelect } from './building.js'
 import { findPath } from './map.js'
+import { db, getLastEvent, createNewTable, addEventDB, printAll, deleteEventDB, updateEventDB } from './clientSideDB.js'
+import { msv } from './index.js'
 
+var t0, t2;
 var clickedEvent = null;
+const startSemester = new Date("2022/08/29 00:00");
 var snapDur = 45*60*1000;
 var calendarEl = document.getElementById('calendar');
+
 export var calendar = new FullCalendar.Calendar(calendarEl, {
     themeSystem: 'bootstrap5',
     initialView: 'timeGridDay',
@@ -19,8 +24,10 @@ export var calendar = new FullCalendar.Calendar(calendarEl, {
       delEventButton: {
         icon: 'calendar-x',
         click: function() {
-            if (clickedEvent && confirm('Delete this event?'))
+            if (clickedEvent && confirm('Delete this event?')) {
+                deleteEventDB(clickedEvent.id, msv);
                 clickedEvent.remove();
+            }
         }
       }
     },
@@ -47,6 +54,11 @@ export var calendar = new FullCalendar.Calendar(calendarEl, {
         
         info.el.querySelector(".fc-event-title-container").append(placeText);
         info.el.querySelector(".fc-event-title-container").append(hiddenText);
+    },
+    eventChange: (info) => {
+        var e = info.event;
+        console.log(e.id, e.title, e.start.toISOString(), e.end.toISOString())
+        updateEventDB(e.id, e.start.toISOString(), e.end.toISOString(), msv);
     }
 });
 
@@ -79,45 +91,79 @@ calendar.on('dateClick', function(info) {
     }
 });
 
-const startSemester = new Date("2022/08/29 00:00");
-
 function initEvents() {
-    var timer = new Date(startSemester);
-    for (var week = 0; week < 15; week++) {
-        for (var day = 0; day < 7; day++) {
-            var curday = timer.getDay();
-            for (var tiet = 0; tiet < 12; tiet++) {
-                var subject = timeTable[week][curday][tiet];
-
-                if (subject.subjectName == "")
-                    continue;
-                
-                var tietEnd = tiet + 1;
-                while (tietEnd < 12 && timeTable[week][curday][tietEnd].subjectName == subject.subjectName)
-                    tietEnd++;
-
-                var startTime = new Date(timer);
-                var endTime = new Date(timer);
-                startTime.setHours(tiet + 7);
-                endTime.setHours(tietEnd + 7);
-
-                calendar.addEvent({
-                  title: subject.group + " - " + subject.subjectName,
-                  description: subject.subjectCode + ", " + subject.credits + ", " + subject.lecturer,
-                  start: startTime.toISOString(),
-                  end: endTime.toISOString(),
-                  extendedProps: {
-                    place: subject.place
-                  },
-                  color: 'red'
-                });
-
-                tiet = tietEnd - 1;
-            }
-
-            timer.setDate(timer.getDate() + 1);
+    var promm = new Promise((resolve, reject) => {
+        if (db.objectStoreNames.contains(msv))
+            resolve();
+        else {
+            var tableProm = createNewTable(msv);
+            tableProm.then(e => {
+                resolve();
+            }).catch(e => console.log(e.result));
         }
-    }
+    });
+
+    promm.then(() => {
+        var prom = getLastEvent(msv);
+        prom.then(data => {
+                var lastEventInDB = data ? data.value : null;
+                if (lastEventInDB && new Date(lastEventInDB.start) >= startSemester)
+                    return;
+
+                var timer = new Date(startSemester);
+                for (var week = 0; week < 15; week++) {
+                    for (var day = 0; day < 7; day++) {
+                        var curday = timer.getDay();
+                        for (var tiet = 0; tiet < 12; tiet++) {
+                            if (timeTable[week][curday][tiet].subjectName == "")
+                                continue;
+
+                            var tietEnd = tiet + 1;
+                            while (tietEnd < 12 && timeTable[week][curday][tietEnd].subjectName ==
+                                                    timeTable[week][curday][tiet].subjectName)
+                                tietEnd++;
+
+                            var startTime = new Date(timer);
+                            var endTime = new Date(timer);
+                            startTime.setHours(tiet + 7);
+                            endTime.setHours(tietEnd + 7);
+
+                            addEventDB(timeTable[week][curday][tiet].subjectName,
+                                        startTime.toISOString(),
+                                        endTime.toISOString(),
+                                        timeTable[week][curday][tiet].place, msv);
+
+                            tiet = tietEnd - 1;
+                        }
+
+                        timer.setDate(timer.getDate() + 1);
+                    }
+                }
+            })
+            .catch(err => console.log(err))
+            .finally(() => {
+                //printAll();
+
+                const objectStore = db.transaction(msv).objectStore(msv);
+                var myCursor = objectStore.getAll();
+                myCursor.onsuccess = e => {
+                    var events = e.target.result;
+                    for (var i = 0; i < events.length; i++) {
+                        calendar.addEvent({
+                            id: events[i].id,
+                          title:events[i].title,
+                          start: events[i].start,
+                          end: events[i].end,
+                          extendedProps: {
+                            place: events[i].place
+                          },
+                          color: 'red'
+                        });
+                    }
+                };
+                myCursor.onerror = e => console.log('open cursor failed initCalendar');
+            });
+    })
 }
 
 function calWeekNumber() {

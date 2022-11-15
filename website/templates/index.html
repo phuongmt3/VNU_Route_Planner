@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="../static/styles.css">
 
   <!-- FullCalendar -->
+  <script type="module" src="../static/javascript/clientSideDB.js"></script>
   <link href='/static/plugins/fullcalendar/main.css' rel='stylesheet' />
   <script src='/static/plugins/fullcalendar/main.js'></script>
   <link href='https://bootswatch.com/5/minty/bootstrap.min.css' rel='stylesheet'>
@@ -64,6 +65,10 @@
           <script type="module" src="../static/javascript/map.js"></script>
         </div>
       </div>
+      <!--<div class="col-auto">
+        <button type="button" class="btn btn-primary mb-3" id="resetDB">Reset
+          user database</button>
+      </div>-->
 
       <div class="dragbar" id="dragbar"></div>
         
@@ -86,7 +91,7 @@
         </div>
         <div class="mb-3">
           <input list="places" name="endPlace" placeholder="Place..." id="place" required>
-          <datalist id="places">
+          <datalist>
             {% for i in showedPlaceList: %}
             <option value="{{placeNames[i]}}"></option>
             {% endfor %}
