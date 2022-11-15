@@ -3,6 +3,8 @@ import { onMapClick } from './addPlace.js';
 import { renderBuilding, selectPlace, clearPlaceSelect, selectAllBuilding } from './building.js';
 import { renderRoad } from './road.js';
 
+const avgWalkSpeed = 62.5;
+
 var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     id: "osm",
     maxZoom: 19,
@@ -96,7 +98,7 @@ $(document).on('click','.postPlace',function() {
             renderRoad(map, response[0], lineGroup);
             selectPlace(placeName);
 
-            distancePopup.setContent("Khoảng cách ~ " + response[1] + " mét");
+            distancePopup.setContent("~ " + response[1] + " m, " + Math.round(response[1]/avgWalkSpeed) + " min");
             console.log("Database' size = " + response[2]);
         });
 });
@@ -165,7 +167,7 @@ export function findPath(name1, name2) {
             }
 
             renderRoad(map, response[0], lineGroup);
-            distancePopup.setContent("Khoảng cách ~ " + response[1] + " mét");
+            distancePopup.setContent("~ " + response[1] + " m, " + Math.round(response[1]/avgWalkSpeed) + " min");
             console.log("Database' size = " + response[2]);
         });
 }
