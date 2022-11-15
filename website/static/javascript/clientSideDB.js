@@ -9,10 +9,7 @@ function openReq(version) {
         openRequest.onupgradeneeded = e => {
             db = e.target.result;
 
-            const objStore = db.createObjectStore('0', {
-                keyPath: "id",
-                autoIncrement: true,
-            });
+            const objStore = db.createObjectStore('0', { keyPath: "id" });
 
             objStore.createIndex("title", "title", { unique: false });
             objStore.createIndex("start", "start", { unique: false });
@@ -40,7 +37,9 @@ function openReq(version) {
 openReq(1);
 
 export function addEventDB(Title, Start, End, Place, msv) {
-    const newEvent = { title: Title,
+    lastID++;
+    const newEvent = { id: lastID,
+                        title: Title,
                         start: Start,
                          end: End,
                          place: Place };
@@ -49,11 +48,10 @@ export function addEventDB(Title, Start, End, Place, msv) {
         .add(newEvent);
     dbOpenRequest.onerror = () => console.log("Transaction not opened due to error");
     dbOpenRequest.onsuccess = () => console.log("Add completed");
-    lastID++;
 }
 
 export function getLastEvent(msv) {
-    const objectStore = db.transaction([msv], "readonly").objectStore(msv);
+    const objectStore = db.transaction([msv]).objectStore(msv);
     return new Promise((resolve, reject) => {
         if (lastEvent.get(msv))
             resolve(lastEvent.get(msv));
@@ -77,10 +75,7 @@ export function createNewTable(msv) {
         req.onupgradeneeded = e => {
             db = e.target.result;
 
-            const objectStore = db.createObjectStore(msv, {
-                keyPath: "id",
-                autoIncrement: true,
-            });
+            const objectStore = db.createObjectStore(msv, { keyPath: "id" });
 
             objectStore.createIndex("title", "title", { unique: false });
             objectStore.createIndex("start", "start", { unique: false });
@@ -125,6 +120,7 @@ export function updateEventDB(id, startTime, endTime, msv) {
     const objectStore = db.transaction([msv], "readwrite").objectStore(msv);
     const req = objectStore.get(parseInt(id));
     req.onsuccess = () => {
+    console.log(id, startTime, endTime, msv, req.result);
         var event = req.result;
         event.start = startTime;
         event.end = endTime;
