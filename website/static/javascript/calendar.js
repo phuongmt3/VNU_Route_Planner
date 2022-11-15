@@ -27,9 +27,11 @@ export var calendar = new FullCalendar.Calendar(calendarEl, {
         }
       }
     },
-    // Todo: remove select individual events
     eventClick: function(info) { 
-        selectTimeSlot(info.event) 
+        setTimeout(() => {
+            let timeGrid = document.querySelectorAll(`.fc-timegrid-slot.fc-timegrid-slot-label`);
+            selectEventsInTimeRange(timeGrid[info.event.start.getHours() * 2 + Math.floor(info.event.start.getMinutes() / 30)])
+        }, 400);
     },
     nowIndicator: true,
     editable: true,
@@ -151,7 +153,7 @@ async function findRoute(startPlace, endPlace, color) {
 
     // Color when render to map
     color = (color == 'rgb(245, 81, 30, 0.96)') ? 'red' : 
-            (color == 'rgb(3, 155, 230, 0.96)') ? 'dodgerblue' : 'lime';
+            (color == 'rgb(3, 155, 230, 0.96)') ? 'deepskyblue' : 'lime';
 
     selectPlace(endPlace, color);
     await findPath(startPlace, endPlace, color);
@@ -203,13 +205,13 @@ initCalendar();
 let timeGridLabelList = document.querySelectorAll('.fc-timegrid-slot.fc-timegrid-slot-label');
 timeGridLabelList.forEach(timeGridLabel => {
     timeGridLabel.addEventListener('click', () => {
-        selectEventsInTimeRange(timeGridLabel);
+        if (calendar.view.type == 'timeGridDay')
+            selectEventsInTimeRange(timeGridLabel);
     })
 })
 
 async function selectEventsInTimeRange(timeGridLabel) {
-    if (calendar.view.type != 'timeGridDay') return;
-    unselectAllHour();
+    unselectTimeRange();
 
     let hours = timeGridLabel.getAttribute('data-time').split(':');
     let selectTime = new Date(calendar.getDate().setHours(hours[0], hours[1], 0));
@@ -226,7 +228,7 @@ async function selectEventsInTimeRange(timeGridLabel) {
     timeGridLabel.nextSibling.style.backgroundColor = 'rgba(188, 232, 241, 0.3)';
 }
 
-export function unselectAllHour() {
+export function unselectTimeRange() {
     timeGridLabelList.forEach(timeGridLabel => {
         timeGridLabel.style.backgroundColor = '#fff';
         timeGridLabel.nextSibling.style.backgroundColor = '#fff';

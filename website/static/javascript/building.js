@@ -133,22 +133,12 @@ export function selectPlace(name, color) {
     }
 }
 
-// function blendColor(c1, c2) {
-//     if ((c1 == 'red' && c2 == 'dodgerblue') || (c2 == 'red' && c1 == 'dodgerblue')) {
-//         return 'magenta';
-//     } else if ((c1 == 'red' && c2 == 'lime') || (c2 == 'red' && c1 == 'lime')) {
-//         return 'yellow';
-//     } else if ((c1 == 'dodgerblue' && c2 == 'lime') || (c2 == 'dodgerblue' && c1 == 'lime')) {
-//         return 'cyan';
-//     } else return 'blueviolet';
-// }
-
 export function mark(layer, color) {
     if (layer.options.opacity > 0) {
         if (color == 'red' || layer.options.color == 'red') {
             color = 'red';
-        } else if (color == 'dodgerblue' || layer.options.color == 'dodgerblue') {
-            color = 'dodgerblue';
+        } else if (color == 'deepskyblue' || layer.options.color == 'deepskyblue') {
+            color = 'deepskyblue';
         } else {
             color = 'lime';
         }

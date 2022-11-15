@@ -13,9 +13,11 @@ def getStudentSchedule(msvList):
     global roadNumb
 
     timeTableData = []
+    message = []
 
     msvList = msvList.split(',')
     roadNumb = len(msvList)
+
     for msv in msvList:
         mycursor.execute("SELECT * FROM sinhvien WHERE MSV = (%s)", (msv,))
         data = mycursor.fetchone()
@@ -24,8 +26,9 @@ def getStudentSchedule(msvList):
             timeTable = getTimeTable(subjectList)
 
             timeTableData.append({"msv": msv, "timeTable": timeTable})
+            message.append("Welcome " + data[1])
 
-    return json.dumps(timeTableData)
+    return json.dumps({"timeTableData": timeTableData, "message": message})
 
 
 # Autocomplete

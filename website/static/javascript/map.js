@@ -77,6 +77,15 @@ L.control.slideMenu('<h2>VNU Route Planner</h2>').addTo(map);
 var inputBox = L.control.inputBox({ position: 'topleft' }).addTo(map);
 // var locationBox = L.control.locationBox({ position: 'topleft' }).addTo(map);
 
+export var notification = L.control
+    .notifications({
+        timeout: 3000,
+        position: 'topleft',
+        closable: true,
+        dismissable: true,
+    })
+    .addTo(map);
+
 // Add place and update path, distance when click "visit"
 $(document).on('click','.postPlace',function() {
     let placeName = this.id;
@@ -98,7 +107,7 @@ $(document).on('click','.postPlace',function() {
 
             clearLine();
                     
-            let color = ['red', 'dodgerblue', 'lime'];
+            let color = ['red', 'deepskyblue', 'lime'];
             for (let i = 0; i < 3; i++) {
                 // console.log(response[i][0].length)
                 if (response[i][0].length < 2) continue;
@@ -161,7 +170,7 @@ export async function findPath(name1, name2, color) {
         "name2": name2,
     };
 
-    let index = (color == 'red') ? 0 : (color == 'dodgerblue') ? 1 : 2;
+    let index = (color == 'red') ? 0 : (color == 'deepskyblue') ? 1 : 2;
     let response = await fetch(`/find_path/${index}`, { method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
     response = await response.json();
 

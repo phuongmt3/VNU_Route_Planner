@@ -1,0 +1,31 @@
+{
+    "name": "leaflet-notifications",
+    "version": "1.0.8",
+    "description": "Leaflet plugin to show notification (toasts) inside the map",
+    "main": "js/leaflet-notifications.js",
+    "style": "css/leaflet-notifications.css",
+    "scripts": {
+        "minify": "minify js/leaflet-notifications.js > js/leaflet-notifications.min.js && minify css/leaflet-notifications.css > css/leaflet-notifications.min.css"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@gitlab.com/manuel.richter95/leaflet.notifications.git"
+    },
+    "keywords": [
+        "leaflet",
+        "notification",
+        "alerts",
+        "messages",
+        "toast",
+        "plugin"
+    ],
+    "author": "Manuel Richter",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://gitlab.com/manuel.richter95/leaflet.notifications/issues"
+    },
+    "homepage": "https://gitlab.com/manuel.richter95/leaflet.notifications#readme",
+    "dependencies": {
+        "font-awesome": "^4.7.0"
+    }
+}

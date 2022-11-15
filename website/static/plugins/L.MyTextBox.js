@@ -5,7 +5,7 @@ L.Control.inputBox = L.Control.extend({
         text.id = "inputBox";
         text.innerHTML = `
             <form class="row" action="javascript:void(0);" id="my-form">
-                <div class="col-11 form-group">
+                <div class="col-10 form-group">
                     <input type="text" id="student_search" class="form-control" name="student_search" placeholder="MSV, Name, ..." style="height: 38px;">
                 </div>
                 <div class="col-1" style="padding-left: 0;">
@@ -13,7 +13,7 @@ L.Control.inputBox = L.Control.extend({
                         <span class="material-symbols-outlined">search</span>
                     </button>
                 </div>
-                <div class="col-11" id="match-list" style="height: 38px;"> 
+                <div class="col-10" id="match-list" style="height: 38px;"> 
                 <!-- <div class="col-auto">
                     <button type="submit" name="submit_button" class="btn btn-primary" value="Reset Dijkstra database">Reset
                     Dijkstra database</button>

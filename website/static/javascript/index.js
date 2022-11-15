@@ -1,6 +1,6 @@
 import { calendar } from './calendar.js'
-import { initCalendar, unselectAllHour } from './calendar.js';
-import { clearMap } from './map.js';
+import { initCalendar, unselectTimeRange } from './calendar.js';
+import { clearMap, notification } from './map.js';
 
 // Drag bar /////////////////////////////////////////////////////////////////////////////////////
 var left = document.getElementById('map-container');
@@ -18,7 +18,7 @@ const drag = (e) => {
   }
   if (left.offsetWidth <= 300) {
     calendar.changeView('timeGridWeek');
-    unselectAllHour();
+    unselectTimeRange();
   }
 }
 
@@ -45,7 +45,7 @@ const minimize = (e) =>{
     left.style.width = '300px';
     setTimeout(() => {
       calendar.changeView('timeGridWeek');
-      unselectAllHour();
+      unselectTimeRange();
     }, 500);
   } else {
     left.style.width = '100%';
@@ -136,6 +136,8 @@ $(document).on('click','#student_search_btn',function() {
 
 // Select student by enter
 studentSearchEl.addEventListener("keydown", function(e) {
+  if (e.repeat) return;
+
   var x = document.getElementById("match-list");
   if (x) x = x.getElementsByTagName("div");
   if (e.key == "ArrowDown") {
@@ -153,7 +155,7 @@ studentSearchEl.addEventListener("keydown", function(e) {
 
       matchList.innerHTML = '';
       // $(this).blur();
-      updateSchedule();
+      // updateSchedule();
     }
   }
 });
@@ -171,27 +173,28 @@ function addActive(x) {
 }
 
 // Select different student and render
-function updateSchedule() {
+async function updateSchedule() {
   calendar.removeAllEvents();
   clearMap();
 
   let msvList = document.getElementById("student_search").value;
-  fetch(`/get_student_schedule/${msvList}`)
-      .then(function (response) {
-          return response.json();
-      }).then(function (response) {
-          if (response.length == 0) {
-            return 0;
-          }
+  let res = await fetch(`/get_student_schedule/${msvList}`);
+  res = await res.json();
 
-          // Remove twice just in case 
-          calendar.removeAllEvents();
+  if (res.timeTableData.length == 0) return;
+
+  // Remove twice just in case ...
+  calendar.removeAllEvents();
           
-          // Max 3 persons
-          const color = ['rgb(245, 81, 30, 0.96)', 'rgb(3, 155, 230, 0.96)', 'rgb(125, 179, 67, 0.96)'];
-          for (let i = 0; i < response.length; i++) {
-            timeTable = response[i].timeTable;
-            initCalendar(response[i].msv, color[i]);
-          }
-      });
+  // Max 3 persons
+  const color = ['rgb(245, 81, 30, 0.96)', 'rgb(3, 155, 230, 0.96)', 'rgb(125, 179, 67, 0.96)'];
+  for (let i = 0; i < res.timeTableData.length; i++) {
+    timeTable = res.timeTableData[i].timeTable;
+    initCalendar(res.timeTableData[i].msv, color[i]);
+  }
+
+  for (let i = 0; i < res.message.length; i++) {
+    notification.success('Success', res.message[i]);
+  }
 }
+
