@@ -1,27 +1,38 @@
-export function renderRoad(map, posList, lineGroup) {
-    if (lineGroup._snaking) {
-        lineGroup._snaking = false;
+export let redLine = L.polyline([], { color: 'red', offset: 2 });
+export let blueLine = L.polyline([], { color: 'dodgerblue', offset: 6 });
+export let greenLine = L.polyline([], { color: 'lime', offset: 10 });
+
+
+export function renderRoad(map, posList, color) {
+    for (let i = 0; i < posList.length; i++) {
+        if (color == 'red')
+            redLine.addLatLng([parseFloat(posList[i][0]), parseFloat(posList[i][1])]);
+        else if (color == 'dodgerblue')
+            blueLine.addLatLng([parseFloat(posList[i][0]), parseFloat(posList[i][1])]);
+        else
+            greenLine.addLatLng([parseFloat(posList[i][0]), parseFloat(posList[i][1])]);
     }
 
-    lineGroup.clearLayers();
-
-    for (let i = 0; i < posList.length - 1; i++) {
-        var latlngs = [
-            [parseFloat(posList[i][0]), parseFloat(posList[i][1])], [parseFloat(posList[i + 1][0]), parseFloat(posList[i + 1][1])]
-        ];
-        var line = L.polyline(latlngs, { color: 'red' });
-
-        // Check if latlngs is overlapping lines in lineGroup
-        for (const layer of Object.values(lineGroup._layers).reverse()) {
-            if (latlngs.toString() === [Object.values(layer._latlngs[1]), Object.values(layer._latlngs[0])].toString()) {
-                line.setStyle({ weight: 6 })
-                break;
-            }
-        }
-
-        lineGroup.addLayer(line);
+    if (color == 'red') {
+        redLine.addTo(map).snakeIn();
+    } else if (color == 'dodgerblue') {
+        blueLine.addTo(map).snakeIn();
+    } else {
+        greenLine.addTo(map).snakeIn();
     }
+}
 
-    lineGroup.addTo(map).snakeIn();
+export function clearLine() {
+    redLine._snaking = false;
+    redLine.remove();
+    redLine = L.polyline([], { color: 'red', offset: 2 });
+
+    blueLine._snaking = false;
+    blueLine.remove();
+    blueLine = L.polyline([], { color: 'dodgerblue', offset: 6 });
+
+    greenLine._snaking = false;
+    greenLine.remove();
+    greenLine = L.polyline([], { color: 'lime', offset: 10 });
 }
     

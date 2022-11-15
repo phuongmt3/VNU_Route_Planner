@@ -1,4 +1,4 @@
-import { selectPlace, clearPlaceSelect } from './building.js'
+import { selectPlace } from './building.js'
 import { findPath, clearMap } from './map.js'
 
 const startSemester = new Date("2022/08/29 00:00");
@@ -129,19 +129,19 @@ function calWeekNumber() {
     return week;
 }
 
-function selectTimeSlot(event) {
-    // Unselect event
-    if (clickedEvent != null && clickedEvent._instance.instanceId == event._instance.instanceId) {
-        clickedEvent.setProp("color", clickedEvent.backgroundColor.replace('0.69', '0.96'));
-        clickedEvent = null;
-        clearMap();
+async function selectTimeSlot(event) {
+    // Unselect event if click twice
+    // if (clickedEvent != null && clickedEvent._instance.instanceId == event._instance.instanceId) {
+    //     clickedEvent.setProp("color", clickedEvent.backgroundColor.replace('0.69', '0.96'));
+    //     clickedEvent = null;
+    //     clearMap();
 
-        return;
-    }
+    //     return;
+    // }
 
-    if (clickedEvent != null)
-        clickedEvent.setProp("color", clickedEvent.backgroundColor.replace('0.69', '0.96'));
-    event.setProp("color", event.backgroundColor.replace('0.96', '0.69'));
+    // if (clickedEvent != null)
+    //     clickedEvent.setProp("color", clickedEvent.backgroundColor.replace('0.69', '0.96'));
+    // event.setProp("color", event.backgroundColor.replace('0.96', '0.69'));
 
     clickedEvent = event;
 
@@ -152,17 +152,19 @@ function selectTimeSlot(event) {
         startPlace = prevEvent.extendedProps.place;
     var endPlace = event.extendedProps.place;
 
-    findRoute(startPlace, endPlace);
+    await findRoute(startPlace, endPlace, clickedEvent.backgroundColor);
 }
 
-async function findRoute(startPlace, endPlace) {
+async function findRoute(startPlace, endPlace, color) {
     startPlace = startPlace.includes("-") ? startPlace.split("-")[1] : startPlace;
     endPlace = endPlace.includes("-") ? endPlace.split("-")[1] : endPlace;
 
-    clearPlaceSelect();
-    selectPlace(endPlace);
+    // Color when render to map
+    color = (color == 'rgb(245, 81, 30, 0.96)') ? 'red' : 
+            (color == 'rgb(3, 155, 230, 0.96)') ? 'dodgerblue' : 'lime';
 
-    await findPath(startPlace, endPlace);
+    selectPlace(endPlace, color);
+    await findPath(startPlace, endPlace, color);
     
     // $("#startPlace").val(startPlace);
     // $("#endPlace").val(endPlace);
@@ -170,12 +172,12 @@ async function findRoute(startPlace, endPlace) {
 
 function acceptedEvent(event, startTime, endTime, owner) {
     if (startTime != 0)
-        return new Date(event.start) < startTime && new Date(event.end) < endTime && owner == event.extendedProps.owner;
-    return new Date(event.start) <= new Date() && new Date(event.end) >= new Date() && owner == event.extendedProps.owner;
+        return new Date(event.start) < startTime && new Date(event.end) < endTime && (owner == event.extendedProps.owner || owner == 0);
+    return new Date(event.start) <= new Date() && new Date(event.end) >= new Date() && (owner == event.extendedProps.owner || owner == 0);
 }
 
 // get 2 events nearest < cur event & get cur event
-function getEventFromTime(startTime=0, endTime=0, owner) {
+function getEventFromTime(startTime=0, endTime=0, owner=0) {
     var events = calendar.getEvents().sort((a, b) => {
         if (a.start == b.start)
             return a.end - b.end;
@@ -205,3 +207,36 @@ export function initCalendar(msv, color) {
 }
 
 initCalendar();
+
+let timeGridLabelList = document.querySelectorAll('.fc-timegrid-slot.fc-timegrid-slot-label');
+timeGridLabelList.forEach(timeGridLabel => {
+    timeGridLabel.addEventListener('click', () => {
+        selectEventsInAnHour(timeGridLabel);
+    })
+})
+
+async function selectEventsInAnHour(timeGridLabel) {
+    if (calendar.view.type != 'timeGridDay') return;
+    unselectAllHour();
+
+    let hours = timeGridLabel.getAttribute('data-time').split(':');
+    let selectTime = new Date(calendar.getDate().setHours(hours[0], hours[1], 0));
+
+    clearMap();
+
+    for (const thisEvent of calendar.getEvents()) {
+        if (thisEvent.start >= selectTime && thisEvent.start <= new Date(selectTime.getTime() + 30*60*1000)) {
+            await selectTimeSlot(thisEvent);
+        }
+    }
+
+    timeGridLabel.style.backgroundColor = 'rgba(188, 232, 241, 0.3)';
+    timeGridLabel.nextSibling.style.backgroundColor = 'rgba(188, 232, 241, 0.3)';
+}
+
+export function unselectAllHour() {
+    timeGridLabelList.forEach(timeGridLabel => {
+        timeGridLabel.style.backgroundColor = '#fff';
+        timeGridLabel.nextSibling.style.backgroundColor = '#fff';
+    })
+}

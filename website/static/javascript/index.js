@@ -1,5 +1,5 @@
 import { calendar } from './calendar.js'
-import { initCalendar } from './calendar.js';
+import { initCalendar, unselectAllHour } from './calendar.js';
 
 // Drag bar /////////////////////////////////////////////////////////////////////////////////////
 var left = document.getElementById('map-container');
@@ -17,6 +17,7 @@ const drag = (e) => {
   }
   if (left.offsetWidth <= 300) {
     calendar.changeView('timeGridWeek');
+    unselectAllHour();
   }
 }
 
@@ -43,6 +44,7 @@ const minimize = (e) =>{
     left.style.width = '300px';
     setTimeout(() => {
       calendar.changeView('timeGridWeek');
+      unselectAllHour();
     }, 500);
   } else {
     left.style.width = '100%';
@@ -115,6 +117,7 @@ const outputHtml = matches => {
 studentSearchEl.addEventListener('input', () => searchStudent(studentSearchEl.value))
 
 // Select student by click
+// Todo: fix problem with map
 $(document).on('click','.match-search',function() {
   let array = studentSearchEl.value.replaceAll(' ', '').split(',');
   array[array.length-1] = this.id;
@@ -182,7 +185,7 @@ function updateSchedule() {
           // Remove twice just in case 
           calendar.removeAllEvents();
           
-          // max 3 person 
+          // Max 3 persons
           const color = ['rgb(245, 81, 30, 0.96)', 'rgb(3, 155, 230, 0.96)', 'rgb(125, 179, 67, 0.96)'];
           for (let i = 0; i < response.length; i++) {
             timeTable = response[i].timeTable;

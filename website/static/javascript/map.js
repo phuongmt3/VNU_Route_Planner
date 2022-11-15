@@ -1,7 +1,7 @@
 import { renderMarkers } from './marker.js';
 import { onMapClick } from './addPlace.js';
 import { renderBuilding, selectPlace, clearPlaceSelect, selectAllBuilding } from './building.js';
-import { renderRoad } from './road.js';
+import { clearLine, renderRoad } from './road.js';
 
 var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     id: "osm",
@@ -34,14 +34,14 @@ const foodGroup = L.layerGroup()
 const souvenirGroup = L.layerGroup()
 const parkingGroup = L.layerGroup()
 
-const lineGroup = L.featureGroup([], { snakingPause: 0 })
+// const lineGroup = L.featureGroup([], { snakingPause: 0 })
 const distancePopup = L.popup()
 
 renderBuilding(map, placeList, buildingNameGroup);
 renderMarkers(map, markerList, placeList, foodGroup, souvenirGroup, parkingGroup);
 
 var overlayMaps = {
-    "Path": lineGroup,
+    // "Path": lineGroup,
     "Building's name": buildingNameGroup,
     "Food": foodGroup,
     "Souvenir": souvenirGroup,
@@ -58,7 +58,7 @@ var developMode = L.easyButton({
                 onMapClick(map);    // Add new place
 
                 selectAllBuilding();
-                lineGroup.addTo(map);
+                // lineGroup.addTo(map);
                 buildingNameGroup.addTo(map);
                 foodGroup.addTo(map);
                 souvenirGroup.addTo(map);
@@ -89,7 +89,8 @@ $(document).on('click','.postPlace',function() {
             if (response.length == 0) 
                 return;
                 
-            renderRoad(map, response[0], lineGroup);
+            // Todo: visit for all members
+            renderRoad(map, response[0], 'red');
             selectPlace(placeName);
 
             distancePopup.setContent("Khoảng cách ~ " + response[1] + " mét");
@@ -98,14 +99,14 @@ $(document).on('click','.postPlace',function() {
 });
 
 // Change start/ end point when input text-box change
-$(document).on('change', '#startPlace, #endPlace', function() {
-    var startPlace = document.querySelector("#startPlace").value;
-    var endPlace = document.querySelector("#endPlace").value;
+// $(document).on('change', '#startPlace, #endPlace', function() {
+//     var startPlace = document.querySelector("#startPlace").value;
+//     var endPlace = document.querySelector("#endPlace").value;
 
-    clearPlaceSelect();
-    selectPlace(endPlace);
-    findPath(startPlace, endPlace);
-});
+//     clearPlaceSelect();
+//     selectPlace(endPlace);
+//     findPath(startPlace, endPlace);
+// });
 
 // Auto hide building's name
 map.on('baselayerchange', function (e) {
@@ -124,13 +125,15 @@ map.on('zoomend', function () {
     }
 })
 
-lineGroup.on('mouseover', function (e) {
-    distancePopup.setLatLng(e.latlng).openOn(map);
-});
+// Todo: render distance 
 
-lineGroup.on('mouseout', function () {
-    distancePopup.close();
-});
+// redLine.on('mouseover', function (e) {
+//     distancePopup.setLatLng(e.latlng).openOn(map);
+// });
+
+// redLine.on('mouseout', function () {
+//     distancePopup.close();
+// });
 
 inputBox.getContainer().addEventListener('mouseover', function () {
     map.dragging.disable();
@@ -140,9 +143,7 @@ inputBox.getContainer().addEventListener('mouseout', function () {
     map.dragging.enable();
 });
 
-export async function findPath(name1, name2) {
-    lineGroup.clearLayers();
-
+export async function findPath(name1, name2, color) {
     var data = {
         "name1": name1,
         "name2": name2,
@@ -155,12 +156,12 @@ export async function findPath(name1, name2) {
         return 0;
     }
 
-    renderRoad(map, response[0], lineGroup);
+    renderRoad(map, response[0], color);
     distancePopup.setContent("Khoảng cách ~ " + response[1] + " mét");
     console.log("Database' size = " + response[2]);
 }
 
 export function clearMap() {
-    lineGroup.clearLayers();
+    clearLine();
     clearPlaceSelect();
 }

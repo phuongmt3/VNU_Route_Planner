@@ -34,14 +34,17 @@ function setBuildingEvent(placeList, map) {
         // When hovering a building -> description
         buildingData.smallPopup
                 .setContent(buildingInfo[1]);
-        buildingData.layer.on('mouseover', function () {
-            if (!buildingInfo[4]) mark(buildingData.layer);
-            buildingData.smallPopup.openOn(map);
-        });
-        buildingData.layer.on('mouseout', function () {
-            if (!buildingInfo[4]) unMark(buildingData.layer);
-            buildingData.smallPopup.close();
-        });
+        
+        // Todo: mouseover for multi-select
+
+        // buildingData.layer.on('mouseover', function () {
+        //     if (!buildingInfo[4]) mark(buildingData.layer);
+        //     buildingData.smallPopup.openOn(map);
+        // });
+        // buildingData.layer.on('mouseout', function () {
+        //     if (!buildingInfo[4]) unMark(buildingData.layer);
+        //     buildingData.smallPopup.close();
+        // });
 
         // When clicking a building -> detail, visit/unvisit
         buildingData.layer.bindPopup(L.popup({autoClose: false})
@@ -116,8 +119,8 @@ export function clearPlaceSelect() {
     });
 }
 
-// Select a named building 
-export function selectPlace(name) {
+// Select a named building with color
+export function selectPlace(name, color) {
     if (name.includes("-")) name = name.split("-")[1];
 
     for (const buildingInfo of placeList) {
@@ -128,24 +131,28 @@ export function selectPlace(name) {
         if (!buildingData) return;
 
         if (buildingInfo[4]) {
-            mark(buildingData.layer);
-        } else {
-            unMark(buildingData.layer);
-        }
+            mark(buildingData.layer, color);
+        } 
         break;
     }
 }
 
-export function mark(layer) {
+export function mark(layer, color) {
+    if (layer.options.opacity > 0) {
+        color = 'magenta';
+    }
+
     layer.setStyle({
         "opacity": 1,
-        "fillOpacity": 0.25
+        "fillOpacity": 0.25,
+        "color": color
     });
 }
 
 export function unMark(layer) {
     layer.setStyle({
         "opacity": 0,
-        "fillOpacity": 0
+        "fillOpacity": 0,
+        "color": "#FF0000"
     });
 }
