@@ -101,6 +101,9 @@ def home():
     placeNames = [""]
     initRoad(showedPlaceList, placeNames)
 
+    timeTable = []
+    msv = 0
+
     mycursor.execute("SELECT name, posY, posX, main FROM points WHERE main > 1")
     markerList = mycursor.fetchall()
 

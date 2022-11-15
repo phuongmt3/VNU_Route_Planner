@@ -1,6 +1,8 @@
 import { calendar } from './calendar.js'
 import { initCalendar } from './calendar.js';
 
+export var msv = 0;
+
 // Drag bar /////////////////////////////////////////////////////////////////////////////////////
 var left = document.getElementById('map-container');
 var right = document.getElementById('calendar-container');
@@ -127,7 +129,7 @@ function addActive(x) {
 
 // Select different student and render
 function updateSchedule() {
-  let msv = document.getElementById("student_search").value;
+  msv = document.getElementById("student_search").value;
   fetch(`/get_student_schedule/${msv}`)
       .then(function (response) {
           return response.json();
