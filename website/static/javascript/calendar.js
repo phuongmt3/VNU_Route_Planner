@@ -1,6 +1,6 @@
 import { selectPlace, clearPlaceSelect } from './building.js'
 import { findPath } from './map.js'
-import { db, getLastEvent, createNewTable, addEventDB, printAll, deleteEventDB } from './clientSideDB.js'
+import { db, getLastEvent, createNewTable, addEventDB, printAll, deleteEventDB, updateEventDB } from './clientSideDB.js'
 import { msv } from './index.js'
 
 var t0, t2;
@@ -54,6 +54,11 @@ export var calendar = new FullCalendar.Calendar(calendarEl, {
         
         info.el.querySelector(".fc-event-title-container").append(placeText);
         info.el.querySelector(".fc-event-title-container").append(hiddenText);
+    },
+    eventChange: (info) => {
+        var e = info.event;
+        console.log(e.id, e.title, e.start.toISOString(), e.end.toISOString())
+        updateEventDB(e.id, e.start.toISOString(), e.end.toISOString(), msv);
     }
 });
 

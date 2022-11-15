@@ -121,6 +121,18 @@ export function deleteEventDB(id, msv) {
         .onsuccess = () => console.log(`Note ${id} deleted.`);
 }
 
+export function updateEventDB(id, startTime, endTime, msv) {
+    const objectStore = db.transaction([msv], "readwrite").objectStore(msv);
+    const req = objectStore.get(parseInt(id));
+    req.onsuccess = () => {
+        var event = req.result;
+        event.start = startTime;
+        event.end = endTime;
+        objectStore.put(event)
+                    .onsuccess = () => console.log('update event success');
+    }
+}
+
 function deleteDatabase() {
     if (db)
         db.close();
