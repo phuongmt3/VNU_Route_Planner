@@ -1,6 +1,6 @@
-export let redLine = L.polyline([], { color: 'red', offset: 2 });
-export let blueLine = L.polyline([], { color: 'dodgerblue', offset: 6 });
-export let greenLine = L.polyline([], { color: 'lime', offset: 10 });
+export let redLine = L.polyline([], { color: 'red', offset: 1 });
+export let blueLine = L.polyline([], { color: 'dodgerblue', offset: 3 });
+export let greenLine = L.polyline([], { color: 'lime', offset: 5 });
 
 
 export function renderRoad(map, posList, color) {
@@ -25,14 +25,14 @@ export function renderRoad(map, posList, color) {
 export function clearLine() {
     redLine._snaking = false;
     redLine.remove();
-    redLine = L.polyline([], { color: 'red', offset: 2 });
+    redLine = L.polyline([], { color: 'red', offset: 1 });
 
     blueLine._snaking = false;
     blueLine.remove();
-    blueLine = L.polyline([], { color: 'dodgerblue', offset: 6 });
+    blueLine = L.polyline([], { color: 'dodgerblue', offset: 3 });
 
     greenLine._snaking = false;
     greenLine.remove();
-    greenLine = L.polyline([], { color: 'lime', offset: 10 });
+    greenLine = L.polyline([], { color: 'lime', offset: 5 });
 }
     

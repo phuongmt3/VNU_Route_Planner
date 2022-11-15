@@ -3,6 +3,7 @@ import { onMapClick } from './addPlace.js';
 import { renderBuilding, selectPlace, clearPlaceSelect, selectAllBuilding } from './building.js';
 import { clearLine, renderRoad } from './road.js';
 
+
 var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     id: "osm",
     maxZoom: 19,
@@ -78,7 +79,9 @@ var inputBox = L.control.inputBox({ position: 'topleft' }).addTo(map);
 
 // Add place and update path, distance when click "visit"
 $(document).on('click','.postPlace',function() {
-    let placeName = this.id
+    let placeName = this.id;
+    let el = this;
+
     fetch(`/post_place/${placeName}`, {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
@@ -86,15 +89,24 @@ $(document).on('click','.postPlace',function() {
         .then(function (response) {
             return response.json();
         }).then(function (response) {
+            console.log(response);
+
             if (response.length == 0) 
                 return;
-                
-            // Todo: visit for all members
-            renderRoad(map, response[0], 'red');
-            selectPlace(placeName);
 
-            distancePopup.setContent("Khoảng cách ~ " + response[1] + " mét");
-            console.log("Database' size = " + response[2]);
+            selectPlace(placeName, 'red');
+
+            clearLine();
+                    
+            let color = ['red', 'dodgerblue', 'lime'];
+            for (let i = 0; i < 3; i++) {
+                // console.log(response[i][0].length)
+                if (response[i][0].length < 2) continue;
+        
+                renderRoad(map, response[i][0], color[i]);
+                
+                distancePopup.setContent("Khoảng cách ~ " + response[i][1] + " mét");
+            }
         });
 });
 
@@ -149,7 +161,8 @@ export async function findPath(name1, name2, color) {
         "name2": name2,
     };
 
-    let response = await fetch("/find_path/", { method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+    let index = (color == 'red') ? 0 : (color == 'dodgerblue') ? 1 : 2;
+    let response = await fetch(`/find_path/${index}`, { method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
     response = await response.json();
 
     if (response.length == 0) {
@@ -158,10 +171,10 @@ export async function findPath(name1, name2, color) {
 
     renderRoad(map, response[0], color);
     distancePopup.setContent("Khoảng cách ~ " + response[1] + " mét");
-    console.log("Database' size = " + response[2]);
 }
 
-export function clearMap() {
+export async function clearMap() {
     clearLine();
     clearPlaceSelect();
+    await fetch(`/reset_roads/`, { method: "POST", headers: { 'Content-Type': 'application/json' } });
 }

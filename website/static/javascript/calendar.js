@@ -1,10 +1,12 @@
 import { selectPlace } from './building.js'
 import { findPath, clearMap } from './map.js'
 
+
 const startSemester = new Date("2022/08/29 00:00");
 var clickedEvent = null;
 var snapDur = 45*60*1000;
 var calendarEl = document.getElementById('calendar');
+
 export var calendar = new FullCalendar.Calendar(calendarEl, {
     themeSystem: 'bootstrap5',
     initialView: 'timeGridDay',
@@ -25,6 +27,7 @@ export var calendar = new FullCalendar.Calendar(calendarEl, {
         }
       }
     },
+    // Todo: remove select individual events
     eventClick: function(info) { 
         selectTimeSlot(info.event) 
     },
@@ -38,6 +41,7 @@ export var calendar = new FullCalendar.Calendar(calendarEl, {
     defaultTimedEventDuration: '00:30',
     snapDuration: '00:15',
     firstDay: 1,
+    // Events description
     eventDidMount: function(info) {
         let placeText = document.createElement("div");
         placeText.classList.add("description-text");
@@ -130,21 +134,7 @@ function calWeekNumber() {
 }
 
 async function selectTimeSlot(event) {
-    // Unselect event if click twice
-    // if (clickedEvent != null && clickedEvent._instance.instanceId == event._instance.instanceId) {
-    //     clickedEvent.setProp("color", clickedEvent.backgroundColor.replace('0.69', '0.96'));
-    //     clickedEvent = null;
-    //     clearMap();
-
-    //     return;
-    // }
-
-    // if (clickedEvent != null)
-    //     clickedEvent.setProp("color", clickedEvent.backgroundColor.replace('0.69', '0.96'));
-    // event.setProp("color", event.backgroundColor.replace('0.96', '0.69'));
-
     clickedEvent = event;
-
     var prevEvent = getEventFromTime(new Date(event.start), new Date(event.end), clickedEvent.extendedProps.owner)[0];
 
     var startPlace = "Cổng chính ĐHQGHN";
@@ -170,13 +160,14 @@ async function findRoute(startPlace, endPlace, color) {
     // $("#endPlace").val(endPlace);
 }
 
+// Same owner or no owner -> accept
 function acceptedEvent(event, startTime, endTime, owner) {
     if (startTime != 0)
         return new Date(event.start) < startTime && new Date(event.end) < endTime && (owner == event.extendedProps.owner || owner == 0);
     return new Date(event.start) <= new Date() && new Date(event.end) >= new Date() && (owner == event.extendedProps.owner || owner == 0);
 }
 
-// get 2 events nearest < cur event & get cur event
+// get 2 events nearest < cur event & cur event
 function getEventFromTime(startTime=0, endTime=0, owner=0) {
     var events = calendar.getEvents().sort((a, b) => {
         if (a.start == b.start)
@@ -192,6 +183,7 @@ function getEventFromTime(startTime=0, endTime=0, owner=0) {
     return null;
 }
 
+// Todo: check bugs
 export function initCalendar(msv, color) {
     if (timeTable.length > 0) {
         initEvents(msv, color);
@@ -211,11 +203,11 @@ initCalendar();
 let timeGridLabelList = document.querySelectorAll('.fc-timegrid-slot.fc-timegrid-slot-label');
 timeGridLabelList.forEach(timeGridLabel => {
     timeGridLabel.addEventListener('click', () => {
-        selectEventsInAnHour(timeGridLabel);
+        selectEventsInTimeRange(timeGridLabel);
     })
 })
 
-async function selectEventsInAnHour(timeGridLabel) {
+async function selectEventsInTimeRange(timeGridLabel) {
     if (calendar.view.type != 'timeGridDay') return;
     unselectAllHour();
 
@@ -223,7 +215,7 @@ async function selectEventsInAnHour(timeGridLabel) {
     let selectTime = new Date(calendar.getDate().setHours(hours[0], hours[1], 0));
 
     clearMap();
-
+    // If event start in 30 minutes from selectTime, call selectTimeSlot
     for (const thisEvent of calendar.getEvents()) {
         if (thisEvent.start >= selectTime && thisEvent.start <= new Date(selectTime.getTime() + 30*60*1000)) {
             await selectTimeSlot(thisEvent);

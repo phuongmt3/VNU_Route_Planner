@@ -4,14 +4,18 @@ from .findroad import *
 from .findschedule import getSubjectList, getTimeTable
 
 views = Blueprint('views', __name__)
-road = Road()
+road = [Road(), Road(), Road()]
+roadNumb = 0
 
 
 @views.route('/get_student_schedule/<msvList>', methods=['GET'])
 def getStudentSchedule(msvList):
+    global roadNumb
+
     timeTableData = []
 
     msvList = msvList.split(',')
+    roadNumb = len(msvList)
     for msv in msvList:
         mycursor.execute("SELECT * FROM sinhvien WHERE MSV = (%s)", (msv,))
         data = mycursor.fetchone()
@@ -24,6 +28,7 @@ def getStudentSchedule(msvList):
     return json.dumps(timeTableData)
 
 
+# Autocomplete
 @views.route('/list_student.json', methods=['GET'])
 def getListStudent():
     mycursor.execute("select * from sinhvien")
@@ -32,6 +37,7 @@ def getListStudent():
     return json.dumps(data, default=str)
 
 
+# Add a new place to db
 @views.route('/add_place/', methods=['POST'])
 def addPlace():
     posX, posY = request.json['posX'], request.json['posY']
@@ -44,11 +50,20 @@ def addPlace():
     return []
 
 
-@views.route('/find_path/', methods=['POST'])
-def findPath():
+@views.route('/reset_roads/', methods=['POST'])
+def resetRoads():
+    for index in range(roadNumb):
+        road[index].reset() 
+
+    return []
+
+
+@views.route('/find_path/<index>', methods=['POST'])
+def findPath(index):
+    # index = road number
+    index = int(index)
     name1, name2 = request.json['name1'], request.json['name2']
 
-    # Get id from name
     mycursor.execute("select `id` from `points` where `main` > 0 and `name` = %s", (name1,))
     data = mycursor.fetchone()
     startID = int(str(data[0]))
@@ -57,44 +72,50 @@ def findPath():
     data = mycursor.fetchone()
     endID = int(str(data[0]))
 
-    road.reset()
-    road.calculate(startID, endID)
+    road[index].calculate(startID, endID)
 
     mycursor.execute("select Count(*) from `dijkstra`")
     dbSize = mycursor.fetchone()[0]
 
-    return json.dumps([road.posList, round(road.distance, 3), dbSize], cls=DecimalEncoder)
+    return json.dumps([road[index].posList, round(road[index].distance, 3), dbSize], cls=DecimalEncoder)
 
 
+# Post visit place for all members
 @views.route('/post_place/<name>', methods=['POST'])
 def postPlace(name):
-    # Get id from name
+    result = []
+
     mycursor.execute("select `id`, `main` from `points` where `main` > 0 and `name` = %s", (name,))
     data = mycursor.fetchone()
     thisPlaceId = int(str(data[0]))
 
-    if thisPlaceId is road.placesByTime[0] or thisPlaceId is road.placesByTime[-1]:
-        return []
+    # mycursor.execute("select Count(*) from `dijkstra`")
+    # dbSize = mycursor.fetchone()[0]
 
-    # Switch gate start/ end
-    if data[1] == 2:
-        mycursor.execute("select `main` from `points` where `id` = %s", (road.placesByTime[0],))
-        if mycursor.fetchone()[0] == 2:
-            road.calculate(thisPlaceId, road.placesByTime[-1])
+    for index in range(roadNumb):
+        if (thisPlaceId is road[index].placesByTime[0] or thisPlaceId is road[index].placesByTime[-1]):
+            result.append([road[index].posList, round(road[index].distance, 3)])
+            continue
 
-        mycursor.execute("select `main` from `points` where `id` = %s", (road.placesByTime[-1],))
-        if mycursor.fetchone()[0] == 2:
-            road.calculate(road.placesByTime[0], thisPlaceId)
+        # Switch gate start/ end
+        if data[1] == 2:
+            mycursor.execute("select `main` from `points` where `id` = %s", (road[index].placesByTime[0],))
+            if mycursor.fetchone()[0] == 2:
+                road[index].calculate(thisPlaceId, road[index].placesByTime[-1])
 
-    if thisPlaceId not in road.placesByTime:
-        road.addPlace(thisPlaceId)
-    else:
-        road.removePlace(thisPlaceId)
+            mycursor.execute("select `main` from `points` where `id` = %s", (road[index].placesByTime[-1],))
+            if mycursor.fetchone()[0] == 2:
+                road[index].calculate(road[index].placesByTime[0], thisPlaceId)
 
-    mycursor.execute("select Count(*) from `dijkstra`")
-    dbSize = mycursor.fetchone()[0]
+        # If not already, visit
+        if thisPlaceId not in road[index].placesByTime:
+            road[index].addPlace(thisPlaceId)
+        # else:
+        #     road[index].removePlace(thisPlaceId)
 
-    return json.dumps([road.posList, round(road.distance, 3), dbSize], cls=DecimalEncoder)
+        result.append([road[index].posList, round(road[index].distance, 3)])
+
+    return json.dumps(result, cls=DecimalEncoder)
 
 
 @views.route('/', methods=['GET', 'POST'])

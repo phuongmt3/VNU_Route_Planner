@@ -1,5 +1,6 @@
 import { geojsonFeature as buildings } from './buildingData.js'
 
+
 const buildingMap = new Map();
 
 export function renderBuilding(map, placeList, buildingNameGroup) {
@@ -7,8 +8,7 @@ export function renderBuilding(map, placeList, buildingNameGroup) {
         onEachFeature: function (feature, layer) {
             const centerPosition = calculateCenter(feature.geometry.coordinates[0][0]);
             buildingNameGroup.addLayer(L.tooltip(centerPosition, { content: feature.properties.name, permanent: true, direction: 'center', className: "my-labels" }));
-            const smallPopup = L.popup()
-                    .setLatLng(centerPosition);
+            const smallPopup = L.popup().setLatLng(centerPosition);
     
             buildingMap.set(feature.properties.name, { "layer": layer, "centerPosition": centerPosition, "smallPopup": smallPopup });
         },
@@ -35,16 +35,14 @@ function setBuildingEvent(placeList, map) {
         buildingData.smallPopup
                 .setContent(buildingInfo[1]);
         
-        // Todo: mouseover for multi-select
-
-        // buildingData.layer.on('mouseover', function () {
-        //     if (!buildingInfo[4]) mark(buildingData.layer);
-        //     buildingData.smallPopup.openOn(map);
-        // });
-        // buildingData.layer.on('mouseout', function () {
-        //     if (!buildingInfo[4]) unMark(buildingData.layer);
-        //     buildingData.smallPopup.close();
-        // });
+        buildingData.layer.on('mouseover', function () {
+            if (!buildingInfo[4]) mark(buildingData.layer, 'red');
+            buildingData.smallPopup.openOn(map);
+        });
+        buildingData.layer.on('mouseout', function () {
+            if (!buildingInfo[4]) unMark(buildingData.layer);
+            buildingData.smallPopup.close();
+        });
 
         // When clicking a building -> detail, visit/unvisit
         buildingData.layer.bindPopup(L.popup({autoClose: false})
@@ -69,11 +67,11 @@ function setBuildingEvent(placeList, map) {
                     </div>
                     `));
         buildingData.layer.on('click', function () {
-            if (buildingInfo[4]) {
-                $(document).ready(function(){
-                    $(".postPlace").replaceWith(`<button type="button" id="` + buildingInfo[0] + `" class="postPlace btn btn-outline-danger">Unvisit</button>`);
-                })
-            }
+            // if (buildingInfo[4]) {
+            //     $(document).ready(function(){
+            //         $(".postPlace").replaceWith(`<button type="button" id="` + buildingInfo[0] + `" class="postPlace btn btn-outline-warning" disabled>Visiting</button>`);
+            //     })
+            // }
 
             buildingData.layer.openPopup();
         });
@@ -125,21 +123,35 @@ export function selectPlace(name, color) {
 
     for (const buildingInfo of placeList) {
         if (buildingInfo[0] != name) continue;
-        buildingInfo[4] = !buildingInfo[4];
+        buildingInfo[4] = true;
 
         let buildingData = buildingMap.get(name);
         if (!buildingData) return;
 
-        if (buildingInfo[4]) {
-            mark(buildingData.layer, color);
-        } 
+        mark(buildingData.layer, color);
         break;
     }
 }
 
+// function blendColor(c1, c2) {
+//     if ((c1 == 'red' && c2 == 'dodgerblue') || (c2 == 'red' && c1 == 'dodgerblue')) {
+//         return 'magenta';
+//     } else if ((c1 == 'red' && c2 == 'lime') || (c2 == 'red' && c1 == 'lime')) {
+//         return 'yellow';
+//     } else if ((c1 == 'dodgerblue' && c2 == 'lime') || (c2 == 'dodgerblue' && c1 == 'lime')) {
+//         return 'cyan';
+//     } else return 'blueviolet';
+// }
+
 export function mark(layer, color) {
     if (layer.options.opacity > 0) {
-        color = 'magenta';
+        if (color == 'red' || layer.options.color == 'red') {
+            color = 'red';
+        } else if (color == 'dodgerblue' || layer.options.color == 'dodgerblue') {
+            color = 'dodgerblue';
+        } else {
+            color = 'lime';
+        }
     }
 
     layer.setStyle({

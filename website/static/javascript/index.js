@@ -1,5 +1,6 @@
 import { calendar } from './calendar.js'
 import { initCalendar, unselectAllHour } from './calendar.js';
+import { clearMap } from './map.js';
 
 // Drag bar /////////////////////////////////////////////////////////////////////////////////////
 var left = document.getElementById('map-container');
@@ -172,6 +173,7 @@ function addActive(x) {
 // Select different student and render
 function updateSchedule() {
   calendar.removeAllEvents();
+  clearMap();
 
   let msvList = document.getElementById("student_search").value;
   fetch(`/get_student_schedule/${msvList}`)

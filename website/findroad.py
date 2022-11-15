@@ -84,7 +84,8 @@ class Road:
         self.posList = [[posX[i], posY[i]] for i in trackingList]
 
     def reset(self):
-        self.placesByTime = []
+        # Main gate -> main gate
+        self.placesByTime = [1,1]
 
 
 def initGlobal():
