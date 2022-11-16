@@ -1,6 +1,6 @@
 import { calendar } from './calendar.js'
 import { initCalendar } from './calendar.js';
-import { map, displayMessage } from './map.js';
+import { map, displayMessage, clearMap } from './map.js';
 
 // Drag bar /////////////////////////////////////////////////////////////////////////////////////
 var left = document.getElementById('map-container');
@@ -115,14 +115,16 @@ studentSearchEl.addEventListener('input', () => searchStudent(studentSearchEl.va
 $(document).on('click','.match-search',function() {
   studentSearchEl.value = this.id;
   matchList.innerHTML = '';
-  $(this).blur();
+
   map.dragging.enable();
+  clearMap();
   updateSchedule();
 });
 
 $(document).on('click','#student_search_btn',function() {
   matchList.innerHTML = '';
-  $(this).blur();
+
+  clearMap();
   updateSchedule();
 });
 
@@ -137,11 +139,11 @@ studentSearchEl.addEventListener("keydown", function(e) {
     currentFocus--;
     addActive(x);
   } else if (e.key == "Enter") {
-    // e.preventDefault();
     if (currentFocus > -1 && x) {
       studentSearchEl.value = x[currentFocus].id;
       matchList.innerHTML = '';
-      $(this).blur();
+      
+      clearMap();
       updateSchedule();
     }
   }
