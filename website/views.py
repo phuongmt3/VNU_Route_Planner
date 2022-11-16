@@ -9,15 +9,19 @@ road = Road()
 
 @views.route('/get_student_schedule/<msv>', methods=['GET'])
 def getStudentSchedule(msv):
+    timeTable = []
+    notification = ''
+
     mycursor.execute("SELECT * FROM sinhvien WHERE MSV = (%s)", (msv,))
     data = mycursor.fetchone()
     if data:
         subjectList = getSubjectList(msv)
         timeTable = getTimeTable(subjectList)
+        notification = "Success Welcome " + data[1]
     else:
-        return []
+        notification = "Warning Not found " + msv
 
-    return json.dumps(timeTable)
+    return json.dumps([timeTable, notification])
 
 
 @views.route('/list_student.json', methods=['GET'])

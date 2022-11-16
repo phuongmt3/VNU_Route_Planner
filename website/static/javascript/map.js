@@ -42,10 +42,6 @@ const distancePopup = L.popup()
 renderBuilding(map, placeList, buildingNameGroup);
 renderMarkers(map, markerList, placeList, foodGroup, souvenirGroup, parkingGroup);
 
-foodGroup.addTo(map);
-souvenirGroup.addTo(map);
-parkingGroup.addTo(map);
-
 var overlayMaps = {
     "Path": lineGroup,
     "Building's name": buildingNameGroup,
@@ -81,6 +77,15 @@ L.control.slideMenu('<h2>VNU Route Planner</h2>').addTo(map);
 
 var inputBox = L.control.inputBox({ position: 'topleft' }).addTo(map);
 // var locationBox = L.control.locationBox({ position: 'topleft' }).addTo(map);
+
+export var notification = L.control
+    .notifications({
+        timeout: 3000,
+        position: 'topleft',
+        closable: true,
+        dismissable: true,
+    })
+    .addTo(map);
 
 // Add place and update path, distance when click "visit"
 $(document).on('click','.postPlace',function() {
@@ -170,4 +175,17 @@ export function findPath(name1, name2) {
             distancePopup.setContent("~ " + response[1] + " m, " + Math.round(response[1]/avgWalkSpeed) + " min");
             console.log("Database' size = " + response[2]);
         });
+}
+
+export function displayMessage(message) {
+    notification.clear();
+
+    let thisMessage = message.split(/ (.*)/s);
+
+    if (thisMessage[0] == "Success") 
+        notification.success('Success', thisMessage[1]);
+    else if (thisMessage[0] == "Info")
+        notification.info('Info', thisMessage[1]);
+    else 
+        notification.warning('Warning', thisMessage[1]);
 }

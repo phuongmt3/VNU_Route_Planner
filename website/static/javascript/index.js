@@ -1,5 +1,6 @@
 import { calendar } from './calendar.js'
 import { initCalendar } from './calendar.js';
+import { map, displayMessage } from './map.js';
 
 // Drag bar /////////////////////////////////////////////////////////////////////////////////////
 var left = document.getElementById('map-container');
@@ -7,6 +8,8 @@ var right = document.getElementById('calendar-container');
 var bar = document.getElementById('dragbar');
 
 const drag = (e) => {
+  left.style.transition = '0s';
+
   document.selection ? document.selection.empty() : window.getSelection().removeAllRanges();
   left.style.width = (e.pageX - bar.offsetWidth / 2) + 'px';
   
@@ -32,6 +35,36 @@ left.addEventListener('mouseup', () => {
 
 right.addEventListener('mouseup', () => {
   document.removeEventListener('mousemove', drag);
+});
+
+const minimize = (e) =>{
+  left.style.transition = '0.5s';
+
+  if (left.offsetWidth > 300) {
+    left.style.width = '300px';
+    setTimeout(() => {
+      calendar.changeView('timeGridWeek');
+    }, 500);
+  } else {
+    left.style.width = screen.width - 300 + 'px';
+    setTimeout(() => {
+      calendar.changeView('timeGridDay');
+    }, 500);
+  }
+}
+
+bar.addEventListener('dblclick', minimize);
+
+calendar.on('eventClick', function(e) {
+  left.style.transition = '0.5s';
+
+  if (right.offsetWidth > 300) 
+    left.style.width = '100%';
+
+  if (calendar.view.type != 'timeGridDay') 
+    setTimeout(() => {
+      calendar.changeView('timeGridDay', e.event.start);
+    }, 200);
 });
 
 // Search student /////////////////////////////////////////////////////////////////////////////////////
@@ -83,6 +116,7 @@ $(document).on('click','.match-search',function() {
   studentSearchEl.value = this.id;
   matchList.innerHTML = '';
   $(this).blur();
+  map.dragging.enable();
   updateSchedule();
 });
 
@@ -132,11 +166,13 @@ function updateSchedule() {
       .then(function (response) {
           return response.json();
       }).then(function (response) {
-          if (response.length == 0) {
+          if (response[0].length == 0) {
             return 0;
           }
 
-          timeTable = response;
+          timeTable = response[0];
           initCalendar(msv);
+
+          displayMessage(response[1]);
       });
 }
