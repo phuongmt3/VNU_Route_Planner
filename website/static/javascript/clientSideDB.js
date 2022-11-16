@@ -12,11 +12,10 @@ function openReq(version) {
             const objStore = db.createObjectStore('0', { keyPath: "id" });
 
             objStore.createIndex("title", "title", { unique: false });
+            objStore.createIndex("description", "description", { unique: false });
             objStore.createIndex("start", "start", { unique: false });
             objStore.createIndex("end", "end", { unique: false });
             objStore.createIndex("place", "place", { unique: false });
-
-            console.log("Database setup complete");
         };
         openRequest.onsuccess = e => resolve(e);
         openRequest.onerror = e => reject(e);
@@ -24,7 +23,6 @@ function openReq(version) {
 
     prom.then(e => {
         db = openRequest.result;
-        console.log("Database opened successfully");
         var storeNames = db.objectStoreNames;
         for (var i = 0; i < storeNames.length; i++)
             lastEvent.set(storeNames[i], getLastEvent(storeNames[i]));
@@ -36,10 +34,11 @@ function openReq(version) {
 
 openReq(1);
 
-export function addEventDB(Title, Start, End, Place, msv) {
+export function addEventDB(Title, Description, Start, End, Place, msv) {
     lastID++;
     const newEvent = { id: lastID,
                         title: Title,
+                        description: Description,
                         start: Start,
                          end: End,
                          place: Place };
@@ -47,7 +46,7 @@ export function addEventDB(Title, Start, End, Place, msv) {
         .objectStore(msv)
         .add(newEvent);
     dbOpenRequest.onerror = () => console.log("Transaction not opened due to error");
-    dbOpenRequest.onsuccess = () => console.log("Add completed");
+    //dbOpenRequest.onsuccess = () => console.log("Add completed");
 }
 
 export function getLastEvent(msv) {
@@ -78,11 +77,10 @@ export function createNewTable(msv) {
             const objectStore = db.createObjectStore(msv, { keyPath: "id" });
 
             objectStore.createIndex("title", "title", { unique: false });
+            objectStore.createIndex("description", "description", { unique: false });
             objectStore.createIndex("start", "start", { unique: false });
             objectStore.createIndex("end", "end", { unique: false });
             objectStore.createIndex("place", "place", { unique: false });
-
-            console.log("Database setup complete");
         };
         req.onerror = e => reject("Failed to open new table");
     });
@@ -112,20 +110,19 @@ export function printAll() {
 export function deleteEventDB(id, msv) {
     db.transaction([msv], "readwrite")
         .objectStore(msv)
-        .delete(parseInt(id))
-        .onsuccess = () => console.log(`Note ${id} deleted.`);
+        .delete(parseInt(id));
+        //.onsuccess = () => console.log(`Note ${id} deleted.`);
 }
 
 export function updateEventDB(id, startTime, endTime, msv) {
     const objectStore = db.transaction([msv], "readwrite").objectStore(msv);
     const req = objectStore.get(parseInt(id));
     req.onsuccess = () => {
-    console.log(id, startTime, endTime, msv, req.result);
         var event = req.result;
         event.start = startTime;
         event.end = endTime;
-        objectStore.put(event)
-                    .onsuccess = () => console.log('update event success');
+        objectStore.put(event);
+                    //.onsuccess = () => console.log('update event success');
     }
 }
 

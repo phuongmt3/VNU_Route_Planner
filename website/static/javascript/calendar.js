@@ -42,11 +42,8 @@ export var calendar = new FullCalendar.Calendar(calendarEl, {
 
         info.el.addEventListener('contextmenu', e => onRightClickEvent(e, info));
     },
-    eventChange: (info) => {
-        var e = info.event;
-        console.log(e.id, e.title, e.start.toISOString(), e.end.toISOString())
-        updateEventDB(e.id, e.start.toISOString(), e.end.toISOString(), msv);
-    }
+    eventResize: (info) => updateEventDB(info.event.id, info.event.start.toISOString(), info.event.end.toISOString(), msv),
+    eventDrop: (info) => updateEventDB(info.event.id, info.event.start.toISOString(), info.event.end.toISOString(), msv)
 });
 
 function onRightClickEvent(e, info) {
@@ -151,12 +148,13 @@ function initEvents() {
                     for (var day = 0; day < 7; day++) {
                         var curday = timer.getDay();
                         for (var tiet = 0; tiet < 12; tiet++) {
-                            if (timeTable[week][curday][tiet].subjectName == "")
+                            var subject = timeTable[week][curday][tiet];
+
+                            if (subject.subjectName == "")
                                 continue;
 
                             var tietEnd = tiet + 1;
-                            while (tietEnd < 12 && timeTable[week][curday][tietEnd].subjectName ==
-                                                    timeTable[week][curday][tiet].subjectName)
+                            while (tietEnd < 12 && timeTable[week][curday][tietEnd].subjectName == subject.subjectName)
                                 tietEnd++;
 
                             var startTime = new Date(timer);
@@ -164,10 +162,11 @@ function initEvents() {
                             startTime.setHours(tiet + 7);
                             endTime.setHours(tietEnd + 7);
 
-                            addEventDB(timeTable[week][curday][tiet].subjectName,
+                            addEventDB(subject.group + " - " + subject.subjectName,
+                                        subject.subjectCode + ", " + subject.credits + ", " + subject.lecturer,
                                         startTime.toISOString(),
                                         endTime.toISOString(),
-                                        timeTable[week][curday][tiet].place, msv);
+                                        subject.place, msv);
 
                             tiet = tietEnd - 1;
                         }
@@ -187,7 +186,8 @@ function initEvents() {
                     for (var i = 0; i < events.length; i++) {
                         calendar.addEvent({
                             id: events[i].id,
-                          title:events[i].title,
+                          title: events[i].title,
+                          description: events[i].description,
                           start: events[i].start,
                           end: events[i].end,
                           extendedProps: {
@@ -196,6 +196,7 @@ function initEvents() {
                           color: 'red'
                         });
                     }
+                    selectCurEvent();
                 };
                 myCursor.onerror = e => console.log('open cursor failed initCalendar');
             });
@@ -264,35 +265,33 @@ function getEventFromTime(startTime=0, endTime=0) {
     return null;
 }
 
+function selectCurEvent() {
+    var curEvent = getEventFromTime();
+    if (curEvent != null) {
+        selectEvent(curEvent[0]);
+        clickedEvent = curEvent[0];
+    }
+    else {
+        var t1 = new Date();
+        var t2 = new Date(t1.getTime() + 1);
+        var nearEvents = getEventFromTime(t1, t2);
+        var prev = nearEvents[0] && t1 - nearEvents[0].end < snapDur;
+        var next = nearEvents[1] && nearEvents[1].start - t2 < snapDur;
+
+        if (prev && next)
+            findRoute(nearEvents[0].extendedProps.place, nearEvents[1].extendedProps.place);
+        else if (prev)
+            findRoute(nearEvents[0].extendedProps.place, "Cổng chính ĐHQGHN");
+        else if (next)
+            findRoute("Cổng chính ĐHQGHN", nearEvents[1].extendedProps.place);
+    }
+}
+
 export function initCalendar() {
     calendar.removeAllEvents();
     
-    if (timeTable.length > 0) {
+    if (timeTable.length > 0)
         initEvents();
-        var curEvent = getEventFromTime();
-        if (curEvent != null) {
-            selectEvent(curEvent);
-            clickedEvent = curEvent;
-            curEvent = curEvent[0];
-        }
-        else {
-            var t1 = new Date();
-            var t2 = new Date(t1.getTime() + snapDur);
-            var nearEvents = getEventFromTime(t1, t2);
-            if (nearEvents) {
-                var prev = nearEvents[0] && t1 - nearEvents[0].end < snapDur;
-                var next = nearEvents[1] && nearEvents[1].start - t2 < snapDur;
-
-                if (prev && next)
-                    findRoute(nearEvents[0].extendedProps.place, nearEvents[1].extendedProps.place);
-                else if (prev)
-                    findRoute(nearEvents[0].extendedProps.place, "Cổng chính ĐHQGHN");
-                else if (next)
-                    findRoute("Cổng chính ĐHQGHN", nearEvents[1].extendedProps.place);
-            }
-        }
-    }
-
     calendar.render();
 }
 

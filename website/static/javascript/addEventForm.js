@@ -16,7 +16,7 @@ $(document).on("click", ".addEvent", function() {
     var end = checkValidEndTime(endTime, startTime[0], startTime[1]) ? new Date(dayClicked.getFullYear(), dayClicked.getMonth(), dayClicked.getDate(), endTime[0], endTime[1])
                                     : new Date(start.getTime() + 30*60*1000);
 
-    addEventDB(title, start.toISOString(), end.toISOString(), place, msv);
+    addEventDB(title, "", start.toISOString(), end.toISOString(), place, msv);
     calendar.addEvent({
         id: lastID,
         title: title,
