@@ -161,6 +161,8 @@ export async function clearMap() {
 }
 
 export function displayMessages(message) {
+    notification.clear();
+
     for (let i = 0; i < message.length; i++) {
         let thisMessage = message[i].split(/ (.*)/s);
     
