@@ -1,6 +1,6 @@
 import { calendar } from './calendar.js'
 import { initCalendar, unselectTimeRange } from './calendar.js';
-import { clearMap, notification } from './map.js';
+import { clearMap, displayMessages, map } from './map.js';
 
 // Drag bar /////////////////////////////////////////////////////////////////////////////////////
 var left = document.getElementById('map-container');
@@ -118,13 +118,13 @@ const outputHtml = matches => {
 studentSearchEl.addEventListener('input', () => searchStudent(studentSearchEl.value))
 
 // Select student by click
-// Todo: fix problem with map
 $(document).on('click','.match-search',function() {
   let array = studentSearchEl.value.replaceAll(' ', '').split(',');
   array[array.length-1] = this.id;
   studentSearchEl.value = array.join(', ');
 
   matchList.innerHTML = '';
+  map.dragging.enable();
   updateSchedule();
 });
 
@@ -154,7 +154,6 @@ studentSearchEl.addEventListener("keydown", function(e) {
       studentSearchEl.value = array.join(', ');
 
       matchList.innerHTML = '';
-      // $(this).blur();
       // updateSchedule();
     }
   }
@@ -181,11 +180,6 @@ async function updateSchedule() {
   let res = await fetch(`/get_student_schedule/${msvList}`);
   res = await res.json();
 
-  if (res.timeTableData.length == 0) return;
-
-  // Remove twice just in case ...
-  calendar.removeAllEvents();
-          
   // Max 3 persons
   const color = ['rgb(245, 81, 30, 0.96)', 'rgb(3, 155, 230, 0.96)', 'rgb(125, 179, 67, 0.96)'];
   for (let i = 0; i < res.timeTableData.length; i++) {
@@ -193,8 +187,6 @@ async function updateSchedule() {
     initCalendar(res.timeTableData[i].msv, color[i]);
   }
 
-  for (let i = 0; i < res.message.length; i++) {
-    notification.success('Success', res.message[i]);
-  }
+  displayMessages(res.message);
 }
 

@@ -189,12 +189,15 @@ function getEventFromTime(startTime=0, endTime=0, owner=0) {
 export function initCalendar(msv, color) {
     if (timeTable.length > 0) {
         initEvents(msv, color);
-        var curEvent = getEventFromTime();
-        if (curEvent != null) {
-            selectTimeSlot(curEvent);
-            clickedEvent = curEvent;
-            curEvent = curEvent[0];
-        }
+        // var curEvent = getEventFromTime();
+        // if (curEvent != null) {
+        //     selectTimeSlot(curEvent);
+        //     clickedEvent = curEvent;
+        //     curEvent = curEvent[0];
+        // }
+        
+        let timeGrid = document.querySelectorAll(`.fc-timegrid-slot.fc-timegrid-slot-label`);
+        selectEventsInTimeRange(timeGrid[(new Date()).getHours() * 2 + Math.floor((new Date()).getMinutes() / 30)])
     }
 
     calendar.render();

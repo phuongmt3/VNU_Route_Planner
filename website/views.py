@@ -26,7 +26,9 @@ def getStudentSchedule(msvList):
             timeTable = getTimeTable(subjectList)
 
             timeTableData.append({"msv": msv, "timeTable": timeTable})
-            message.append("Welcome " + data[1])
+            message.append("Success Welcome " + data[1])
+        else:
+            message.append("Warning Not found " + msv)
 
     return json.dumps({"timeTableData": timeTableData, "message": message})
 
@@ -87,6 +89,8 @@ def findPath(index):
 @views.route('/post_place/<name>', methods=['POST'])
 def postPlace(name):
     result = []
+    message = []
+    count = 0
 
     mycursor.execute("select `id`, `main` from `points` where `main` > 0 and `name` = %s", (name,))
     data = mycursor.fetchone()
@@ -96,8 +100,10 @@ def postPlace(name):
     # dbSize = mycursor.fetchone()[0]
 
     for index in range(roadNumb):
-        if (thisPlaceId is road[index].placesByTime[0] or thisPlaceId is road[index].placesByTime[-1]):
+        # Check if thisPlace = start/end
+        if thisPlaceId is road[index].placesByTime[0] or thisPlaceId is road[index].placesByTime[-1]:
             result.append([road[index].posList, round(road[index].distance, 3)])
+            count += 1
             continue
 
         # Switch gate start/ end
@@ -111,14 +117,20 @@ def postPlace(name):
                 road[index].calculate(road[index].placesByTime[0], thisPlaceId)
 
         # If not already, visit
-        if thisPlaceId not in road[index].placesByTime:
+        elif (thisPlaceId in road[index].placesByTime):
+            count += 1
+        else:
             road[index].addPlace(thisPlaceId)
-        # else:
-        #     road[index].removePlace(thisPlaceId)
 
         result.append([road[index].posList, round(road[index].distance, 3)])
 
-    return json.dumps(result, cls=DecimalEncoder)
+    # Check if all members visiting selected place
+    if count == roadNumb:
+        message.append("Info Already visiting " + name)
+    else:
+        message.append("Success Visiting " + name)
+        
+    return json.dumps({"roads": result, "message": message}, cls=DecimalEncoder)
 
 
 @views.route('/', methods=['GET', 'POST'])

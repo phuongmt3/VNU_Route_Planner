@@ -35,14 +35,10 @@ const foodGroup = L.layerGroup()
 const souvenirGroup = L.layerGroup()
 const parkingGroup = L.layerGroup()
 
-// const lineGroup = L.featureGroup([], { snakingPause: 0 })
-const distancePopup = L.popup()
-
 renderBuilding(map, placeList, buildingNameGroup);
 renderMarkers(map, markerList, placeList, foodGroup, souvenirGroup, parkingGroup);
 
 var overlayMaps = {
-    // "Path": lineGroup,
     "Building's name": buildingNameGroup,
     "Food": foodGroup,
     "Souvenir": souvenirGroup,
@@ -59,7 +55,6 @@ var developMode = L.easyButton({
                 onMapClick(map);    // Add new place
 
                 selectAllBuilding();
-                // lineGroup.addTo(map);
                 buildingNameGroup.addTo(map);
                 foodGroup.addTo(map);
                 souvenirGroup.addTo(map);
@@ -72,6 +67,7 @@ var developMode = L.easyButton({
 
 var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 
+// Todo: add more info
 L.control.slideMenu('<h2>VNU Route Planner</h2>').addTo(map);
 
 var inputBox = L.control.inputBox({ position: 'topleft' }).addTo(map);
@@ -87,36 +83,23 @@ export var notification = L.control
     .addTo(map);
 
 // Add place and update path, distance when click "visit"
-$(document).on('click','.postPlace',function() {
+$(document).on('click','.postPlace', async function() {
     let placeName = this.id;
-    let el = this;
 
-    fetch(`/post_place/${placeName}`, {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-    })
-        .then(function (response) {
-            return response.json();
-        }).then(function (response) {
-            console.log(response);
+    let res = await fetch(`/post_place/${placeName}`, { method: "POST", headers: { 'Content-Type': 'application/json' } });
+    res = await res.json();
 
-            if (response.length == 0) 
-                return;
+    clearLine();
 
-            selectPlace(placeName, 'red');
+    selectPlace(placeName, 'red');
+            
+    let color = ['red', 'deepskyblue', 'lime'];
+    for (let i = 0; i < res.roads.length; i++) {
+        if (res.roads[i][0].length < 2) continue;
+        renderRoad(map, res.roads[i][0], res.roads[i][1], color[i]);
+    }
 
-            clearLine();
-                    
-            let color = ['red', 'deepskyblue', 'lime'];
-            for (let i = 0; i < 3; i++) {
-                // console.log(response[i][0].length)
-                if (response[i][0].length < 2) continue;
-        
-                renderRoad(map, response[i][0], color[i]);
-                
-                distancePopup.setContent("Khoảng cách ~ " + response[i][1] + " mét");
-            }
-        });
+    displayMessages(res.message)
 });
 
 // Change start/ end point when input text-box change
@@ -146,16 +129,6 @@ map.on('zoomend', function () {
     }
 })
 
-// Todo: render distance 
-
-// redLine.on('mouseover', function (e) {
-//     distancePopup.setLatLng(e.latlng).openOn(map);
-// });
-
-// redLine.on('mouseout', function () {
-//     distancePopup.close();
-// });
-
 inputBox.getContainer().addEventListener('mouseover', function () {
     map.dragging.disable();
 });
@@ -178,12 +151,24 @@ export async function findPath(name1, name2, color) {
         return 0;
     }
 
-    renderRoad(map, response[0], color);
-    distancePopup.setContent("Khoảng cách ~ " + response[1] + " mét");
+    renderRoad(map, response[0], response[1], color);
 }
 
 export async function clearMap() {
     clearLine();
     clearPlaceSelect();
     await fetch(`/reset_roads/`, { method: "POST", headers: { 'Content-Type': 'application/json' } });
+}
+
+export function displayMessages(message) {
+    for (let i = 0; i < message.length; i++) {
+        let thisMessage = message[i].split(/ (.*)/s);
+    
+        if (thisMessage[0] == "Success") 
+            notification.success('Success', thisMessage[1]);
+        else if (thisMessage[0] == "Info")
+            notification.info('Info', thisMessage[1]);
+        else 
+            notification.warning('Warning', thisMessage[1]);
+    }
 }
