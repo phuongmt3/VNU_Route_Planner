@@ -109,15 +109,15 @@ function initEvents(msv, color) {
                 endTime.setHours(tietEnd + 7);
 
                 calendar.addEvent({
-                  title: subject.group + " - " + subject.subjectName,
-                  description: subject.subjectCode + ", " + subject.credits + ", " + subject.lecturer,
-                  start: startTime.toISOString(),
-                  end: endTime.toISOString(),
-                  extendedProps: {
-                    place: subject.place
-                  },
-                  color: color,
-                  owner: msv
+                    title: subject.group + " - " + subject.subjectName,
+                    description: subject.subjectCode + ", " + subject.credits + ", " + subject.lecturer,
+                    start: startTime.toISOString(),
+                    end: endTime.toISOString(),
+                    extendedProps: {
+                        place: subject.place
+                    },
+                    color: color,
+                    owner: msv
                 });
 
                 tiet = tietEnd - 1;
@@ -164,13 +164,15 @@ async function findRoute(startPlace, endPlace, color) {
 
 // Same owner or no owner -> accept
 function acceptedEvent(event, startTime, endTime, owner) {
+    const checkOwner = (owner == event.extendedProps.owner || !event.extendedProps.owner || !owner);
+
     if (startTime != 0)
-        return new Date(event.start) < startTime && new Date(event.end) < endTime && (owner == event.extendedProps.owner || owner == 0);
-    return new Date(event.start) <= new Date() && new Date(event.end) >= new Date() && (owner == event.extendedProps.owner || owner == 0);
+        return new Date(event.start) < startTime && new Date(event.end) < endTime && checkOwner;
+    return new Date(event.start) <= new Date() && new Date(event.end) >= new Date() && checkOwner;
 }
 
 // get 2 events nearest < cur event & cur event
-function getEventFromTime(startTime=0, endTime=0, owner=0) {
+function getEventFromTime(startTime=0, endTime=0, owner) {
     var events = calendar.getEvents().sort((a, b) => {
         if (a.start == b.start)
             return a.end - b.end;

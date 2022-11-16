@@ -17,12 +17,13 @@ $(document).on("click", ".addEvent", function() {
 
     calendar.addEvent({
         title: title,
+        description: "",
         start: start.toISOString(),
         end: end.toISOString(),
         extendedProps: {
             place: place
         },
-        color: 'red'
+        color: 'rgb(245, 81, 30, 0.96)'
     });
 
     document.getElementById("myForm").style.display = "none";
