@@ -1,6 +1,6 @@
 import { calendar, dayClicked } from './calendar.js'
 import { addEventDB, lastID } from './clientSideDB.js'
-import { msv } from './index.js'
+import { msv } from './calendar.js'
 
 $(document).on("click", ".addEvent", function() {
     var title = $("#title").val();

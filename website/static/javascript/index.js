@@ -1,8 +1,6 @@
 import { calendar } from './calendar.js'
 import { initCalendar } from './calendar.js';
 
-export var msv = 0;
-
 // Drag bar /////////////////////////////////////////////////////////////////////////////////////
 var left = document.getElementById('map-container');
 var right = document.getElementById('calendar-container');
@@ -129,7 +127,7 @@ function addActive(x) {
 
 // Select different student and render
 function updateSchedule() {
-  msv = document.getElementById("student_search").value;
+  var msv = document.getElementById("student_search").value;
   fetch(`/get_student_schedule/${msv}`)
       .then(function (response) {
           return response.json();
@@ -139,6 +137,6 @@ function updateSchedule() {
           }
 
           timeTable = response;
-          initCalendar();
+          initCalendar(msv);
       });
 }

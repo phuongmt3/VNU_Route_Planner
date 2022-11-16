@@ -1,9 +1,8 @@
 import { selectPlace, clearPlaceSelect } from './building.js'
 import { findPath } from './map.js'
 import { db, getLastEvent, createNewTable, addEventDB, printAll, deleteEventDB, updateEventDB } from './clientSideDB.js'
-import { msv } from './index.js'
 
-var t0, t2;
+export var msv = '0';
 var clickedEvent = null;
 var rightClickedEle = null;
 const startSemester = new Date("2022/08/29 00:00");
@@ -287,7 +286,8 @@ function selectCurEvent() {
     }
 }
 
-export function initCalendar() {
+export function initCalendar(MSV) {
+    msv = MSV;
     calendar.removeAllEvents();
     
     if (timeTable.length > 0)
@@ -295,4 +295,4 @@ export function initCalendar() {
     calendar.render();
 }
 
-initCalendar();
+initCalendar('0');
