@@ -1,7 +1,8 @@
 import { renderMarkers } from './marker.js';
 import { onMapClick } from './addPlace.js';
 import { renderBuilding, selectPlace, clearPlaceSelect, selectAllBuilding } from './building.js';
-import { renderRoad } from './road.js';
+import { road, clearRoad, renderRoad } from './road.js';
+
 
 const avgWalkSpeed = 62.5;
 
@@ -36,18 +37,13 @@ const foodGroup = L.layerGroup()
 const souvenirGroup = L.layerGroup()
 const parkingGroup = L.layerGroup()
 
-const lineGroup = L.featureGroup([], { snakingPause: 0 })
 const distancePopup = L.popup()
 
 renderBuilding(map, placeList, buildingNameGroup);
 renderMarkers(map, markerList, placeList, foodGroup, souvenirGroup, parkingGroup);
 
-foodGroup.addTo(map);
-souvenirGroup.addTo(map);
-parkingGroup.addTo(map);
-
 var overlayMaps = {
-    "Path": lineGroup,
+    "Path": road,
     "Building's name": buildingNameGroup,
     "Food": foodGroup,
     "Souvenir": souvenirGroup,
@@ -64,7 +60,7 @@ var developMode = L.easyButton({
                 onMapClick(map);    // Add new place
 
                 selectAllBuilding();
-                lineGroup.addTo(map);
+                road.addTo(map);
                 buildingNameGroup.addTo(map);
                 foodGroup.addTo(map);
                 souvenirGroup.addTo(map);
@@ -82,6 +78,15 @@ L.control.slideMenu('<h2>VNU Route Planner</h2>').addTo(map);
 var inputBox = L.control.inputBox({ position: 'topleft' }).addTo(map);
 // var locationBox = L.control.locationBox({ position: 'topleft' }).addTo(map);
 
+export var notification = L.control
+    .notifications({
+        timeout: 3000,
+        position: 'topleft',
+        closable: true,
+        dismissable: true,
+    })
+    .addTo(map);
+
 // Add place and update path, distance when click "visit"
 $(document).on('click','.postPlace',function() {
     let placeName = this.id
@@ -95,7 +100,8 @@ $(document).on('click','.postPlace',function() {
             if (response.length == 0) 
                 return;
                 
-            renderRoad(map, response[0], lineGroup);
+            clearRoad();
+            renderRoad(map, response[0]);
             selectPlace(placeName);
 
             distancePopup.setContent("~ " + response[1] + " m, " + Math.round(response[1]/avgWalkSpeed) + " min");
@@ -130,11 +136,11 @@ map.on('zoomend', function () {
     }
 })
 
-lineGroup.on('mouseover', function (e) {
+road.on('mouseover', function (e) {
     distancePopup.setLatLng(e.latlng).openOn(map);
 });
 
-lineGroup.on('mouseout', function () {
+road.on('mouseout', function () {
     distancePopup.close();
 });
 
@@ -147,7 +153,6 @@ inputBox.getContainer().addEventListener('mouseout', function () {
 });
 
 export function findPath(name1, name2) {
-    lineGroup.clearLayers();
 
     var data = {
         "name1": name1,
@@ -165,9 +170,28 @@ export function findPath(name1, name2) {
             if (response.length == 0) {
                 return 0;
             }
-
-            renderRoad(map, response[0], lineGroup);
+            
+            clearRoad();
+            renderRoad(map, response[0]);
             distancePopup.setContent("~ " + response[1] + " m, " + Math.round(response[1]/avgWalkSpeed) + " min");
             console.log("Database' size = " + response[2]);
         });
+}
+
+export function clearMap() {
+    clearRoad();
+    clearPlaceSelect();
+}
+
+export function displayMessage(message) {
+    notification.clear();
+
+    let thisMessage = message.split(/ (.*)/s);
+
+    if (thisMessage[0] == "Success") 
+        notification.success('Success', thisMessage[1]);
+    else if (thisMessage[0] == "Info")
+        notification.info('Info', thisMessage[1]);
+    else 
+        notification.warning('Warning', thisMessage[1]);
 }

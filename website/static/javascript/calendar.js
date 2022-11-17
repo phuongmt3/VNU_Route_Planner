@@ -238,8 +238,8 @@ function findRoute(startPlace, endPlace) {
     clearPlaceSelect()
     selectPlace(endPlace);
     findPath(startPlace, endPlace);
-    $("#startPlace").val(startPlace);
-    $("#endPlace").val(endPlace);
+    // $("#startPlace").val(startPlace);
+    // $("#endPlace").val(endPlace);
 }
 
 function acceptedEvent(event, startTime, endTime) {
