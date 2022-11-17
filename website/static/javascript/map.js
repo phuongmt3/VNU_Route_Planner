@@ -3,7 +3,6 @@ import { onMapClick } from './addPlace.js';
 import { renderBuilding, selectPlace, clearPlaceSelect, selectAllBuilding } from './building.js';
 import { road, clearRoad, renderRoad } from './road.js';
 
-
 const avgWalkSpeed = 62.5;
 
 var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -73,7 +72,15 @@ var developMode = L.easyButton({
 
 var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 
-L.control.slideMenu('<h2>VNU Route Planner</h2>').addTo(map);
+L.control.slideMenu(
+    '<h2>VNU Route Planner</h2>' +
+    '<button class="btn btn-primary" id="chartPage">Chart</button>'
+    , {width:'25%'}).addTo(map);
+
+$("#chartPage").click(e => {
+    window.open('chart');
+    //window.location.replace('chart');
+});
 
 var inputBox = L.control.inputBox({ position: 'topleft' }).addTo(map);
 // var locationBox = L.control.locationBox({ position: 'topleft' }).addTo(map);

@@ -105,9 +105,6 @@ def home():
     placeNames = [""]
     initRoad(showedPlaceList, placeNames)
 
-    timeTable = []
-    msv = 0
-
     mycursor.execute("SELECT name, posY, posX, main FROM points WHERE main > 1")
     markerList = mycursor.fetchall()
 
@@ -123,3 +120,8 @@ def home():
     return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList,
                            placeList=json.dumps(placeList),
                            markerList=json.dumps(markerList, cls=DecimalEncoder))
+
+
+@views.route('/chart', methods=['POST', 'GET'])
+def chart():
+    return render_template('chart.html')
