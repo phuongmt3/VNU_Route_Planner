@@ -142,9 +142,6 @@ studentSearchEl.addEventListener("keydown", function(e) {
     if (currentFocus > -1 && x) {
       studentSearchEl.value = x[currentFocus].id;
       matchList.innerHTML = '';
-      
-      clearMap();
-      updateSchedule();
     }
   }
 });

@@ -4,8 +4,6 @@ import { renderBuilding, selectPlace, clearPlaceSelect, selectAllBuilding } from
 import { road, clearRoad, renderRoad } from './road.js';
 
 
-const avgWalkSpeed = 62.5;
-
 var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     id: "osm",
     maxZoom: 19,
@@ -36,8 +34,6 @@ const buildingNameGroup = L.layerGroup()
 const foodGroup = L.layerGroup()
 const souvenirGroup = L.layerGroup()
 const parkingGroup = L.layerGroup()
-
-const distancePopup = L.popup()
 
 renderBuilding(map, placeList, buildingNameGroup);
 renderMarkers(map, markerList, placeList, foodGroup, souvenirGroup, parkingGroup);
@@ -101,10 +97,9 @@ $(document).on('click','.postPlace',function() {
                 return;
                 
             clearRoad();
-            renderRoad(map, response[0]);
+            renderRoad(map, response[0], response[1]);
             selectPlace(placeName);
 
-            distancePopup.setContent("~ " + response[1] + " m, " + Math.round(response[1]/avgWalkSpeed) + " min");
             console.log("Database' size = " + response[2]);
         });
 });
@@ -136,14 +131,6 @@ map.on('zoomend', function () {
     }
 })
 
-road.on('mouseover', function (e) {
-    distancePopup.setLatLng(e.latlng).openOn(map);
-});
-
-road.on('mouseout', function () {
-    distancePopup.close();
-});
-
 inputBox.getContainer().addEventListener('mouseover', function () {
     map.dragging.disable();
 });
@@ -172,8 +159,7 @@ export function findPath(name1, name2) {
             }
             
             clearRoad();
-            renderRoad(map, response[0]);
-            distancePopup.setContent("~ " + response[1] + " m, " + Math.round(response[1]/avgWalkSpeed) + " min");
+            renderRoad(map, response[0], response[1]);
             console.log("Database' size = " + response[2]);
         });
 }
