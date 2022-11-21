@@ -26,7 +26,7 @@ def getStudentSchedule(msv):
 
 @views.route('/list_student.json', methods=['GET'])
 def getListStudent():
-    mycursor.execute("select * from sinhvien")
+    mycursor.execute("select MSV, Tên from sinhvien")
     data = mycursor.fetchall()
 
     return json.dumps(data, default=str)
@@ -51,10 +51,14 @@ def findPath():
     # Get id from name
     mycursor.execute("select `id` from `points` where `main` > 0 and `name` = %s", (name1,))
     data = mycursor.fetchone()
+    if not data:
+        return []
     startID = int(str(data[0]))
 
     mycursor.execute("select `id` from `points` where `main` > 0 and `name` = %s", (name2,))
     data = mycursor.fetchone()
+    if not data:
+        return []
     endID = int(str(data[0]))
 
     road.reset()
@@ -123,3 +127,9 @@ def home():
     return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList,
                            placeList=json.dumps(placeList),
                            markerList=json.dumps(markerList, cls=DecimalEncoder))
+
+
+@views.route('/resetDijkstra/', methods=['GET'])
+def resetDijkstra():
+    resetDijkstraTable()
+    return []

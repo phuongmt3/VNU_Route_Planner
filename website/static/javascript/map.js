@@ -181,3 +181,7 @@ export function displayMessage(message) {
     else 
         notification.warning('Warning', thisMessage[1]);
 }
+
+$("#Reset_Dijkstra_table").click(() => {
+    fetch('/resetDijkstra/');
+});

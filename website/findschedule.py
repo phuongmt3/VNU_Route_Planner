@@ -58,7 +58,7 @@ def getTimeTable(subjectList):
                  range(totWeek)]
 
     for item in subjectList:
-        day = item.day - 1
+        day = int(item.day) - 1
         start, end = (int(s) for s in item.time.split('-'))
         subjectName = item.LMHName
         place = item.place

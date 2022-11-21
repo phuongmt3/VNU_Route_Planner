@@ -14,10 +14,10 @@ L.Control.inputBox = L.Control.extend({
                     </button>
                 </div>
                 <div class="col-9" id="match-list" style="height: 38px;"> 
-                <!-- <div class="col-auto">
-                    <button type="submit" name="submit_button" class="btn btn-primary" value="Reset Dijkstra database">Reset
+                <!--<div class="col-auto">
+                    <button type="submit" name="submit_button" class="btn btn-primary" id="Reset_Dijkstra_table">Reset
                     Dijkstra database</button>
-                </div> -->
+                </div>-->
             </form>
             `;
         
