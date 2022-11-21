@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request
 
 from .findroad import *
-from .findschedule import getSubjectList, getTimeTable
+from .findschedule import getSubjectList, getTimeTable, getSubjectListFull, getMSVList, getTimeTableFull
 
 views = Blueprint('views', __name__)
 road = Road()
@@ -105,9 +105,6 @@ def home():
     placeNames = [""]
     initRoad(showedPlaceList, placeNames)
 
-    timeTable = []
-    msv = 0
-
     mycursor.execute("SELECT name, posY, posX, main FROM points WHERE main > 1")
     markerList = mycursor.fetchall()
 
@@ -123,3 +120,18 @@ def home():
     return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList,
                            placeList=json.dumps(placeList),
                            markerList=json.dumps(markerList, cls=DecimalEncoder))
+
+
+@views.route('/get_group_schedule/<msv>_<name>_<birth>_<courseClass>_<subjectCode>_<subjectName>_<subjectGroup>_<credit>_<note>', methods=['GET'])
+def getGroupSchedule(msv, name, birth, courseClass, subjectCode, subjectName, subjectGroup, credit, note):
+    msvList = getMSVList(msv, name, birth, courseClass, subjectCode, subjectName, subjectGroup, credit, note)
+    subjectList = getSubjectListFull(msvList)
+    timeTable = getTimeTableFull(subjectList)
+
+    notification = str(len(msvList)) + " students found!"
+    return json.dumps([timeTable, notification])
+
+
+@views.route('/calendar_overlap', methods=['GET', 'POST'])
+def calendarOverlap():
+    return render_template('calendar_overlap.html')

@@ -69,7 +69,42 @@ var developMode = L.easyButton({
 
 var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 
-L.control.slideMenu('<h2>VNU Route Planner</h2>').addTo(map);
+L.control.slideMenu(`
+    <div class="slide-menu-header">VNU Route Planner</div>
+
+    <div class="slide-menu-content">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" data-bs-toggle="tab" href="#how_to_use" aria-selected="true" role="tab">How to use</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" data-bs-toggle="tab" href="#about" aria-selected="true" role="tab">About</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Other tools</a>
+                <div class="dropdown-menu" style="">
+                    <a class="dropdown-item" href="http://127.0.0.1:5000/calendar_overlap">Calendar Overlap</a>
+                </div>
+            </li>
+        </ul>
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade active show" id="how_to_use" role="tabpanel">
+                <p> - Nhập mã sinh viên vào ô tìm kiếm rồi ấn enter để load dữ liệu của sinh viên.</p>
+                <p> - ...</p>
+            </div>
+            <div class="tab-pane fade" id="about" role="tabpanel">
+                <p>VNU Route Planner - Công cụ quản lý thời gian hiệu quả hàng đầu dành riêng cho sinh viên UET!</p>
+                <p>Sản phẩm được phát triển bởi nhóm Avidity - UET.</p>
+                <p>Tất cả hình ảnh minh họa thuộc quyền sở hữu của SGUET.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-menu-bottom">
+        <span> Source code: <a href="https://github.com/phuongmt3/VNU_Route_Planner"><span style="font-weight: bold">Github</span></span></a></span>
+    </div>
+    
+`).addTo(map);
 
 var inputBox = L.control.inputBox({ position: 'topleft' }).addTo(map);
 // var locationBox = L.control.locationBox({ position: 'topleft' }).addTo(map);
