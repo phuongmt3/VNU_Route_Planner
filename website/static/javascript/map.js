@@ -39,7 +39,6 @@ renderBuilding(map, placeList, buildingNameGroup);
 renderMarkers(map, markerList, placeList, foodGroup, souvenirGroup, parkingGroup);
 
 var overlayMaps = {
-    "Path": road,
     "Building's name": buildingNameGroup,
     "Food": foodGroup,
     "Souvenir": souvenirGroup,
@@ -73,41 +72,65 @@ L.control.slideMenu(`
     <div class="slide-menu-header">VNU Route Planner</div>
 
     <div class="slide-menu-content">
-        <ul class="nav nav-tabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <a class="nav-link active" data-bs-toggle="tab" href="#how_to_use" aria-selected="true" role="tab">How to use</a>
-            </li>
-            <li class="nav-item" role="presentation">
-                <a class="nav-link" data-bs-toggle="tab" href="#about" aria-selected="true" role="tab">About</a>
-            </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Other tools</a>
-                <div class="dropdown-menu" style="">
-                    <a class="dropdown-item" href="http://127.0.0.1:5000/calendar_overlap">Calendar Overlap</a>
-                </div>
-            </li>
-        </ul>
-        <div id="myTabContent" class="tab-content">
-            <div class="tab-pane fade active show" id="how_to_use" role="tabpanel">
-                <p> - Nhập mã sinh viên vào ô tìm kiếm rồi ấn enter để load dữ liệu của sinh viên.</p>
-                <p> - ...</p>
+        <div class="accordion" id="accordionExample">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                How to use
+            </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample" style="">
+            <div class="accordion-body">
+                <p> - Nhập mã sinh viên/ tên sinh viên vào ô tìm kiếm rồi ấn enter để load dữ liệu.</p>
+                <p> - Khi đến sự kiện, trên bản đồ sẽ hiển thị đường đi ngắn nhất theo dự đoán.</p>
+                <p> - Có thể xem đường đi các sự kiện chưa hoặc đã diễn ra bằng cách click vào sự kiện trên calendar.</p>
+                <p> - Để thêm sự kiện, click vào khoảng trống trên calendar. Để xóa, chuột phải rồi click icon X trên sự kiện.</p>
+                <p> - Để thêm địa điểm muốn ghé qua trên đường đi, chọn địa điểm trên map rồi click vào Visit, ngược lại, click Unvisit.</p>
             </div>
-            <div class="tab-pane fade" id="about" role="tabpanel">
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                About
+            </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample" style="">
+            <div class="accordion-body">
                 <p>VNU Route Planner - Công cụ quản lý thời gian hiệu quả hàng đầu dành riêng cho sinh viên UET!</p>
                 <p>Sản phẩm được phát triển bởi nhóm Avidity - UET.</p>
                 <p>Tất cả hình ảnh minh họa thuộc quyền sở hữu của SGUET.</p>
             </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingThree">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                Other tools
+            </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample" style="">
+            <div class="accordion-body list-group">
+                <a href="http://127.0.01:5000/calendar_overlap" class="list-group-item list-group-item-action flex-column align-items-start active">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Calendar Overlap</h5>
+                    </div>
+                    <small>Kết hợp thời gian biểu của 1 nhóm người nhất định để tìm thời gian thích hợp nhất (VD: tìm thời gian học bù tốt nhất).</small>
+                </a>
+            </div>
+            </div>
+        </div>
         </div>
     </div>
 
     <div class="slide-menu-bottom">
         <span> Source code: <a href="https://github.com/phuongmt3/VNU_Route_Planner"><span style="font-weight: bold">Github</span></span></a></span>
     </div>
-    
 `).addTo(map);
 
 var inputBox = L.control.inputBox({ position: 'topleft' }).addTo(map);
-// var locationBox = L.control.locationBox({ position: 'topleft' }).addTo(map);
 
 export var notification = L.control
     .notifications({
@@ -175,17 +198,7 @@ inputBox.getContainer().addEventListener('mouseout', function () {
 });
 
 export function findPath(name1, name2) {
-
-    var data = {
-        "name1": name1,
-        "name2": name2,
-    };
-
-    fetch(`/find_path/`, {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-    })
+    fetch(`/find_path/${name1}/${name2}`)
         .then(function (response) {
             return response.json();
         }).then(function (response) {

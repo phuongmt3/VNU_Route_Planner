@@ -96,32 +96,32 @@ def getMSVList(msv, name, birth, courseClass, subjectCode, subjectName, subjectG
                     ON dk.ID_ghi_chú = gc.ID_ghi_chú\
                     WHERE "
 
-    if msv != '0':
+    if msv != '':
         executeText += "sv.MSV LIKE '" + msv + "%' AND "
-    if name != '0':
+    if name != '':
         executeText += "sv.Tên LIKE '%" + name + "%' AND "
-    if birth[0] != '0':
+    if birth != '':
         birth = birth.split('-')
         executeText += "YEAR(sv.Ngày_sinh) = " + birth[0] + " AND "
         if (len(birth) > 2):
             executeText += "MONTH(sv.Ngày_sinh) = " + birth[1] + " AND "
             executeText += "DAY(sv.Ngày_sinh) = " + birth[2] + " AND "
         
-    if courseClass != '0':
+    if courseClass != '':
         executeText += "sv.Lớp_khóa_học LIKE '%" + courseClass + "%' AND "
-    if subjectCode != '0':
+    if subjectCode != '':
         subjectCode = subjectCode.split(' ')
         executeText += "dk.Mã_HP = '" + subjectCode[0] + "' AND "
         if len(subjectCode) > 1:
              executeText += "dk.Mã_LHP = '" + subjectCode[1] + "' AND "
 
-    if subjectName != '0':
+    if subjectName != '':
         executeText += "mh.Tên_môn_học LIKE '%" + subjectName + "%' AND "
-    if subjectGroup != '0':
+    if subjectGroup != '':
         executeText += "dk.Nhóm = '" + subjectGroup + "' AND "
-    if credit != '0':
+    if credit != '':
         executeText += "mh.Số_TC = " + subjectGroup + " AND "
-    if note != '0':
+    if note != '':
         executeText += "gc.Nội_dung = '" + note + "' AND "
 
     executeText += "TRUE"
