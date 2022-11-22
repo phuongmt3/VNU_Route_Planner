@@ -1,5 +1,9 @@
+from datetime import date
+
 from .models import mycursor
 
+
+startSemester = date(2022, 8, 29)
 
 class ClassInfor:
     def __init__(self, LMH, LMHName, group, TC, note, week, day, time, place, svCnt, lecturer):
@@ -83,3 +87,52 @@ def getTimeTable(subjectList):
                 for i in range(start - 1, end):
                     timeTable[week][day][i] = {"subjectName": subjectName, "place": place, "group": group, "subjectCode": subjectCode, "credits": credits, "lecturer": lecturer}
     return timeTable
+
+
+def classListOfDate(date):
+    dif = (date - startSemester).days
+    week = int(dif / 7) + 1
+    thu = str(dif % 7 + 2) if dif % 7 + 2 < 8 else 'CN'
+
+    mycursor.execute("select * from room")
+    rooms = mycursor.fetchall()
+    giangduong = []
+    room = []
+    res = []
+    prevGD = None
+    for r in rooms:
+        if r[0] != prevGD:
+            giangduong.append(r[0])
+            room.append([])
+            res.append([])
+            prevGD = r[0]
+        room[-1].append(r[1])
+        res[-1].append([])
+
+    mycursor.execute("select Giảng_đường,Số_phòng,Số_SV,ClassType, monhoc.Tên_môn_học,\
+        substring_index(Tiết,'-',1)+6 as TimeStart, substring_index(Tiết,'-',-1)+7 as TimeEnd,\
+        concat(class.Mã_HP,'_',class.Mã_LHP,' ',class.Nhóm) as Class_ID,\
+        group_concat(if (Ten is null, '', Ten)) as Giangvien\
+        from\
+        (SELECT *, substring_index(Tuần,'-',1) as Week1, substring_index(Tuần,'-',-1) as Week2,\
+        if(Nhóm='CL', 'Ly thuyet', 'Thuc hanh') as ClassType\
+        FROM vnu_route_planner_db_test.lopmonhoc\
+        having (Week1 = ' ' or Week1 like '%,10%' or (10 between week1 and week2)) \
+        and Thứ=2) class \
+        join monhoc on class.Mã_HP=monhoc.Mã_HP\
+        left join dayhoc on class.Mã_HP=dayhoc.Mã_HP and class.Mã_LHP=dayhoc.Mã_LHP and class.Nhóm=dayhoc.Nhóm\
+        left join giangvien on dayhoc.ID_Giangvien=giangvien.ID_Giangvien\
+        group by Class_ID;")
+    classes = mycursor.fetchall()
+
+    for lop in classes:
+        for i in range(len(giangduong)):
+            if lop[0] == giangduong[i]:
+                for j in range(len(room[i])):
+                    if lop[1] == room[i][j]:
+                        res[i][j].append(lop)
+                        break
+                break
+
+    return res, room, giangduong
+

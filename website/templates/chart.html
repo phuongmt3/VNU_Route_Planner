@@ -1,14 +1,16 @@
 <html>
-<head><meta charset="utf-8" /></head>
+<head>
+    <meta charset="utf-8">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        var lop = {{ lop| safe }};
+        var room = {{ room| safe}};
+        var giangduong = {{ gd| safe}};
+    </script>
+</head>
 <body>
-    <div>
-        <script type="text/javascript">
-            window.PlotlyConfig = {MathJaxConfig: 'local'};
-        </script>
-        <script type="text/javascript" src="../static/javascript/chart_1.js"></script>
-        <div id="7d56a3bd-a0ef-4ac6-a208-46a9edcb164e" class="plotly-graph-div" style="height:100%; width:100%;">
-        </div>
-        <script type="text/javascript" src="../static/javascript/chart_2.js"></script>
-    </div>
+
+    <div id="plotly-div" style="width:100%;height:500;"></div>
+    <script type="text/javascript" src="../static/javascript/chart.js"></script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request
 
 from .findroad import *
-from .findschedule import getSubjectList, getTimeTable
+from .findschedule import *
 
 views = Blueprint('views', __name__)
 road = Road()
@@ -122,6 +122,16 @@ def home():
                            markerList=json.dumps(markerList, cls=DecimalEncoder))
 
 
-@views.route('/chart', methods=['POST', 'GET'])
+@views.route('/chart', methods=['GET'])
 def chart():
-    return render_template('chart.html')
+    today = date.today()
+    classList = classListOfDate(today)
+    return render_template('chart.html', lop=json.dumps(classList[0]), room=classList[1], gd=classList[2])
+
+
+@views.route('/chart/findSchedule', methods=['POST', 'GET'])
+def chartSchedule():
+    # Default today
+    today = date.today()
+    classList = classListOfDate(today)
+    return json.dumps(classList)
