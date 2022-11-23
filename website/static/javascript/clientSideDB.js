@@ -126,7 +126,7 @@ export function updateEventDB(id, startTime, endTime, msv) {
     }
 }
 
-function deleteDatabase() {
+export function deleteDatabase() {
     if (db)
         db.close();
     var req = indexedDB.deleteDatabase("events_db");

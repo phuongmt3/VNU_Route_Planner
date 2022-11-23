@@ -102,7 +102,8 @@ const searchStudent = async searchText => {
     matchList.innerHTML = '';
   }
 
-  outputHtml(matches);
+  // Only take 10 matches
+  outputHtml(matches.slice(0, 10));
 }
 
 const outputHtml = matches => {

@@ -59,14 +59,6 @@ body,
     margin-right: 5px;
 }
 
-#startPlace,
-#endPlace {
-    position: relative;
-    top: -8px;
-    border: 0;
-    font-size: large;
-}
-
 .widget-code {
   display: block;
   position: absolute;
@@ -124,7 +116,8 @@ body,
 }
 
 .fc-header-toolbar {
-  display: block !important; 
+  display: flex;
+  flex-wrap: wrap;
   padding: 16px;
 } 
 
@@ -153,4 +146,27 @@ body,
 .delBtn {
     height: 100%;
     width: 15%;
+}
+
+.slide-menu-content {
+  margin: 0.25rem;
+  border-top: 1px solid #000;
+  padding-top: 0.5rem;
+}
+
+.slide-menu-header {
+  font-size: 1.8rem;
+  color: #5a5a5a;
+}
+
+.slide-menu-title {
+  font-size: 1.1rem;
+  color: #5a5a5a;
+  font-weight: bold;
+}
+
+.slide-menu-bottom {
+  margin-top: 64px;
+  font-size: 0.8rem;
+  color: #5a5a5a;
 }
