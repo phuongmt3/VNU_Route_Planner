@@ -52,7 +52,7 @@ def getSubjectList(msv):
 
 
 def getTimeTable(subjectList):
-    totWeek, totDayOfWeek, totLesson = (15, 7, 12)
+    totWeek, totDayOfWeek, totLesson = (16, 8, 13)
     timeTable = [[[{"subjectName": "", "place": ""} for j in range(totLesson)] for i in range(totDayOfWeek)] for k in
                  range(totWeek)]
 
@@ -67,16 +67,16 @@ def getTimeTable(subjectList):
         lecturer = item.lecturer
         if place[0] == '-':
             place = place[1:]
-        if '-' in item.week:
+        if '-' in item.week and ';' not in item.week:
             weekStart, weekEnd = (int(s) for s in item.week.split('-'))
             for week in range(weekStart - 1, weekEnd):
                 for i in range(start - 1, end):
                     timeTable[week][day][i] = {"subjectName": subjectName, "place": place, "group": group, "subjectCode": subjectCode, "credits": credits, "lecturer": lecturer}
-        elif ',' in item.week:
-            studyWeeks = (int(s) for s in item.week.split(','))
+        elif ';' in item.week and '-' not in item.week:
+            studyWeeks = (int(s) for s in item.week.split(';'))
             for week in studyWeeks:
                 for i in range(start - 1, end):
-                    timeTable[week][day][i] = {"subjectName": subjectName, "place": place, "group": group, "subjectCode": subjectCode, "credits": credits, "lecturer": lecturer}
+                    timeTable[week-1][day][i] = {"subjectName": subjectName, "place": place, "group": group, "subjectCode": subjectCode, "credits": credits, "lecturer": lecturer}
         else:
             for week in range(15):
                 for i in range(start - 1, end):
@@ -85,14 +85,14 @@ def getTimeTable(subjectList):
 
 
 def getMSVList(msv, name, birth, courseClass, subjectCode, subjectName, subjectGroup, credit, note):
-    executeText = " SELECT DISTINCT sv.MSV FROM vnu_route_planner_db_test.sinhvien sv\
-                    INNER JOIN vnu_route_planner_db_test.dangky dk\
+    executeText = " SELECT DISTINCT sv.MSV FROM vnu_route_planner_db_new.sinhvien sv\
+                    INNER JOIN vnu_route_planner_db_new.dangky dk\
                     ON sv.MSV = dk.MSV\
-                    INNER JOIN vnu_route_planner_db_test.lopmonhoc lmh\
+                    INNER JOIN vnu_route_planner_db_new.lopmonhoc lmh\
                     ON dk.Mã_HP = lmh.Mã_HP AND dk.Mã_LHP = lmh.Mã_LHP AND dk.Nhóm = lmh.Nhóm\
-                    INNER JOIN vnu_route_planner_db_test.monhoc mh\
+                    INNER JOIN vnu_route_planner_db_new.monhoc mh\
                     ON dk.Mã_HP = mh.Mã_HP\
-                    INNER JOIN vnu_route_planner_db_test.ghichu gc\
+                    INNER JOIN vnu_route_planner_db_new.ghichu gc\
                     ON dk.ID_ghi_chú = gc.ID_ghi_chú\
                     WHERE "
 
@@ -159,14 +159,14 @@ def getSubjectListFull(msvList):
 
 
 def getTimeTableFull(subjectList):
-    totWeek, totDayOfWeek, totLesson = (15, 7, 12)
+    totWeek, totDayOfWeek, totLesson = (16, 8, 13)
     timeTable = [[["" for j in range(totLesson)] for i in range(totDayOfWeek)] for k in range(totWeek)]
 
     for item in subjectList:
         day = item.day - 1
         start, end = (int(s) for s in item.time.split('-'))
         subjectName = item.LMHName
-        if '-' in item.week:
+        if '-' in item.week and ';' not in item.week:
             weekStart, weekEnd = (int(s) for s in item.week.split('-'))
             for week in range(weekStart - 1, weekEnd):
                 for i in range(start - 1, end):
@@ -174,14 +174,14 @@ def getTimeTableFull(subjectList):
                         timeTable[week][day][i] = subjectName
                     else:
                         timeTable[week][day][i] += subjectName
-        elif ',' in item.week:
-            studyWeeks = (int(s) for s in item.week.split(','))
+        elif ';' in item.week and '-' not in item.week:
+            studyWeeks = (int(s) for s in item.week.split(';'))
             for week in studyWeeks:
                 for i in range(start - 1, end):
-                    if timeTable[week][day][i] == '':
-                        timeTable[week][day][i] = subjectName
+                    if timeTable[week-1][day][i] == '':
+                        timeTable[week-1][day][i] = subjectName
                     else:
-                        timeTable[week][day][i] += subjectName
+                        timeTable[week-1][day][i] += subjectName
         else:
             for week in range(15):
                 for i in range(start - 1, end):

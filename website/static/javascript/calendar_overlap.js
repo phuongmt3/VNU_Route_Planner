@@ -15,33 +15,28 @@ var calendar = new FullCalendar.Calendar(calendarEl, {
     defaultTimedEventDuration: '00:30',
     snapDuration: '00:15',
     firstDay: 1,
-    businessHours: {
-        daysOfWeek: [ 1, 2, 3, 4, 5, 6 ], // Monday - Saturday
-        startTime: '07:00',
-        endTime: '19:00',
-    },
 });
 
 function calWeekNumber() {
     var week = Math.ceil((calendar.getDate() - startSemester + 24*3600*1000)/(24*3600*1000) / 7 );
-    if (week < 0 || week > 15)
+    if (week < 0 || week > 16)
         return 0;
     return week;
 }
 
 function initEvents() {
     var timer = new Date(startSemester);
-    for (var week = 0; week < 15; week++) {
+    for (var week = 0; week < 16; week++) {
         for (var day = 0; day < 7; day++) {
             var curday = timer.getDay();
-            for (var tiet = 0; tiet < 12; tiet++) {
+            for (var tiet = 0; tiet < 13; tiet++) {
                 var percent = timeTable[week][curday][tiet];
 
                 if (percent == "")
                     continue;
                 
                 var tietEnd = tiet + 1;
-                while (tietEnd < 12 && timeTable[week][curday][tietEnd] == percent)
+                while (tietEnd < 13 && timeTable[week][curday][tietEnd] == percent)
                     tietEnd++;
 
                 var startTime = new Date(timer);

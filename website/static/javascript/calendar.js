@@ -152,17 +152,17 @@ function initEvents() {
                     return;
 
                 var timer = new Date(startSemester);
-                for (var week = 0; week < 15; week++) {
+                for (var week = 0; week < 16; week++) {
                     for (var day = 0; day < 7; day++) {
                         var curday = timer.getDay();
-                        for (var tiet = 0; tiet < 12; tiet++) {
+                        for (var tiet = 0; tiet < 13; tiet++) {
                             var subject = timeTable[week][curday][tiet];
 
                             if (subject.subjectName == "")
                                 continue;
 
                             var tietEnd = tiet + 1;
-                            while (tietEnd < 12 && timeTable[week][curday][tietEnd].subjectName == subject.subjectName)
+                            while (tietEnd < 13 && timeTable[week][curday][tietEnd].subjectName == subject.subjectName)
                                 tietEnd++;
 
                             var startTime = new Date(timer);
@@ -213,7 +213,7 @@ function initEvents() {
 
 function calWeekNumber() {
     var week = Math.ceil((calendar.getDate() - startSemester + 24*3600*1000)/(24*3600*1000) / 7 );
-    if (week < 0 || week > 15)
+    if (week < 0 || week > 16)
         return 0;
     return week;
 }
