@@ -1,67 +1,128 @@
 console.log(lop)
+if ($('#chooseDate').val() === "")
+    document.getElementById('chooseDate').valueAsDate = new Date();
+
+$('#chooseDate').change(() => {
+    var data = {
+        "date": $('#chooseDate').val()
+    };
+
+    fetch(`/chart/findSchedule`, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    })
+        .then(function (response) {
+            return response.json();
+        }).then(function (response) {
+            lop = response[0];
+            giangduong = response[1];
+            week = response[2];
+            week > 0 ? $('#weekNum').text("Week: " + String(week)) : $('#weekNum').text("Week: Out of semester ");
+
+            drawChart();
+        });
+});
+
+drawChart();
+
+
 function setupData() {
-    var data = [];
+    var traces = [];
     for (var gd = 0; gd < lop.length; gd++) {
-        //data.push([]);
-        for (var r = 0; r < lop[gd].length; r++)
-            for (var i = 0; i < lop[gd][r].length; i++){
-                var clas = lop[gd][r][i];
-                var start = '2000-01-01 ' + (clas[5] < 10 ? '0' + String(clas[5]) + ':00:00' : String(clas[5]) + ':00:00');
-                var end = '2000-01-01 ' + (clas[6] - 1 < 10 ? '0' + String(clas[6]-1) + ':50:00' : String(clas[6]-1) + ':50:00');
-                //data[gd].push({
-                if (gd == 6)
-                    data.push({
-                        name: clas[4],
-                        x: [start, end],
-                        y: [r, r],
-                        marker: {color: 'green'},
-                        //hoverinfo: 'none',
-                        //visible: false
-                    });
-            }
+        var visibility = false;
+        if (gd == 0)
+            visibility = true;
+
+        var duration = [], startTime = [], room = [], subject = [];
+        for (var i = 0; i < lop[gd].length; i++) {
+            var clas = lop[gd][i];
+            duration.push((clas[6] - clas[5]) * 60 - 10);
+            startTime.push(clas[5] * 60);
+            var roomName ='P.' + clas[1];
+            room.push(roomName.length > 8 ? roomName.substr(0,8) + '...' : roomName);
+            subject.push(clas[4] + '<br>' + String(clas[5]) + ':00-' + String(clas[6] - 1) + ':50');
+        }
+
+        traces.push({
+            x: duration,
+            base: startTime,
+            y: room,
+            name: giangduong[gd],
+            text: subject,
+            type: 'bar',
+            orientation: 'h',
+            marker: //{color: 'MediumAquamarine'},
+            {color: 'SeaGreen'},
+            hovertemplate: '<b>%{text}</b>',
+            textposition: 'none',
+            visible: visibility
+        });
     }
-    return data;
+
+    return traces;
 }
 
-data = setupData();console.log(data);
-shapes = [];
-for (var i = 0; i < data.length; i++)
-    shapes.push({x0: data[i].x[0],
-                  x1: data[i].x[1],
-                  y0: data[i].y[0] - 0.4,
-                  y1: data[i].y[0] + 0.4,
-                  line: {width: 0},
-                  type: 'rect',
-                  xref: 'x',
-                  yref: 'y',
-                  opacity: 1,
-                  fillcolor: 'rgb(0, 50, 100)'});
+function visibleGD(id) {
+    var res = [];
+    for (var i = 0; i < giangduong.length; i++)
+        res.push(false);
+    res[id] = true;
+    return res;
+}
 
-layout = {
-  title: 'Gantt Chart', 
-  width: 900,
-  xaxis: {
-    type: 'date',
-    showgrid: true,
-    zeroline: false,
-    range: ['2000-01-01 6:30:00', '2000-01-01 21:30:00'],
-    tickformat: '%H:%M'
-  },
-  yaxis: {
-    range: [-1, 12],
-    showgrid: true, 
-    ticktext: room[6],
-    tickvals: Array.from(Array(room[6].length).keys()),
-    zeroline: false,
-    autorange: false
-  },
-  height: 600, 
-  shapes: shapes,
-  hovermode: 'closest',
-  showlegend: false,
-};
-Plotly.plot('plotly-div', {
-  data: data,
-  layout: layout,
-  displayModeBar: false
-});
+function setupBtnList() {
+    var list = [];
+    for (var gd = 0; gd < giangduong.length; gd++) {
+        list.push({
+            args: [{'visible': visibleGD(gd)}],
+            label: giangduong[gd],
+            method: 'update'
+        });
+    }
+    return list;
+}
+
+function drawChart() {
+    var updatemenus = [
+    {
+        buttons: setupBtnList(),
+        direction: 'down',
+        pad: {'r': 10, 't': 10},
+        showactive: true,
+        type: 'dropdown',
+        x: 0,
+        xanchor: 'left',
+        y: 1.2,
+        yanchor: 'top',
+        font: {color: '#5072a8'}
+    }];
+
+    var tickval = [];
+    var ticktext = [];
+    for (var i = 420; i <= 1260; i += 60) {
+        tickval.push(i);
+        var text = i/60 < 10 ? '0' + String(i/60) + ':00' : String(i/60) + ':00';
+        ticktext.push(text);
+    }
+
+    layout = {
+      title: 'Timeline',
+      updatemenus: updatemenus,
+      width: 1000,
+      xaxis: {
+          range: [390, 1260],
+          showgrid: true,
+          tickvals: tickval,
+          ticktext: ticktext
+      },
+      yaxis: {
+        title: 'Room'
+      },
+      height: 600,
+      hovermode: 'closest',
+      showlegend: false,
+    };
+
+    Plotly.newPlot('plotly-div', setupData(), layout, {displayModeBar: false});
+}

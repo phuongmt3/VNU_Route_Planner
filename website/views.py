@@ -126,12 +126,13 @@ def home():
 def chart():
     today = date.today()
     classList = classListOfDate(today)
-    return render_template('chart.html', lop=json.dumps(classList[0]), room=classList[1], gd=classList[2])
+    return render_template('chart.html', lop=json.dumps(classList[0]), gd=classList[1], week=classList[2])
 
 
 @views.route('/chart/findSchedule', methods=['POST', 'GET'])
 def chartSchedule():
     # Default today
-    today = date.today()
+    today = request.json['date'].split('-')
+    today = date(int(today[0]), int(today[1]), int(today[2]))
     classList = classListOfDate(today)
     return json.dumps(classList)
