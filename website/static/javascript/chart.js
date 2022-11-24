@@ -18,7 +18,7 @@ $('#chooseDate').change(() => {
             lop = response[0];
             giangduong = response[1];
             week = response[2];
-            week > 0 ? $('#weekNum').text("Week: " + String(week)) : $('#weekNum').text("Week: Out of semester ");
+            week > 0 ? $('#weekNum').text("Week " + String(week)) : $('#weekNum').text("Out of semester ");
 
             drawChart();
         });
@@ -104,6 +104,7 @@ function drawChart() {
         xanchor: 'left',
         y: 1.2,
         yanchor: 'top',
+        maxHeight: 50,
         font: {color: '#5072a8'}
     }];
 
@@ -118,8 +119,17 @@ function drawChart() {
     var cur = today.getHours() * 60 + today.getMinutes();
 
     layout = {
-      title: 'Timeline',
-      width: 1000,
+      title: {
+        text: 'Class Timeline',
+        font: {
+          family: 'Courier New, monospace',
+          size: 35
+          },
+      },
+      width: 1200,
+      xanchor: 'left',
+      x: 0,
+      y: 1.2,
       updatemenus: updatemenus,
       xaxis: {
           range: [390, 1260],
@@ -128,7 +138,13 @@ function drawChart() {
           ticktext: ticktext
       },
       yaxis: {
-        title: 'Room',
+        title: {
+          text: 'Room',
+          font: {
+            size: 18,
+            color: '#7f7f7f'
+          }
+        },
         automargin: true,
       },
       shapes: [{
@@ -214,12 +230,13 @@ function drawChart() {
     var yaxis = myPlot._fullLayout.yaxis;
     var l = myPlot._fullLayout.margin.l;
     var t = myPlot._fullLayout.margin.t;
+    var marginLeft = parseInt($(".user-select-none").css("margin-left").split("p")[0]);
 
     myPlot.addEventListener('click', e => {
         if (e instanceof PointerEvent)
             return;
-        var x = xaxis.p2c(e.x - l);
-        var y = yaxis.p2c(e.y - t);
+        var x = xaxis.p2c(e.x - marginLeft - l);
+        var y = yaxis.p2c(e.y - marginLeft - t);
         Plotly.relayout('plotly-div', {'shapes[0].x0': x, 'shapes[0].x1': x});
     });
 }

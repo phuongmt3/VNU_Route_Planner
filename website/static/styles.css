@@ -154,3 +154,7 @@ body,
     height: 100%;
     width: 15%;
 }
+
+.svg-container {
+    margin-left: 70px !important;
+}

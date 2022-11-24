@@ -78,19 +78,8 @@ L.control.slideMenu(
     , {width:'25%'}).addTo(map);
 
 $("#chartPage").click(e => {
-    window.open('chart');
+    window.location.replace('chart');
 });
-
-
-
-
-
-
-
-
-
-
-
 
 var inputBox = L.control.inputBox({ position: 'topleft' }).addTo(map);
 // var locationBox = L.control.locationBox({ position: 'topleft' }).addTo(map);

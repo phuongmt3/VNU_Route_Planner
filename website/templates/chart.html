@@ -13,18 +13,31 @@
     </script>
 </head>
 <body>
-    <label>Showed Date: </label>
-    <input type="date" id="chooseDate">
-    <div id="weekNum">
-        <p>Week:
-            {% if week > 0 %}
-                {{ week }}
-            {% else %}
-                Out of semester
-            {% endif %}
-        </p>
-    </div>
-    <div id="plotly-div" style="width:100%;height:500;"></div>
+    <nav class="navbar navbar-dark bg-dark justify-content-between">
+        <div class="navbar-nav-scroll">
+            <ul class="navbar-nav bd-navbar-nav flex-row" style="padding-left:40;">
+              <li class="nav-item">
+                <a class="nav-link" href="/" style="font-size:20;">Home</a>
+              </li>
+            </ul>
+        </div>
+
+        <div class="col-3 navbar-text" style="color:white; text-align:right;">
+            <p id="weekNum" class="h4">Week
+                {% if week > 0 %}
+                    {{ week }}
+                {% else %}
+                    Out of semester
+                {% endif %}
+            </p>
+        </div>
+
+      <div class="form-inline col-3" style="padding-right:40;">
+          <input type="date" id="chooseDate" class="form-control" style="background-color:#E8E8E8;">
+      </div>
+    </nav>
+
+    <div id="plotly-div"></div>
     <script type="text/javascript" src="../static/javascript/chart.js"></script>
 </body>
 </html>
