@@ -34,7 +34,7 @@ function setupData() {
         if (gd == 0)
             visibility = true;
 
-        var duration = [], startTime = [], room = [], subject = [];
+        var duration = [], startTime = [], room = [], subject = [], opacity = [], line = [];
         for (var i = 0; i < lop[gd].length; i++) {
             var clas = lop[gd][i];
             duration.push((clas[6] - clas[5]) * 60 - 10);
@@ -42,6 +42,8 @@ function setupData() {
             var roomName ='P.' + clas[1];
             room.push(roomName.length > 8 ? roomName.substr(0,8) + '...' : roomName);
             subject.push(clas[4] + '<br>' + String(clas[5]) + ':00-' + String(clas[6] - 1) + ':50');
+            opacity.push(0.4);
+            line.push({ color: 'black', width: 10 });
         }
 
         traces.push({
@@ -53,7 +55,7 @@ function setupData() {
             type: 'bar',
             orientation: 'h',
             marker: //{color: 'MediumAquamarine'},
-            {color: 'SeaGreen'},
+            {color: 'SeaGreen', opacity: opacity, line: line},
             hovertemplate: '<b>%{text}</b>',
             textposition: 'none',
             visible: visibility
@@ -105,11 +107,13 @@ function drawChart() {
         var text = i/60 < 10 ? '0' + String(i/60) + ':00' : String(i/60) + ':00';
         ticktext.push(text);
     }
+    var today = new Date();
+    var cur = today.getHours() * 60 + today.getMinutes();
 
     layout = {
       title: 'Timeline',
-      updatemenus: updatemenus,
       width: 1000,
+      updatemenus: updatemenus,
       xaxis: {
           range: [390, 1260],
           showgrid: true,
@@ -117,12 +121,96 @@ function drawChart() {
           ticktext: ticktext
       },
       yaxis: {
-        title: 'Room'
+        title: 'Room',
+        automargin: true,
       },
-      height: 600,
+      shapes: [{
+        type: 'line',
+        xref: 'x',
+        yref: 'paper',
+        x0: cur,
+        x1: cur,
+        y0: 0,
+        y1: 1,
+        line: {
+            color: 'red',
+            width: 3
+        }
+      }],
+      height: 650,
       hovermode: 'closest',
       showlegend: false,
     };
 
-    Plotly.newPlot('plotly-div', setupData(), layout, {displayModeBar: false});
+    Plotly.newPlot('plotly-div', setupData(), layout, {
+        displayModeBar: false
+    });
+
+    myPlot = document.getElementById('plotly-div');
+    myPlot.on('plotly_click', info => {
+        var point = info.points[0], newAnnotation = {
+            x: point.xaxis.d2l(point.x) - 12,
+            y: point.yaxis.d2l(point.y),
+            arrowhead: 6,
+            ax: 0,
+            ay: -70,
+            bgcolor: 'rgba(255, 255, 255, 0.9)',
+            arrowcolor: point.fullData.marker.color,
+            font: {size:12},
+            bordercolor: point.fullData.marker.color,
+            borderwidth: 3,
+            borderpad: 4,
+            text: '<b>Name</b>       '+(point.data.name) + '<br>' +
+                  '<i>' + point.text + '</i><br>' +
+                  '<b>A</b>     '+(point.x) +
+                  '<br><b>B</b>     '+(point.y)
+        };
+
+        if((myPlot.layout.annotations || []).length) {
+           var foundCopy = false;
+           myPlot.layout.annotations.forEach((ann, sameIndex) => {
+             if(ann.x === newAnnotation.x && ann.y === newAnnotation.y)
+               foundCopy = true;
+             Plotly.relayout('plotly-div', 'annotations[0]', 'remove');
+           });
+           if(foundCopy) return;
+         }
+
+         Plotly.relayout('plotly-div', 'annotations[0]', newAnnotation);
+    });
+
+    myPlot.on('plotly_hover', function(data){
+        var point = data.points[0];
+        var pn = point.pointNumber;
+        var tn = point.curveNumber;
+        var opacity = point.data.marker.opacity;
+        opacity[pn] = 1;
+
+        var update = {'marker': {color: 'SeaGreen', opacity: opacity}};
+        Plotly.restyle('plotly-div', update, [tn]);
+    });
+
+    myPlot.on('plotly_unhover', function(data){
+        var point = data.points[0];
+        var pn = point.pointNumber;
+        var tn = point.curveNumber;
+        var opacity = point.data.marker.opacity;
+        opacity[pn] = 0.4;
+
+        var update = {'marker': {color: 'SeaGreen', opacity: opacity}};
+        Plotly.restyle('plotly-div', update, [tn]);
+    });
+
+    var xaxis = myPlot._fullLayout.xaxis;
+    var yaxis = myPlot._fullLayout.yaxis;
+    var l = myPlot._fullLayout.margin.l;
+    var t = myPlot._fullLayout.margin.t;
+
+    myPlot.addEventListener('click', e => {
+        if (e instanceof PointerEvent)
+            return;
+        var x = xaxis.p2c(e.x - l);
+        var y = yaxis.p2c(e.y - t);
+        Plotly.relayout('plotly-div', {'shapes[0].x0': x, 'shapes[0].x1': x});
+    });
 }
