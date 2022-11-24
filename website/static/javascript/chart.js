@@ -62,7 +62,7 @@ function setupData() {
             classType: classType,
             type: 'bar',
             orientation: 'h',
-            marker: {color: 'SeaGreen', opacity: opacity},
+            marker: {color: 'DarkRed', opacity: opacity},
             hovertemplate: '<b>%{text}</b>',
             textposition: 'none',
             visible: visibility
@@ -211,8 +211,7 @@ function drawChart() {
         var opacity = point.data.marker.opacity;
         opacity[pn] = 1;
 
-        var update = {'marker': {color: 'SeaGreen', opacity: opacity}};
-        Plotly.restyle('plotly-div', update, [tn]);
+        Plotly.restyle('plotly-div', {'marker[tn].opacity': opacity});
     });
 
     myPlot.on('plotly_unhover', function(data){
@@ -222,8 +221,7 @@ function drawChart() {
         var opacity = point.data.marker.opacity;
         opacity[pn] = 0.4;
 
-        var update = {'marker': {color: 'SeaGreen', opacity: opacity}};
-        Plotly.restyle('plotly-div', update, [tn]);
+        Plotly.restyle('plotly-div', {'marker[tn].opacity': opacity});
     });
 
     var xaxis = myPlot._fullLayout.xaxis;

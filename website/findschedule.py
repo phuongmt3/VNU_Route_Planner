@@ -5,6 +5,7 @@ from .models import mycursor
 startSemester = date(2022, 8, 29)
 totWeek, totDayOfWeek, totLesson = (16, 8, 13)
 
+
 class ClassInfo:
     def __init__(self, LMH, LMHName, group, TC, note, week, day, time, place, svCnt, lecturer):
         self.LMH = LMH
@@ -74,12 +75,14 @@ def getTimeTable(subjectList):
             weekStart, weekEnd = (int(s) for s in item.week.split('-'))
             for week in range(weekStart - 1, weekEnd):
                 for i in range(start - 1, end):
-                    timeTable[week][day][i] = {"subjectName": subjectName, "place": place, "group": group, "subjectCode": subjectCode, "credits": credits, "lecturer": lecturer}
+                    timeTable[week][day][i] = {"subjectName": subjectName, "place": place, "group": group,
+                                               "subjectCode": subjectCode, "credits": credits, "lecturer": lecturer}
         elif ';' in item.week and '-' not in item.week:
             studyWeeks = (int(s) for s in item.week.split(';'))
             for week in studyWeeks:
                 for i in range(start - 1, end):
-                    timeTable[week-1][day][i] = {"subjectName": subjectName, "place": place, "group": group, "subjectCode": subjectCode, "credits": credits, "lecturer": lecturer}
+                    timeTable[week - 1][day][i] = {"subjectName": subjectName, "place": place, "group": group,
+                                                   "subjectCode": subjectCode, "credits": credits, "lecturer": lecturer}
         else:
             for week in range(15):
                 for i in range(start - 1, end):
@@ -133,12 +136,13 @@ def classListFromDate(date):
 
     return res, giangduong, week
 
+
 def getMSVList(msv, name, birth, courseClass, subjectCode, subjectName, subjectGroup, credit, note):
     if msv == name == birth == courseClass == subjectCode == subjectName == subjectGroup == credit == note == '':
         mycursor.execute("SELECT MSV FROM vnu_route_planner_db_new.sinhvien")
         msvList = mycursor.fetchall()
         return msvList
-        
+
     executeText = " SELECT DISTINCT sv.MSV FROM vnu_route_planner_db_new.sinhvien sv\
                     INNER JOIN vnu_route_planner_db_new.dangky dk\
                     ON sv.MSV = dk.MSV\
@@ -160,14 +164,14 @@ def getMSVList(msv, name, birth, courseClass, subjectCode, subjectName, subjectG
         if (len(birth) > 2):
             executeText += "MONTH(sv.Ngày_sinh) = " + birth[1] + " AND "
             executeText += "DAY(sv.Ngày_sinh) = " + birth[2] + " AND "
-        
+
     if courseClass != '':
         executeText += "sv.Lớp_khóa_học LIKE '%" + courseClass + "%' AND "
     if subjectCode != '':
         subjectCode = subjectCode.split(' ')
         executeText += "dk.Mã_HP = '" + subjectCode[0] + "' AND "
         if len(subjectCode) > 1:
-             executeText += "dk.Mã_LHP = '" + subjectCode[1] + "' AND "
+            executeText += "dk.Mã_LHP = '" + subjectCode[1] + "' AND "
 
     if subjectName != '':
         executeText += "mh.Tên_môn_học LIKE '%" + subjectName + "%' AND "
@@ -192,24 +196,25 @@ def getTimeTableFull(msvList):
 
     timeTable = [[[0 for j in range(totLesson)] for i in range(totDayOfWeek)] for k in range(totWeek)]
 
-    for msv in msvList: # Duyệt các sinh viên
+    for msv in msvList:  # Duyệt các sinh viên
         mycursor.execute("SELECT Mã_HP, Mã_LHP, Nhóm FROM dangky WHERE MSV = (%s)", (msv,))
         dataFromDangky = mycursor.fetchall()
-        for itemDangky in dataFromDangky:   # Duyệt các môn học
+        for itemDangky in dataFromDangky:  # Duyệt các môn học
             HP = itemDangky[0]
             LHP = itemDangky[1]
             group = itemDangky[2]
 
-            mycursor.execute("SELECT Nhóm, Tuần, Thứ, Tiết FROM lopmonhoc WHERE Mã_HP = (%s) AND Mã_LHP = (%s) AND (Nhóm = 'CL' OR Nhóm = (%s))"
-                            , (HP, LHP, group))
+            mycursor.execute(
+                "SELECT Nhóm, Tuần, Thứ, Tiết FROM lopmonhoc WHERE Mã_HP = (%s) AND Mã_LHP = (%s) AND (Nhóm = 'CL' OR Nhóm = (%s))"
+                , (HP, LHP, group))
             dataFromLopmonhoc = mycursor.fetchall()
 
-            for itemLopmonhoc in dataFromLopmonhoc: # Duyệt các giờ học lặp theo tuần
+            for itemLopmonhoc in dataFromLopmonhoc:  # Duyệt các giờ học lặp theo tuần
                 group = itemLopmonhoc[0]
                 week = itemLopmonhoc[1]
                 day = itemLopmonhoc[2]
                 time = itemLopmonhoc[3]
-                parseLessonTime(timeTable, 1/totStudent, week, day, time)
+                parseLessonTime(timeTable, 1 / totStudent, week, day, time)
     return timeTable
 
 
@@ -225,7 +230,7 @@ def parseLessonTime(timeTable, percent, week, day, time):
         studyWeeks = (int(s) for s in week.split(';'))
         for week in studyWeeks:
             for i in range(start - 1, end):
-                timeTable[week-1][day][i] += percent
+                timeTable[week - 1][day][i] += percent
     else:
         for week in range(15):
             for i in range(start - 1, end):
