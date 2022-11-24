@@ -1,5 +1,6 @@
 from .models import mycursor
 
+totWeek, totDayOfWeek, totLesson = (16, 8, 13)
 
 class ClassInfo:
     def __init__(self, LMH, LMHName, group, TC, note, week, day, time, place, svCnt, lecturer):
@@ -52,7 +53,6 @@ def getSubjectList(msv):
 
 
 def getTimeTable(subjectList):
-    totWeek, totDayOfWeek, totLesson = (16, 8, 13)
     timeTable = [[[{"subjectName": "", "place": ""} for j in range(totLesson)] for i in range(totDayOfWeek)] for k in
                  range(totWeek)]
 
@@ -85,6 +85,11 @@ def getTimeTable(subjectList):
 
 
 def getMSVList(msv, name, birth, courseClass, subjectCode, subjectName, subjectGroup, credit, note):
+    if (msv == name == birth == courseClass == subjectCode == subjectName == subjectGroup == credit == note == ''):
+        mycursor.execute("SELECT MSV FROM vnu_route_planner_db_new.sinhvien")
+        msvList = mycursor.fetchall()
+        return msvList
+        
     executeText = " SELECT DISTINCT sv.MSV FROM vnu_route_planner_db_new.sinhvien sv\
                     INNER JOIN vnu_route_planner_db_new.dangky dk\
                     ON sv.MSV = dk.MSV\
@@ -132,61 +137,47 @@ def getMSVList(msv, name, birth, courseClass, subjectCode, subjectName, subjectG
     return msvList
 
 
-def getSubjectListFull(msvList):
+def getTimeTableFull(msvList):
     msvList = [x[0] for x in msvList]
     totStudent = len(msvList)
-    subjectList = []
+
+    timeTable = [[[0 for j in range(totLesson)] for i in range(totDayOfWeek)] for k in range(totWeek)]
 
     for msv in msvList: # Duyệt các sinh viên
-        mycursor.execute("SELECT * FROM dangky WHERE MSV = (%s)", (msv,))
+        mycursor.execute("SELECT Mã_HP, Mã_LHP, Nhóm FROM dangky WHERE MSV = (%s)", (msv,))
         dataFromDangky = mycursor.fetchall()
         for itemDangky in dataFromDangky:   # Duyệt các môn học
-            HP = itemDangky[1]
-            LHP = itemDangky[2]
-            group = itemDangky[3]
+            HP = itemDangky[0]
+            LHP = itemDangky[1]
+            group = itemDangky[2]
 
-            mycursor.execute("SELECT * FROM lopmonhoc WHERE Mã_HP = (%s) AND Mã_LHP = (%s) AND (Nhóm = 'CL' OR Nhóm = (%s))"
+            mycursor.execute("SELECT Nhóm, Tuần, Thứ, Tiết FROM lopmonhoc WHERE Mã_HP = (%s) AND Mã_LHP = (%s) AND (Nhóm = 'CL' OR Nhóm = (%s))"
                             , (HP, LHP, group))
             dataFromLopmonhoc = mycursor.fetchall()
 
             for itemLopmonhoc in dataFromLopmonhoc: # Duyệt các giờ học lặp theo tuần
-                group = itemLopmonhoc[2]
-                week = itemLopmonhoc[3]
-                day = itemLopmonhoc[4]
-                time = itemLopmonhoc[5]
-                subjectList.append(ClassInfo("0", 1/totStudent, "0", "0", "0", week, day, time, "0", "0", "0"))
-    return subjectList
-
-
-def getTimeTableFull(subjectList):
-    totWeek, totDayOfWeek, totLesson = (16, 8, 13)
-    timeTable = [[["" for j in range(totLesson)] for i in range(totDayOfWeek)] for k in range(totWeek)]
-
-    for item in subjectList:
-        day = item.day - 1
-        start, end = (int(s) for s in item.time.split('-'))
-        subjectName = item.LMHName
-        if '-' in item.week and ';' not in item.week:
-            weekStart, weekEnd = (int(s) for s in item.week.split('-'))
-            for week in range(weekStart - 1, weekEnd):
-                for i in range(start - 1, end):
-                    if timeTable[week][day][i] == '':
-                        timeTable[week][day][i] = subjectName
-                    else:
-                        timeTable[week][day][i] += subjectName
-        elif ';' in item.week and '-' not in item.week:
-            studyWeeks = (int(s) for s in item.week.split(';'))
-            for week in studyWeeks:
-                for i in range(start - 1, end):
-                    if timeTable[week-1][day][i] == '':
-                        timeTable[week-1][day][i] = subjectName
-                    else:
-                        timeTable[week-1][day][i] += subjectName
-        else:
-            for week in range(15):
-                for i in range(start - 1, end):
-                    if timeTable[week][day][i] == '':
-                        timeTable[week][day][i] = subjectName
-                    else:
-                        timeTable[week][day][i] += subjectName
+                group = itemLopmonhoc[0]
+                week = itemLopmonhoc[1]
+                day = itemLopmonhoc[2]
+                time = itemLopmonhoc[3]
+                parseLessonTime(timeTable, 1/totStudent, week, day, time)
     return timeTable
+
+
+def parseLessonTime(timeTable, percent, week, day, time):
+    day = day - 1
+    start, end = (int(s) for s in time.split('-'))
+    if '-' in week and ';' not in week:
+        weekStart, weekEnd = (int(s) for s in week.split('-'))
+        for week in range(weekStart - 1, weekEnd):
+            for i in range(start - 1, end):
+                timeTable[week][day][i] += percent
+    elif ';' in week and '-' not in week:
+        studyWeeks = (int(s) for s in week.split(';'))
+        for week in studyWeeks:
+            for i in range(start - 1, end):
+                timeTable[week-1][day][i] += percent
+    else:
+        for week in range(15):
+            for i in range(start - 1, end):
+                timeTable[week][day][i] += percent

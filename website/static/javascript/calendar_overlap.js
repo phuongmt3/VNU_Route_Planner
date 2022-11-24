@@ -90,6 +90,8 @@ function updateCalendar() {
         data.push(searchValue);
     }
 
+    document.getElementById('notification').innerHTML = '<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>';
+    console.time("timer");
     fetch(`/get_group_schedule/`, {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
@@ -107,7 +109,9 @@ function updateCalendar() {
   
             document.getElementById('notification').textContent = response[1];
             window.scrollTo(0, document.body.scrollHeight);
-        });
+        }).then(() => {
+            console.timeEnd("timer");
+        })
 }
 
 document.getElementById("group_search_btn").addEventListener("click", updateCalendar)
@@ -125,26 +129,22 @@ function addInputBox() {
 
     const addedInput = document.createElement("div");
     addedInput.innerHTML = `
-        <div class="added-input_` + numberOfInput + `" style="display: flex;">
+        <div class="added-input_` + numberOfInput + ` input-group" style="display: flex;">
             <button class="btn" id="add_input_box" style="border-radius: 50%; color: #888">
                 <i class="fa fa-regular fa-plus"></i>
             </button>
 
-            <div class="input-group">
-                <input type="text" aria-label="Mã SV" class="form-control" id="msv_` + numberOfInput + `" placeholder="Mã SV">
-                <input type="text" aria-label="Họ và tên" class="form-control" id="name_` + numberOfInput + `" placeholder="Họ và tên">
-                <input type="text" aria-label="Ngày sinh" class="form-control" id="birth_` + numberOfInput + `" placeholder="Ngày sinh">
-                <input type="text" aria-label="Lớp khóa học" class="form-control" id="course_class_` + numberOfInput + `" placeholder="Lớp khóa học">
-                <input type="text" aria-label="Mã LHP" class="form-control" id="subject_code_` + numberOfInput + `" placeholder="Mã LHP">
-                <input type="text" aria-label="Tên môn học" class="form-control" id="subject_name_` + numberOfInput + `" placeholder="Tên môn học">
-                <input type="text" aria-label="Nhóm" class="form-control" id="subject_group_` + numberOfInput + `" placeholder="Nhóm">
-                <input type="text" aria-label="Số TC" class="form-control" id="credit_` + numberOfInput + `" placeholder="Số TC">
-                <input type="text" aria-label="Ghi chú" class="form-control" id="note_` + numberOfInput + `" placeholder="Ghi chú">
-            </div>
+            <input type="text" aria-label="Mã SV" class="form-control" id="msv_` + numberOfInput + `" placeholder="Mã SV">
+            <input type="text" aria-label="Họ và tên" class="form-control" id="name_` + numberOfInput + `" placeholder="Họ và tên">
+            <input type="text" aria-label="Ngày sinh" class="form-control" id="birth_` + numberOfInput + `" placeholder="Ngày sinh">
+            <input type="text" aria-label="Lớp khóa học" class="form-control" id="course_class_` + numberOfInput + `" placeholder="Lớp khóa học">
+            <input type="text" aria-label="Mã LHP" class="form-control" id="subject_code_` + numberOfInput + `" placeholder="Mã LHP">
+            <input type="text" aria-label="Tên môn học" class="form-control" id="subject_name_` + numberOfInput + `" placeholder="Tên môn học">
+            <input type="text" aria-label="Nhóm" class="form-control" id="subject_group_` + numberOfInput + `" placeholder="Nhóm">
+            <input type="text" aria-label="Số TC" class="form-control" id="credit_` + numberOfInput + `" placeholder="Số TC">
+            <input type="text" aria-label="Ghi chú" class="form-control" id="note_` + numberOfInput + `" placeholder="Ghi chú">
 
-            <button class="btn btn-outline-success" type="button" id="group_search_btn">
-                Search
-            </button>
+            <button class="btn btn-outline-success" type="button" id="group_search_btn">Search</button>
         </div>
     `;
 
