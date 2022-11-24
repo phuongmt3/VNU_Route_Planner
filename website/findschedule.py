@@ -117,10 +117,11 @@ def classListOfDate(date):
         concat(class.Mã_HP,'_',class.Mã_LHP,' ',class.Nhóm) as Class_ID,\
         group_concat(if (Ten is null, '', Ten)) as Giangvien\
         from\
-        (SELECT *, substring_index(Tuần,'-',1) as Week1, substring_index(Tuần,'-',-1) as Week2,\
-        if(Nhóm='CL', 'Ly thuyet', 'Thuc hanh') as ClassType\
+        (SELECT *, substring_index(substring_index(Tuần,'-',1),';',-1) as Week1,\
+        substring_index(substring_index(Tuần,'-',-1),';',1) as Week2,\
+        if(Nhóm='CL', 'Lý Thuyết', 'Thực Hành') as ClassType\
         FROM lopmonhoc\
-        having (Week1 = ' ' or Week1 like %s or (%s between week1 and week2)) \
+        having (Week1 = ' ' or Week1 like %s or (%s between Week1 and Week2)) \
         and Thứ=%s) class \
         join monhoc on class.Mã_HP=monhoc.Mã_HP\
         left join dayhoc on class.Mã_HP=dayhoc.Mã_HP and class.Mã_LHP=dayhoc.Mã_LHP and class.Nhóm=dayhoc.Nhóm\

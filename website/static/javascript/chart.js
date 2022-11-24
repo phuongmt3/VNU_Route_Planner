@@ -34,7 +34,8 @@ function setupData() {
         if (gd == 0)
             visibility = true;
 
-        var duration = [], startTime = [], room = [], subject = [], opacity = [], line = [];
+        var duration = [], startTime = [], room = [], subject = [], opacity = [];
+        var giangvien = [], classID = [], svCnt = [], classType = [];
         for (var i = 0; i < lop[gd].length; i++) {
             var clas = lop[gd][i];
             duration.push((clas[6] - clas[5]) * 60 - 10);
@@ -43,7 +44,10 @@ function setupData() {
             room.push(roomName.length > 8 ? roomName.substr(0,8) + '...' : roomName);
             subject.push(clas[4] + '<br>' + String(clas[5]) + ':00-' + String(clas[6] - 1) + ':50');
             opacity.push(0.4);
-            line.push({ color: 'black', width: 10 });
+            giangvien.push(clas[8]);
+            classID.push(clas[7]);
+            svCnt.push(clas[2]);
+            classType.push(clas[3]);
         }
 
         traces.push({
@@ -52,10 +56,13 @@ function setupData() {
             y: room,
             name: giangduong[gd],
             text: subject,
+            giangvien: giangvien,
+            classID: classID,
+            svCnt: svCnt,
+            classType: classType,
             type: 'bar',
             orientation: 'h',
-            marker: //{color: 'MediumAquamarine'},
-            {color: 'SeaGreen', opacity: opacity, line: line},
+            marker: {color: 'SeaGreen', opacity: opacity},
             hovertemplate: '<b>%{text}</b>',
             textposition: 'none',
             visible: visibility
@@ -77,7 +84,7 @@ function setupBtnList() {
     var list = [];
     for (var gd = 0; gd < giangduong.length; gd++) {
         list.push({
-            args: [{'visible': visibleGD(gd)}],
+            args: [{'visible': visibleGD(gd)}, {'annotations[0]': 'remove'}],
             label: giangduong[gd],
             method: 'update'
         });
@@ -148,7 +155,9 @@ function drawChart() {
 
     myPlot = document.getElementById('plotly-div');
     myPlot.on('plotly_click', info => {
-        var point = info.points[0], newAnnotation = {
+        var point = info.points[0];
+        var pn = point.pointNumber;
+        var newAnnotation = {
             x: point.xaxis.d2l(point.x) - 12,
             y: point.yaxis.d2l(point.y),
             arrowhead: 6,
@@ -160,10 +169,10 @@ function drawChart() {
             bordercolor: point.fullData.marker.color,
             borderwidth: 3,
             borderpad: 4,
-            text: '<b>Name</b>       '+(point.data.name) + '<br>' +
-                  '<i>' + point.text + '</i><br>' +
-                  '<b>A</b>     '+(point.x) +
-                  '<br><b>B</b>     '+(point.y)
+            text: '<b>Giảng viên</b>    '+ point.data.giangvien[pn] + '<br>' +
+                  '<i>' + point.data.classID[pn] + '  -  ' + point.data.classType[pn] + '</i><br>' +
+                  '<b>' + point.data.svCnt[pn] + '</b> <i>Sinh viên</i><br>' +
+                  '<b>Phòng</b>   '+(point.y)
         };
 
         if((myPlot.layout.annotations || []).length) {
