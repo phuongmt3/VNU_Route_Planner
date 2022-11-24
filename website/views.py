@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request
 from .findroad import *
 from .findschedule import *
 
+
 views = Blueprint('views', __name__)
 road = Road()
 
