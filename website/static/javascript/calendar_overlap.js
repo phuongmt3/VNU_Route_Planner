@@ -116,10 +116,19 @@ function addInputBox() {
     const inputContainerEl = document.querySelector(".input-container");
     const numberOfInput = inputBoxNumb++;
 
+    inputContainerEl.querySelector('i').classList = "fa fa-regular fa-minus";
+    inputContainerEl.querySelector('#add_input_box').id = "remove_input_box";
+
+    inputContainerEl.querySelector('#group_search_btn').style.visibility = "hidden";
+    inputContainerEl.querySelector("#remove_input_box").removeEventListener("click", addInputBox);
+    inputContainerEl.querySelector("#remove_input_box").addEventListener("click", removeInputBox);
+
     const addedInput = document.createElement("div");
     addedInput.innerHTML = `
         <div class="added-input_` + numberOfInput + `" style="display: flex;">
-            <button class="btn" id="remove_input_box" style="border-radius: 50%; color: #888"><i class="fa fa-regular fa-minus"></i></button>
+            <button class="btn" id="add_input_box" style="border-radius: 50%; color: #888">
+                <i class="fa fa-regular fa-plus"></i>
+            </button>
 
             <div class="input-group">
                 <input type="text" aria-label="Mã SV" class="form-control" id="msv_` + numberOfInput + `" placeholder="Mã SV">
@@ -133,11 +142,14 @@ function addInputBox() {
                 <input type="text" aria-label="Ghi chú" class="form-control" id="note_` + numberOfInput + `" placeholder="Ghi chú">
             </div>
 
-            <button class="btn btn-outline-success" type="button" id="group_search_btn" style="visibility: hidden;">Search</button>
+            <button class="btn btn-outline-success" type="button" id="group_search_btn">
+                Search
+            </button>
         </div>
     `;
 
-    addedInput.querySelector("#remove_input_box").addEventListener("click", removeInputBox);
+    addedInput.querySelector("#add_input_box").addEventListener("click", addInputBox)
+    addedInput.querySelector("#group_search_btn").addEventListener("click", updateCalendar)
 
     inputContainerEl.prepend(addedInput)
 }
