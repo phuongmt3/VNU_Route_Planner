@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request
 from .findroad import *
-from .findschedule import getSubjectList, getTimeTable, getSubjectListFull, getMSVList, getTimeTableFull
+from .findschedule import getSubjectList, getTimeTable, getMSVList, getTimeTableFull
 
 views = Blueprint('views', __name__)
 road = Road()
@@ -126,8 +126,7 @@ def getGroupSchedule():
         thisMSVList = getMSVList(data['msv'], data['name'], data['birth'], data['courseClass'], data['subjectCode'], data['subjectName'], data['subjectGroup'], data['credit'], data['note'])
         msvList.extend(x for x in thisMSVList if x not in msvList)
 
-    subjectList = getSubjectListFull(msvList)
-    timeTable = getTimeTableFull(subjectList)
+    timeTable = getTimeTableFull(msvList)
 
     notification = str(len(msvList)) + " students found!"
     return json.dumps([timeTable, notification])
