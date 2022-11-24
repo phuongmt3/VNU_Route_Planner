@@ -72,6 +72,16 @@ const studentSearchEl = document.getElementById("student_search");
 const matchList = document.getElementById("match-list");
 let currentFocus;
 
+function split(str, sep, limit) {
+    str = str.split(sep);
+    if (str.length > limit) {
+        var ret = str.splice(0, limit);
+        ret.push(str.join(sep));
+        return ret[ret.length - 1];
+    }
+    return "";
+}
+
 const searchStudent = async searchText => {
   currentFocus = -1;
 
@@ -80,8 +90,9 @@ const searchStudent = async searchText => {
 
   let matches = listStudent.filter(student => {
     const regex = new RegExp(`^${searchText}`, 'gi');
-    for (let text of student[1].split(' ')) {
-      if (text.match(regex)) return text.match(regex);
+    for (let i = 0; i < 5; i++) {
+      if (split(student[1], ' ', i).match(regex))
+        return true;
     }
     return String(student[0]).match(regex);
   });
@@ -91,7 +102,8 @@ const searchStudent = async searchText => {
     matchList.innerHTML = '';
   }
 
-  outputHtml(matches);
+  // Only take 10 matches
+  outputHtml(matches.slice(0, 10));
 }
 
 const outputHtml = matches => {
@@ -142,9 +154,6 @@ studentSearchEl.addEventListener("keydown", function(e) {
     if (currentFocus > -1 && x) {
       studentSearchEl.value = x[currentFocus].id;
       matchList.innerHTML = '';
-      
-      clearMap();
-      updateSchedule();
     }
   }
 });

@@ -109,6 +109,7 @@ def initRoad(showedPlaceList=[], placeNames=[""]):
 
 
 def resetDijkstraTable():
+    print("resetDijkstraTable")
     mycursor.execute("delete from `dijkstra`")
     db.commit()
     mycursor.execute("select * from `distance`")

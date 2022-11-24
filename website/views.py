@@ -1,5 +1,4 @@
 from flask import Blueprint, render_template, request
-
 from .findroad import *
 from .findschedule import *
 
@@ -26,12 +25,13 @@ def getStudentSchedule(msv):
 
 @views.route('/list_student.json', methods=['GET'])
 def getListStudent():
-    mycursor.execute("select * from sinhvien")
+    mycursor.execute("select MSV, Tên from sinhvien")
     data = mycursor.fetchall()
 
     return json.dumps(data, default=str)
 
 
+# Add new place to db
 @views.route('/add_place/', methods=['POST'])
 def addPlace():
     posX, posY = request.json['posX'], request.json['posY']
@@ -44,17 +44,19 @@ def addPlace():
     return []
 
 
-@views.route('/find_path/', methods=['POST'])
-def findPath():
-    name1, name2 = request.json['name1'], request.json['name2']
-
+@views.route('/find_path/<name1>/<name2>', methods=['GET'])
+def findPath(name1, name2):
     # Get id from name
     mycursor.execute("select `id` from `points` where `main` > 0 and `name` = %s", (name1,))
     data = mycursor.fetchone()
+    if not data:
+        return []
     startID = int(str(data[0]))
 
     mycursor.execute("select `id` from `points` where `main` > 0 and `name` = %s", (name2,))
     data = mycursor.fetchone()
+    if not data:
+        return []
     endID = int(str(data[0]))
 
     road.reset()
@@ -112,27 +114,46 @@ def home():
     data = mycursor.fetchall()
     placeList = [x + (False,) for x in data]
 
-    if request.method == 'POST':
-        if request.form['submit_button'] == 'Reset Dijkstra database':
-            resetDijkstraTable()
-            print('Reset Dijkstra database successfully!')
-
     return render_template('index.html', placeNames=placeNames, showedPlaceList=showedPlaceList,
-                           placeList=json.dumps(placeList),
-                           markerList=json.dumps(markerList, cls=DecimalEncoder))
+                           placeList=json.dumps(placeList), markerList=json.dumps(markerList, cls=DecimalEncoder))
 
 
 @views.route('/chart', methods=['GET'])
 def chart():
     today = date.today()
-    classList = classListOfDate(today)
+    classList = classListFromDate(today)
     return render_template('chart.html', lop=json.dumps(classList[0]), gd=classList[1], week=classList[2])
 
 
 @views.route('/chart/findSchedule', methods=['POST', 'GET'])
 def chartSchedule():
-    # Default today
-    today = request.json['date'].split('-')
-    today = date(int(today[0]), int(today[1]), int(today[2]))
-    classList = classListOfDate(today)
+    day = request.json['date'].split('-')
+    day = date(int(day[0]), int(day[1]), int(day[2]))
+    classList = classListFromDate(day)
     return json.dumps(classList)
+
+
+@views.route('/get_group_schedule/', methods=['POST'])
+def getGroupSchedule():
+    msvList = []
+
+    for data in request.json:
+        thisMSVList = getMSVList(data['msv'], data['name'], data['birth'], data['courseClass'], data['subjectCode'],
+                                 data['subjectName'], data['subjectGroup'], data['credit'], data['note'])
+        msvList.extend(x for x in thisMSVList if x not in msvList)
+
+    timeTable = getTimeTableFull(msvList)
+
+    notification = str(len(msvList)) + " students found!"
+    return json.dumps([timeTable, notification])
+
+
+@views.route('/calendar_overlap', methods=['GET', 'POST'])
+def calendarOverlap():
+    return render_template('calendar_overlap.html')
+
+
+@views.route('/resetDijkstra/', methods=['GET'])
+def resetDijkstra():
+    resetDijkstraTable()
+    return []

@@ -1,6 +1,6 @@
 import { selectPlace, clearPlaceSelect } from './building.js'
 import { findPath } from './map.js'
-import { db, getLastEvent, createNewTable, addEventDB, printAll, deleteEventDB, updateEventDB } from './clientSideDB.js'
+import { db, getLastEvent, createNewTable, addEventDB, printAll, deleteEventDB, updateEventDB, deleteDatabase } from './clientSideDB.js'
 
 export var msv = '0';
 var clickedEvent = null;
@@ -26,6 +26,18 @@ export var calendar = new FullCalendar.Calendar(calendarEl, {
     defaultTimedEventDuration: '00:30',
     snapDuration: '00:15',
     firstDay: 1,
+    customButtons: {
+        myCustomButton: {
+            text: 'Reset calendar',
+            click: function() {
+                alert('Calendar is reset! Reload page to update.');
+                deleteDatabase();
+            }
+        }
+    },
+    footerToolbar: {
+        center: 'myCustomButton'
+    },
     eventDidMount: function(info) {
         let placeText = document.createElement("div");
         placeText.classList.add("description-text");
@@ -50,10 +62,7 @@ function onRightClickEvent(e, info) {
     var delButton = info.el.parentElement.querySelector(".delBtn")
     if (!delButton) {
         let button = document.createElement("button");
-        button.classList.add("btn");
-        button.classList.add("btn-warning");
-        button.classList.add("delBtn");
-        button.classList.add("float-end");
+        button.classList = "btn btn-warning delBtn float-end";
         button.textContent = "X";
         button.onclick = () => {
             justClickDel = true;
@@ -143,17 +152,17 @@ function initEvents() {
                     return;
 
                 var timer = new Date(startSemester);
-                for (var week = 0; week < 15; week++) {
+                for (var week = 0; week < 16; week++) {
                     for (var day = 0; day < 7; day++) {
                         var curday = timer.getDay();
-                        for (var tiet = 0; tiet < 12; tiet++) {
+                        for (var tiet = 0; tiet < 13; tiet++) {
                             var subject = timeTable[week][curday][tiet];
 
                             if (subject.subjectName == "")
                                 continue;
 
                             var tietEnd = tiet + 1;
-                            while (tietEnd < 12 && timeTable[week][curday][tietEnd].subjectName == subject.subjectName)
+                            while (tietEnd < 13 && timeTable[week][curday][tietEnd].subjectName == subject.subjectName)
                                 tietEnd++;
 
                             var startTime = new Date(timer);
@@ -204,7 +213,7 @@ function initEvents() {
 
 function calWeekNumber() {
     var week = Math.ceil((calendar.getDate() - startSemester + 24*3600*1000)/(24*3600*1000) / 7 );
-    if (week < 0 || week > 15)
+    if (week < 0 || week > 16)
         return 0;
     return week;
 }
@@ -238,8 +247,6 @@ function findRoute(startPlace, endPlace) {
     clearPlaceSelect()
     selectPlace(endPlace);
     findPath(startPlace, endPlace);
-    // $("#startPlace").val(startPlace);
-    // $("#endPlace").val(endPlace);
 }
 
 function acceptedEvent(event, startTime, endTime) {
