@@ -148,6 +148,10 @@ body,
     width: 15%;
 }
 
+.svg-container {
+    margin-left: 70px !important;
+}
+
 .slide-menu-content {
   margin: 0.25rem;
   border-top: 1px solid #000;
@@ -170,3 +174,4 @@ body,
   font-size: 0.8rem;
   color: #5a5a5a;
 }
+

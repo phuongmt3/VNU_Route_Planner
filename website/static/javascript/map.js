@@ -119,6 +119,13 @@ L.control.slideMenu(`
                     </div>
                     <small>Kết hợp thời gian biểu của 1 nhóm người nhất định để tìm thời gian thích hợp nhất (VD: tìm thời gian học bù tốt nhất).</small>
                 </a>
+                <br>
+                <a href="http://127.0.01:5000/timelineChart" class="list-group-item list-group-item-action flex-column align-items-start active">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Class Timeline</h5>
+                    </div>
+                    <small>Theo dõi lịch học của toàn trường theo từng giờ và phòng học để tìm phòng học trống.</small>
+                </a>
             </div>
             </div>
         </div>

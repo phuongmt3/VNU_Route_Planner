@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request
 from .findroad import *
-from .findschedule import getSubjectList, getTimeTable, getMSVList, getTimeTableFull
+from .findschedule import *
+
 
 views = Blueprint('views', __name__)
 road = Road()
@@ -14,8 +15,7 @@ def getStudentSchedule(msv):
     mycursor.execute("SELECT * FROM sinhvien WHERE MSV = (%s)", (msv,))
     data = mycursor.fetchone()
     if data:
-        subjectList = getSubjectList(msv)
-        timeTable = getTimeTable(subjectList)
+        timeTable = getTimeTable(msv)
         notification = "Success Welcome " + data[1]
     else:
         notification = "Warning Not found " + msv
@@ -118,12 +118,28 @@ def home():
                            placeList=json.dumps(placeList), markerList=json.dumps(markerList, cls=DecimalEncoder))
 
 
+@views.route('/timelineChart', methods=['GET'])
+def chart():
+    today = date.today()
+    classList = classListFromDate(today)
+    return render_template('timelineChart.html', lop=json.dumps(classList[0]), gd=classList[1], week=classList[2])
+
+
+@views.route('/chart/findSchedule', methods=['POST', 'GET'])
+def chartSchedule():
+    day = request.json['date'].split('-')
+    day = date(int(day[0]), int(day[1]), int(day[2]))
+    classList = classListFromDate(day)
+    return json.dumps(classList)
+
+
 @views.route('/get_group_schedule/', methods=['POST'])
 def getGroupSchedule():
     msvList = []
 
     for data in request.json:
-        thisMSVList = getMSVList(data['msv'], data['name'], data['birth'], data['courseClass'], data['subjectCode'], data['subjectName'], data['subjectGroup'], data['credit'], data['note'])
+        thisMSVList = getMSVList(data['msv'], data['name'], data['birth'], data['courseClass'], data['subjectCode'],
+                                 data['subjectName'], data['subjectGroup'], data['credit'], data['note'])
         msvList.extend(x for x in thisMSVList if x not in msvList)
 
     timeTable = getTimeTableFull(msvList)

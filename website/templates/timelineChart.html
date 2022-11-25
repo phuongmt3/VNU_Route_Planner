@@ -1,0 +1,49 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Timeline | VNU Route Planner</title>
+    <link rel="icon" type="image/x-icon"
+    href="https://preview.redd.it/2yv5x9hto5f61.png?width=341&format=png&auto=webp&s=eccf34f646917d5a7c0196de5c2fc2e7ef3e2427">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="../static/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        var lop = {{ lop| safe }};
+        var giangduong = {{ gd| safe}};
+        var week = {{ week| safe}}
+    </script>
+</head>
+<body>
+    <nav class="navbar navbar-dark justify-content-between" style="background-color:rgb(120,194,173);">
+        <div class="navbar-nav-scroll">
+            <ul class="navbar-nav bd-navbar-nav flex-row" style="padding-left:40;">
+              <li class="nav-item">
+                <a class="nav-link" href="/" style="font-size:20;">Home</a>
+              </li>
+            </ul>
+        </div>
+
+        <div class="col-3 navbar-text" style="color:white; text-align:right;">
+            <p id="weekNum" class="h4">Week
+                {% if week > 0 %}
+                    {{ week }}
+                {% else %}
+                    Out of semester
+                {% endif %}
+            </p>
+        </div>
+
+      <div class="form-inline col-3" style="padding-right:40;">
+          <input type="date" id="chooseDate" class="form-control" style="background-color:#E8E8E8;">
+      </div>
+    </nav>
+
+    <div id="plotly-div"></div>
+    <script type="text/javascript" src="../static/javascript/timelineChart.js"></script>
+</body>
+</html>
