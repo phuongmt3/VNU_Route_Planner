@@ -118,11 +118,11 @@ def home():
                            placeList=json.dumps(placeList), markerList=json.dumps(markerList, cls=DecimalEncoder))
 
 
-@views.route('/chart', methods=['GET'])
+@views.route('/timelineChart', methods=['GET'])
 def chart():
     today = date.today()
     classList = classListFromDate(today)
-    return render_template('chart.html', lop=json.dumps(classList[0]), gd=classList[1], week=classList[2])
+    return render_template('timelineChart.html', lop=json.dumps(classList[0]), gd=classList[1], week=classList[2])
 
 
 @views.route('/chart/findSchedule', methods=['POST', 'GET'])

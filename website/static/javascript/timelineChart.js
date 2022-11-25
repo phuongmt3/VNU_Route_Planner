@@ -1,4 +1,3 @@
-console.log(lop)
 if ($('#chooseDate').val() === "")
     document.getElementById('chooseDate').valueAsDate = new Date();
 
