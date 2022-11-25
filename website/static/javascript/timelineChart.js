@@ -134,7 +134,8 @@ function drawChart() {
           range: [390, 1260],
           showgrid: true,
           tickvals: tickval,
-          ticktext: ticktext
+          ticktext: ticktext,
+          fixedrange: true
       },
       yaxis: {
         title: {
@@ -145,6 +146,7 @@ function drawChart() {
           }
         },
         automargin: true,
+        fixedrange: true
       },
       shapes: [{
         type: 'line',
@@ -229,9 +231,10 @@ function drawChart() {
     var t = myPlot._fullLayout.margin.t;
     var marginLeft = parseInt($(".user-select-none").css("margin-left").split("p")[0]);
 
-    myPlot.addEventListener('click', e => {
-        if (e instanceof PointerEvent)
+    myPlot.addEventListener('contextmenu', e => {
+        if (e.y <= 150 || e.x <= 100 || e.x >= 1200)
             return;
+        e.preventDefault();
         var x = xaxis.p2c(e.x - marginLeft - l);
         var y = yaxis.p2c(e.y - marginLeft - t);
         Plotly.relayout('plotly-div', {'shapes[0].x0': x, 'shapes[0].x1': x});

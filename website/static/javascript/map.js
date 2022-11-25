@@ -113,14 +113,14 @@ L.control.slideMenu(`
             </h2>
             <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample" style="">
             <div class="accordion-body list-group">
-                <a href="http://127.0.01:5000/calendar_overlap" class="list-group-item list-group-item-action flex-column align-items-start active">
+                <a href="/calendar_overlap" class="list-group-item list-group-item-action flex-column align-items-start active">
                     <div class="d-flex w-100 justify-content-between">
                         <h5 class="mb-1">Calendar Overlap</h5>
                     </div>
                     <small>Kết hợp thời gian biểu của 1 nhóm người nhất định để tìm thời gian thích hợp nhất (VD: tìm thời gian học bù tốt nhất).</small>
                 </a>
                 <br>
-                <a href="http://127.0.01:5000/timelineChart" class="list-group-item list-group-item-action flex-column align-items-start active">
+                <a href="/timelineChart" class="list-group-item list-group-item-action flex-column align-items-start active">
                     <div class="d-flex w-100 justify-content-between">
                         <h5 class="mb-1">Class Timeline</h5>
                     </div>
