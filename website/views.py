@@ -15,8 +15,7 @@ def getStudentSchedule(msv):
     mycursor.execute("SELECT * FROM sinhvien WHERE MSV = (%s)", (msv,))
     data = mycursor.fetchone()
     if data:
-        subjectList = getSubjectList(msv)
-        timeTable = getTimeTable(subjectList)
+        timeTable = getTimeTable(msv)
         notification = "Success Welcome " + data[1]
     else:
         notification = "Warning Not found " + msv
