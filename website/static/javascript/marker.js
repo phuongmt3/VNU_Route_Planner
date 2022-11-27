@@ -112,6 +112,14 @@ export function renderMarkers(map, markerList, placeList, foodGroup, souvenirGro
         });
         $(document).on('click','.postPlace',function() {
             thisMarker.closePopup();
+
+            let placeName = this.id;
+            let popupContent = thisMarker.getPopup().getContent();
+            if (popupContent.includes(`<button type="button" id="` + placeName + `" class="postPlace btn btn-outline-success ms-2">Visit</button>`)) {
+                thisMarker.setPopupContent(`<button type="button" id="` + placeName + `" class="postPlace btn btn-outline-danger ms-2">Unvisit</button>`)
+            } else if (popupContent.includes(`<button type="button" id="` + placeName + `" class="postPlace btn btn-outline-danger ms-2">Unvisit</button>`)) {
+                thisMarker.setPopupContent(`<button type="button" id="` + placeName + `" class="postPlace btn btn-outline-success ms-2">Visit</button>`)
+            }
         });
     });
 }
