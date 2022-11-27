@@ -64,7 +64,7 @@ var developMode = L.easyButton({
                 $('.leaflet-container').css('cursor', 'crosshair');
             }
         }]
-}).addTo(map);
+});
 
 var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 
