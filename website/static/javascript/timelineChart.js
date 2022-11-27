@@ -163,7 +163,7 @@ function drawChart() {
       }],
       height: 650,
       hovermode: 'closest',
-      showlegend: false,
+      showlegend: false
     };
 
     Plotly.newPlot('plotly-div', setupData(), layout, {

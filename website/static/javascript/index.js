@@ -85,7 +85,7 @@ function split(str, sep, limit) {
 const searchStudent = async searchText => {
   currentFocus = -1;
 
-  const res = await fetch("http://127.0.0.1:5000/list_student.json");
+  const res = await fetch("/list_student.json");
   const listStudent = await res.json();
 
   let matches = listStudent.filter(student => {

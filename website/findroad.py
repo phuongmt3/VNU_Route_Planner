@@ -15,7 +15,7 @@ class DecimalEncoder(json.JSONEncoder):
 
 class Road:
     def __init__(self):
-        self.placesByTime = []
+        self.placesByTime = [1, 1]
         self.distance = 0
         self.posList = []
 
@@ -232,7 +232,7 @@ def nearestRoad(newpos):
             heapq.heappush(disToPoint, (kc, p[0]))
 
     neareastPoints = []
-    roadlimit = 10
+    roadlimit = 20
     minDis = 100000
     ida = 0
     idb = 0

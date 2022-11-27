@@ -290,6 +290,8 @@ function selectCurEvent() {
             findRoute(nearEvents[0].extendedProps.place, "Cổng chính ĐHQGHN");
         else if (next)
             findRoute("Cổng chính ĐHQGHN", nearEvents[1].extendedProps.place);
+        else
+            findRoute("Cổng chính ĐHQGHN", "Cổng chính ĐHQGHN");
     }
 }
 
