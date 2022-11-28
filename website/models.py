@@ -5,12 +5,12 @@ import mysql.connector
 load_dotenv()
 
 db = mysql.connector.connect(
-    host=os.getenv("HOST"),
-    user=os.getenv("USERNAME"),
-    passwd=os.getenv("PASSWORD"),
-    db=os.getenv("DATABASE"),
+    host=os.getenv("PLANETSCALE_DB_HOST"),
+    user=os.getenv("PLANETSCALE_DB_USERNAME"),
+    passwd=os.getenv("PLANETSCALE_DB_PASSWORD"),
+    db=os.getenv("PLANETSCALE_DB"),
     ssl_verify_identity=True,
-    ssl_ca='/etc/pki/tls/certs/ca-bundle.crt'
+    ssl_ca=os.getenv('PLANETSCALE_SSL_CERT_PATH'),
 )
 
 '''db = mysql.connector.connect(
