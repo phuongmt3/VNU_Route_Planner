@@ -7,10 +7,10 @@ load_dotenv()
 db = mysql.connector.connect(
     host=os.getenv("PLANETSCALE_DB_HOST"),
     user=os.getenv("PLANETSCALE_DB_USERNAME"),
-    passwd=os.getenv("PLANETSCALE_DB_PASSWORD"),
-    db=os.getenv("PLANETSCALE_DB"),
-    ssl_verify_identity=True,
-    ssl_ca=os.getenv('PLANETSCALE_SSL_CERT_PATH'),
+    password=os.getenv("PLANETSCALE_DB_PASSWORD"),
+    database=os.getenv("PLANETSCALE_DB"),
+    #ssl_verify_identity=True,
+    ssl_ca=os.getenv('PLANETSCALE_SSL_CERT_PATH')
 )
 
 '''db = mysql.connector.connect(

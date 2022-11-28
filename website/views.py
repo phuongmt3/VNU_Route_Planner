@@ -12,7 +12,7 @@ def getStudentSchedule(msv):
     timeTable = []
     notification = ''
 
-    mycursor.execute("SELECT * FROM sinhvien WHERE MSV = (%s)", (msv,))
+    mycursor.execute("SELECT * FROM sinhvien WHERE `MSV` = (%s)", (msv,))
     data = mycursor.fetchone()
     if data:
         timeTable = getTimeTable(msv)
@@ -25,7 +25,7 @@ def getStudentSchedule(msv):
 
 @views.route('/list_student.json', methods=['GET'])
 def getListStudent():
-    mycursor.execute("select MSV, Tên from sinhvien")
+    mycursor.execute("select `MSV`, `Tên` from sinhvien")
     data = mycursor.fetchall()
 
     return json.dumps(data, default=str)
