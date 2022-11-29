@@ -1,9 +1,9 @@
 import math
 from queue import PriorityQueue
 import heapq
-from .models import mycursor, db
 import json
 import decimal
+from .init import *
 
 
 class DecimalEncoder(json.JSONEncoder):
@@ -34,7 +34,7 @@ class Road:
                 self.addPlace(visit)
 
         trackingList = self.getTrackingList()
-        self.posList = [[posX[i], posY[i]] for i in trackingList]
+        self.posList = [[points[i][2], points[i][3]] for i in trackingList]
 
     # Get Id of places from start to end
     def getTrackingList(self):
@@ -67,7 +67,7 @@ class Road:
         self.placesByTime.insert(posToAdd, addedId)
 
         trackingList = self.getTrackingList()
-        self.posList = [[posX[i], posY[i]] for i in trackingList]
+        self.posList = [[points[i][2], points[i][3]] for i in trackingList]
 
     # Remove place from placesByTime and update distance, posList
     def removePlace(self, removeId):
@@ -81,31 +81,10 @@ class Road:
         self.placesByTime.remove(removeId)
 
         trackingList = self.getTrackingList()
-        self.posList = [[posX[i], posY[i]] for i in trackingList]
+        self.posList = [[points[i][2], points[i][3]] for i in trackingList]
 
     def reset(self):
         self.placesByTime = []
-
-
-def initGlobal():
-    global posX, posY
-    mycursor.execute("select * from `points`")
-    data = mycursor.fetchall()
-
-    posX = [0.0]
-    posY = [0.0]
-    for d in data:
-        posX.append(float(d[3]))
-        posY.append(float(d[4]))
-
-
-def initRoad(showedPlaceList=[], placeNames=[""]):
-    mycursor.execute("select * from `points`")
-    data = mycursor.fetchall()
-    for d in data:
-        if d[2] > 0:
-            showedPlaceList.append(d[0])
-        placeNames.append(d[1])
 
 
 def resetDijkstraTable():
@@ -120,15 +99,6 @@ def resetDijkstraTable():
     db.commit()
 
 
-def realDistanceP_P(p1, p2):
-    mycursor.execute("select `distance` from `distance` where `id1`=%s and `id2`=%s", (p1, p2))
-    data = mycursor.fetchone()
-    if not data:
-        mycursor.execute("select `distance` from `distance` where `id1`=%s and `id2`=%s", (p2, p1))
-        data = mycursor.fetchone()
-    return data[0]
-
-
 def dijkstra(id1, id2):
     if id1 == id2:
         return 0
@@ -136,14 +106,12 @@ def dijkstra(id1, id2):
     ans = mycursor.fetchone()
 
     if not ans:
-        mycursor.execute("select Count(*) from `points`")
-        data = mycursor.fetchone()
         pq = PriorityQueue()
-        finished = [False] * (data[0] + 1)
-        isMin = [False] * (data[0] + 1)  # to not rerun the old roads when min distance is reached in previous steps
+        finished = [False] * (len(points) + 1)
+        isMin = [False] * (len(points) + 1)  # to not rerun the old roads when min distance is reached in previous steps
         kc = [(0, 0, 0)]  # (curMinKc, thisID, trackingID)
 
-        for i in range(data[0]):
+        for i in range(len(points)):
             kc.append((1000000, i + 1, -1))
         kc[id1] = (0, id1, 0)
         finished[id1] = True
@@ -167,16 +135,12 @@ def dijkstra(id1, id2):
             oldaim = cur[1]
             aim = cur[2]
             minkc = 0
-            mycursor.execute("select `main` from `points` where `id` = %s", (cur[1],))
-            cur1id = mycursor.fetchone()[0]
             while aim != 0:
-                minkc += realDistanceP_P(aim, oldaim)
-                mycursor.execute("select `main` from `points` where `id` = %s", (aim,))
-                aimid = mycursor.fetchone()[0]
-                if cur1id > 0:
+                minkc += distance[aim][oldaim]
+                if points[cur[1]][1] > 0:
                     mycursor.execute("insert ignore into `dijkstra` value (%s, %s, %s, %s)",
                                      (cur[1], aim, minkc, oldaim))
-                if aimid > 0:
+                if points[aim][1] > 0:
                     mycursor.execute("insert ignore into `dijkstra` value (%s, %s, %s, %s)",
                                      (aim, cur[1], minkc, cur[2]))
                 oldaim = aim
@@ -187,25 +151,18 @@ def dijkstra(id1, id2):
                 return cur[0]
 
             # add nextID to pq
-            mycursor.execute("select * from `distance` where `id1`=%s or `id2`=%s", (cur[1], cur[1]))
-            data = mycursor.fetchall()
-            for i in data:
-                nextID = i[0]
-                if i[0] == cur[1]:
-                    nextID = i[1]
-                if finished[nextID] or isMin[nextID]:
-                    continue
+            for nextID in range(0, len(distance[cur[1]])):
+                if distance[cur[1]][nextID] > 0:
+                    if finished[nextID] or isMin[nextID]:
+                        continue
 
-                # check if nextID is a main place or not
-                mycursor.execute("select * from `points` where `id`=%s", (nextID,))
+                    # check if nextID is a main place or not
+                    if points[nextID][2] == 1 and nextID != id1 and nextID != id2:
+                        continue
 
-                po = mycursor.fetchone()
-                if po[2] == 1 and nextID != id1 and nextID != id2:
-                    continue
-
-                if kc[nextID][0] > kc[cur[1]][0] + i[2]:
-                    kc[nextID] = (kc[cur[1]][0] + i[2], nextID, cur[1])
-                    pq.put(kc[nextID])
+                    if kc[nextID][0] > kc[cur[1]][0] + distance[cur[1]][nextID]:
+                        kc[nextID] = (kc[cur[1]][0] + distance[cur[1]][nextID], nextID, cur[1])
+                        pq.put(kc[nextID])
         return -1
 
     # if answer is already existed
@@ -227,8 +184,8 @@ def nearestRoad(newpos):
     points = mycursor.fetchall()
     for p in points:
         if p[2] != 1:
-            kc = (newpos[0] - posX[p[0]]) * (newpos[0] - posX[p[0]]) + (newpos[1] - posY[p[0]]) * (
-                    newpos[1] - posY[p[0]])
+            kc = (newpos[0] - points[p[0]][2]) * (newpos[0] - points[p[0]][2]) + (newpos[1] - points[p[0]][3]) * (
+                    newpos[1] - points[p[0]][3])
             heapq.heappush(disToPoint, (kc, p[0]))
 
     neareastPoints = []
@@ -252,8 +209,8 @@ def nearestRoad(newpos):
 
             if existRoad1 or existRoad2:
                 roadlimit -= 1
-                pa = [posX[p[1]], posY[p[1]]]
-                pb = [posX[t[1]], posY[t[1]]]
+                pa = [points[p[1]][2], points[p[1]][3]]
+                pb = [points[t[1]][2], points[t[1]][3]]
                 curdis = coorDistanceP_Road(pa, pb, newpos)
                 shadowP = shadowPoint(pa, pb, newpos)
                 if curdis < minDis and pointBetween2Points(pa, pb, shadowP):
@@ -267,8 +224,8 @@ def nearestRoad(newpos):
 
 
 def addNewPointsIntoDB(ida, idb, pc, ph):
-    disAB = realDistanceP_P(ida, idb)
-    kcDonVi = disAB / coorDistanceP_P([posX[ida], posY[ida]], [posX[idb], posY[idb]])
+    disAB = distance[ida][idb]
+    kcDonVi = disAB / coorDistanceP_P([points[ida][2], points[ida][3]], [points[idb][2], points[idb][3]])
 
     mycursor.execute("SELECT MAX(`id`) FROM `points`")
     newid = mycursor.fetchone()[0] + 1
@@ -276,7 +233,7 @@ def addNewPointsIntoDB(ida, idb, pc, ph):
     mycursor.execute("INSERT INTO `points` VALUE (%s, %s, %s, %s, %s)", (newid + 1, "", 0, ph[0], ph[1]))
     db.commit()
 
-    disAH = kcDonVi * coorDistanceP_P([posX[ida], posY[ida]], ph)
+    disAH = kcDonVi * coorDistanceP_P([points[ida][2], points[ida][3]], ph)
     disCH = kcDonVi * coorDistanceP_P(pc, ph)
 
     mycursor.execute("INSERT INTO `distance` VALUE (%s, %s, %s)", (ida, newid + 1, disAH))

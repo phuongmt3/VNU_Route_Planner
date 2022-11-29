@@ -9,7 +9,6 @@ db = mysql.connector.connect(
     user=os.getenv("PLANETSCALE_DB_USERNAME"),
     password=os.getenv("PLANETSCALE_DB_PASSWORD"),
     database=os.getenv("PLANETSCALE_DB"),
-    #ssl_verify_identity=True,
     ssl_ca=os.getenv('PLANETSCALE_SSL_CERT_PATH')
 )
 
