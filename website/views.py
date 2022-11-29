@@ -11,22 +11,22 @@ road = Road()
 def getStudentSchedule(msv):
     timeTable = []
     notification = ''
+    msv = int(msv)
 
-    mycursor.execute("SELECT * FROM sinhvien WHERE MSV = (%s)", (msv,))
-    data = mycursor.fetchone()
-    if data:
+    if sinhvien[msv] != '':
         timeTable = getTimeTable(msv)
-        notification = "Success Welcome " + data[1]
+        notification = "Success Welcome " + sinhvien[msv]
     else:
-        notification = "Warning Not found " + msv
+        notification = "Warning Not found " + str(msv)
 
     return json.dumps([timeTable, notification])
 
 
 @views.route('/list_student.json', methods=['GET'])
 def getListStudent():
-    mycursor.execute("select MSV, Tên from sinhvien")
-    data = mycursor.fetchall()
+    data = []
+    for msv in sinhvien:
+        data.append([msv, sinhvien[msv]])
 
     return json.dumps(data, default=str)
 
@@ -47,45 +47,40 @@ def addPlace():
 @views.route('/find_path/<name1>/<name2>', methods=['GET'])
 def findPath(name1, name2):
     # Get id from name
-    mycursor.execute("select `id` from `points` where `main` > 0 and `name` = %s", (name1,))
-    data = mycursor.fetchone()
-    if not data:
-        return []
-    startID = int(str(data[0]))
-
-    mycursor.execute("select `id` from `points` where `main` > 0 and `name` = %s", (name2,))
-    data = mycursor.fetchone()
-    if not data:
-        return []
-    endID = int(str(data[0]))
+    startID = 1
+    endID = 1
+    for i in range(1, len(points)):
+        if points[i][0] == name1:
+            startID = i
+        if points[i][0] == name2:
+            endID = i
 
     road.reset()
     road.calculate(startID, endID)
 
-    mycursor.execute("select Count(*) from `dijkstra`")
-    dbSize = mycursor.fetchone()[0]
-
-    return json.dumps([road.posList, round(road.distance, 3), dbSize], cls=DecimalEncoder)
+    return json.dumps([road.posList, round(road.distance, 3)], cls=DecimalEncoder)
 
 
 @views.route('/post_place/<name>', methods=['POST'])
 def postPlace(name):
     # Get id from name
-    mycursor.execute("select `id`, `main` from `points` where `main` > 0 and `name` = %s", (name,))
-    data = mycursor.fetchone()
-    thisPlaceId = int(str(data[0]))
+    thisPlaceId = 0
+    for i in range(1, len(points)):
+        if points[i][0] == name:
+            thisPlaceId = i
+            break
 
-    if thisPlaceId is road.placesByTime[0] or thisPlaceId is road.placesByTime[-1]:
+    if thisPlaceId == 0 or thisPlaceId is road.placesByTime[0] or thisPlaceId is road.placesByTime[-1]:
         return []
 
     # Switch gate start/ end
-    if data[1] == 2:
-        mycursor.execute("select `main` from `points` where `id` = %s", (road.placesByTime[0],))
-        if mycursor.fetchone()[0] == 2:
-            road.calculate(thisPlaceId, road.placesByTime[-1])
+    if points[thisPlaceId][1] == 2:
+        startPointID = points[road.placesByTime[0]][1]
+        endPointID = points[road.placesByTime[-1]][1]
 
-        mycursor.execute("select `main` from `points` where `id` = %s", (road.placesByTime[-1],))
-        if mycursor.fetchone()[0] == 2:
+        if startPointID == 2:
+            road.calculate(thisPlaceId, road.placesByTime[-1])
+        if endPointID == 2:
             road.calculate(road.placesByTime[0], thisPlaceId)
 
     if thisPlaceId not in road.placesByTime:
@@ -93,10 +88,7 @@ def postPlace(name):
     else:
         road.removePlace(thisPlaceId)
 
-    mycursor.execute("select Count(*) from `dijkstra`")
-    dbSize = mycursor.fetchone()[0]
-
-    return json.dumps([road.posList, round(road.distance, 3), dbSize], cls=DecimalEncoder)
+    return json.dumps([road.posList, round(road.distance, 3)], cls=DecimalEncoder)
 
 
 @views.route('/', methods=['GET', 'POST'])
@@ -107,8 +99,11 @@ def home():
     placeNames = [""]
     initRoad(showedPlaceList, placeNames)
 
-    mycursor.execute("SELECT name, posY, posX, main FROM points WHERE main > 1")
-    markerList = mycursor.fetchall()
+    markerList = []
+    for p in points:
+        if p == 0:
+            continue
+        markerList.append((p[0], p[2], p[3], p[1]))
 
     mycursor.execute("SELECT * FROM diadiem")
     data = mycursor.fetchall()

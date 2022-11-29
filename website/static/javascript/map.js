@@ -165,7 +165,7 @@ $(document).on('click','.postPlace',function() {
             renderRoad(map, response[0], response[1]);
             selectPlace(placeName);
 
-            console.log("Database' size = " + response[2]);
+            console.log("found road");
         });
 });
 
@@ -215,7 +215,7 @@ export function findPath(name1, name2) {
             
             clearRoad();
             renderRoad(map, response[0], response[1]);
-            console.log("Database' size = " + response[2]);
+            console.log("Found road");
         });
 }
 
