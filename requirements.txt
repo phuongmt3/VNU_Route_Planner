@@ -3,7 +3,6 @@ Flask==2.2.2
 gunicorn==20.1.0
 itsdangerous==2.1.2
 Jinja2==3.1.2
-lxml==4.9.1
 MarkupSafe==2.1.1
 mysql==0.0.3
 mysql-connector-python==8.0.31
@@ -20,7 +19,6 @@ pycodestyle==2.8.0
 pydocstyle==6.1.1
 pyflakes==2.4.0
 pylint==2.14.5
-pyls-mypy==0.1.8+6.g3b105b4
 pyparsing==3.0.9
 python-dateutil==2.8.2
 python-docx==0.8.11
@@ -43,3 +41,4 @@ typing_extensions==4.3.0
 ujson==5.4.0
 urllib3==1.26.9
 Werkzeug==2.2.2
+PyMySQL~=1.0.2
