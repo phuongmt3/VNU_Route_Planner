@@ -23,12 +23,12 @@ class Road:
     def calculate(self, startID, endID):
         if len(self.placesByTime) < 2:
             self.placesByTime = [startID, endID]
-            self.distance = dijkstra(startID, endID)
+            self.distance = runDijkstra(startID, endID)
         else:
             visitList = self.placesByTime[1:-1]
 
             self.placesByTime = [startID, endID]
-            self.distance = dijkstra(startID, endID)
+            self.distance = runDijkstra(startID, endID)
 
             for visit in visitList:
                 self.addPlace(visit)
@@ -42,23 +42,21 @@ class Road:
         for i in range(len(self.placesByTime) - 1, 0, -1):
             aim = self.placesByTime[i]
             while aim != self.placesByTime[i - 1]:
-                mycursor.execute("select * from `dijkstra` where id1=%s and id2=%s", (self.placesByTime[i - 1], aim))
-                data = mycursor.fetchone()
-                trackingList.append(data[3])
-                aim = data[3]
+                trackingList.append(dijkstra[self.placesByTime[i - 1]][aim][1])
+                aim = dijkstra[self.placesByTime[i - 1]][aim][1]
         trackingList.reverse()
         return trackingList
 
     # Add place to placesByTime and update distance, posList
     def addPlace(self, addedId):
-        distanceAns = self.distance - dijkstra(self.placesByTime[0], self.placesByTime[1]) \
-                      + dijkstra(self.placesByTime[0], addedId) \
-                      + dijkstra(addedId, self.placesByTime[1])
+        distanceAns = self.distance - runDijkstra(self.placesByTime[0], self.placesByTime[1]) \
+                      + runDijkstra(self.placesByTime[0], addedId) \
+                      + runDijkstra(addedId, self.placesByTime[1])
         posToAdd = 1
         for i in range(1, len(self.placesByTime) - 1):
-            newDistance = self.distance - dijkstra(self.placesByTime[i], self.placesByTime[i + 1]) \
-                          + dijkstra(self.placesByTime[i], addedId) \
-                          + dijkstra(addedId, self.placesByTime[i + 1])
+            newDistance = self.distance - runDijkstra(self.placesByTime[i], self.placesByTime[i + 1]) \
+                          + runDijkstra(self.placesByTime[i], addedId) \
+                          + runDijkstra(addedId, self.placesByTime[i + 1])
             if newDistance < distanceAns:
                 distanceAns = newDistance
                 posToAdd = i + 1
@@ -74,9 +72,9 @@ class Road:
         index = self.placesByTime.index(removeId)
         if index == 0 or index == len(self.placesByTime) - 1:
             return
-        self.distance = self.distance + dijkstra(self.placesByTime[index - 1], self.placesByTime[index + 1]) \
-                        - dijkstra(self.placesByTime[index - 1], removeId) \
-                        - dijkstra(removeId, self.placesByTime[index + 1])
+        self.distance = self.distance + runDijkstra(self.placesByTime[index - 1], self.placesByTime[index + 1]) \
+                        - runDijkstra(self.placesByTime[index - 1], removeId) \
+                        - runDijkstra(removeId, self.placesByTime[index + 1])
 
         self.placesByTime.remove(removeId)
 
@@ -99,74 +97,86 @@ def resetDijkstraTable():
     db.commit()
 
 
-def dijkstra(id1, id2):
+def runDijkstra(id1, id2):
     if id1 == id2:
         return 0
-    mycursor.execute("select `minDistance` from `dijkstra` where `id1`=(%s) and `id2`=(%s)", (id1, id2))
-    ans = mycursor.fetchone()
 
-    if not ans:
-        pq = PriorityQueue()
-        finished = [False] * (len(points) + 1)
-        isMin = [False] * (len(points) + 1)  # to not rerun the old roads when min distance is reached in previous steps
-        kc = [(0, 0, 0)]  # (curMinKc, thisID, trackingID)
+    ans = dijkstra[id1][id2]
+    if ans != 0:
+        return ans[0]
 
-        for i in range(len(points)):
-            kc.append((1000000, i + 1, -1))
-        kc[id1] = (0, id1, 0)
-        finished[id1] = True
-        isMin[id1] = True
+    pq = PriorityQueue()
+    addDBList = []
+    finished = [False] * (len(points) + 1)
+    isMin = [False] * (len(points) + 1)  # to not rerun the old roads when min distance is reached in previous steps
+    kc = [(0, 0, 0)]  # (curMinKc, thisID, trackingID)
 
-        # put all adjacent places of startID into pq
-        mycursor.execute("select * from `dijkstra` where `id1`=%s", (id1,))
-        data = mycursor.fetchall()
-        for k in data:
-            kc[k[1]] = (k[2], k[1], k[3])
-            pq.put(kc[k[1]])
-            isMin[k[1]] = True
+    for i in range(len(points)):
+        kc.append((1000000, i + 1, -1))
+    kc[id1] = (0, id1, 0)
+    finished[id1] = True
+    isMin[id1] = True
 
-        while not pq.empty():
-            cur = pq.get()
-            if finished[cur[1]]:
-                continue
-            finished[cur[1]] = True
+    # put all adjacent places of startID into pq
+    for nextID in range(1, len(points)):
+        if dijkstra[id1][nextID] == 0:
+            continue
+        kc[nextID] = (dijkstra[id1][nextID][0], nextID, dijkstra[id1][nextID][1])
+        pq.put(kc[nextID])
+        isMin[nextID] = True
 
-            # save calculated min roads into dijkstra table
-            oldaim = cur[1]
-            aim = cur[2]
-            minkc = 0
-            while aim != 0:
-                minkc += distance[aim][oldaim]
-                if points[cur[1]][1] > 0:
-                    mycursor.execute("insert ignore into `dijkstra` value (%s, %s, %s, %s)",
-                                     (cur[1], aim, minkc, oldaim))
-                if points[aim][1] > 0:
-                    mycursor.execute("insert ignore into `dijkstra` value (%s, %s, %s, %s)",
-                                     (aim, cur[1], minkc, cur[2]))
-                oldaim = aim
-                aim = kc[aim][2]
-            db.commit()
+    while not pq.empty():
+        cur = pq.get()
+        if finished[cur[1]]:
+            continue
+        finished[cur[1]] = True
 
-            if cur[1] == id2:
-                return cur[0]
+        # save calculated min roads into dijkstra table
+        oldaim = cur[1]
+        aim = cur[2]
+        minkc = 0
+        while aim != 0:
+            minkc += distance[aim][oldaim]
+            if points[cur[1]][1] > 0 and dijkstra[cur[1]][aim] == 0:
+                addDBList.append((cur[1], aim, minkc, oldaim))
+                dijkstra[cur[1]][aim] = (minkc, oldaim)
+            if points[aim][1] > 0 and dijkstra[aim][cur[1]] == 0:
+                addDBList.append((aim, cur[1], minkc, cur[2]))
+                dijkstra[aim][cur[1]] = (minkc, cur[2])
+            oldaim = aim
+            aim = kc[aim][2]
 
-            # add nextID to pq
-            for nextID in range(0, len(distance[cur[1]])):
-                if distance[cur[1]][nextID] > 0:
-                    if finished[nextID] or isMin[nextID]:
-                        continue
+        if cur[1] == id2:
+            if len(addDBList) > 0:
+                executeStr = "insert into `dijkstra` values " + tupleToString(addDBList[0])
+                for i in range(1, len(addDBList)):
+                    executeStr += ',' + tupleToString(addDBList[i])
+                db.commit()
+            return cur[0]
 
-                    # check if nextID is a main place or not
-                    if points[nextID][2] == 1 and nextID != id1 and nextID != id2:
-                        continue
+        # add nextID to pq
+        for nextID in range(0, len(distance[cur[1]])):
+            if distance[cur[1]][nextID] > 0:
+                if finished[nextID] or isMin[nextID]:
+                    continue
 
-                    if kc[nextID][0] > kc[cur[1]][0] + distance[cur[1]][nextID]:
-                        kc[nextID] = (kc[cur[1]][0] + distance[cur[1]][nextID], nextID, cur[1])
-                        pq.put(kc[nextID])
-        return -1
+                # check if nextID is a main place or not
+                if points[nextID][2] == 1 and nextID != id1 and nextID != id2:
+                    continue
 
-    # if answer is already existed
-    return ans[0]
+                if kc[nextID][0] > kc[cur[1]][0] + distance[cur[1]][nextID]:
+                    kc[nextID] = (kc[cur[1]][0] + distance[cur[1]][nextID], nextID, cur[1])
+                    pq.put(kc[nextID])
+
+    return -1
+
+
+def tupleToString(t):
+    ans = '(' + str(t[0])
+    for i in range(1, len(t)):
+        ans += ',' + str(i)
+    ans += ')'
+    return ans
 
 
 def havePointInDB(p):
