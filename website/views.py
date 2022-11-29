@@ -47,16 +47,13 @@ def addPlace():
 @views.route('/find_path/<name1>/<name2>', methods=['GET'])
 def findPath(name1, name2):
     # Get id from name
-    startID = 0
-    endID = 0
+    startID = 1
+    endID = 1
     for i in range(1, len(points)):
         if points[i][0] == name1:
             startID = i
         if points[i][0] == name2:
             endID = i
-
-    if startID == 0 or endID == 0:
-        return []
 
     road.reset()
     road.calculate(startID, endID)
