@@ -68,6 +68,8 @@ calendar.on('eventClick', function(e) {
 });
 
 // Search student /////////////////////////////////////////////////////////////////////////////////////
+const res = await fetch("/list_student.json");
+const listStudent = await res.json();
 const studentSearchEl = document.getElementById("student_search");
 const matchList = document.getElementById("match-list");
 let currentFocus;
@@ -82,11 +84,8 @@ function split(str, sep, limit) {
     return "";
 }
 
-const searchStudent = async searchText => {
+const searchStudent = searchText => {
   currentFocus = -1;
-
-  const res = await fetch("/list_student.json");
-  const listStudent = await res.json();
 
   let matches = listStudent.filter(student => {
     const regex = new RegExp(`^${searchText}`, 'gi');
