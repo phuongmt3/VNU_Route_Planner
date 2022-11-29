@@ -41,4 +41,3 @@ typing_extensions==4.3.0
 ujson==5.4.0
 urllib3==1.26.9
 Werkzeug==2.2.2
-PyMySQL~=1.0.2
