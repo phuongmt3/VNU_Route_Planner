@@ -186,21 +186,20 @@ def getTimeTableFull(msvList):
     totStudent = len(msvList)
 
     timeTable = [[[0 for j in range(totLesson)] for i in range(totDayOfWeek)] for k in range(totWeek)]
-
-    mycursor.execute(
-        "SELECT lmh.Nhóm, lmh.Tuần, lmh.Thứ, lmh.Tiết, lmh.Mã_HP, lmh.Mã_LHP, sub.studentRate FROM lopmonhoc lmh\
-        INNER JOIN (\
-            SELECT `Mã_HP`, `Mã_LHP`, `Nhóm`, COUNT(1) / %s AS studentRate FROM dangky WHERE MSV IN (" + ','.join(msvList) + ")\
-            GROUP BY `Mã_HP`, `Mã_LHP`, `Nhóm`) sub\
-        ON lmh.Mã_HP = sub.Mã_HP AND lmh.Mã_LHP = sub.Mã_LHP AND (lmh.Nhóm = 'CL' OR lmh.Nhóm = sub.Nhóm);"
-        , (str(totStudent),))
+    executeText = "SELECT lmh.`Nhóm`, lmh.`Tuần`, lmh.`Thứ`, lmh.`Tiết`, lmh.`Mã_HP`, lmh.`Mã_LHP`, sub.`studentRate` FROM lopmonhoc lmh\
+                INNER JOIN (\
+                    SELECT `Mã_HP`, `Mã_LHP`, `Nhóm`, COUNT(1) / " + str(totStudent) + " AS studentRate FROM dangky WHERE MSV IN (" + ','.join(msvList) + ")\
+                    GROUP BY `Mã_HP`, `Mã_LHP`, `Nhóm`) sub\
+                ON lmh.`Mã_HP` = sub.`Mã_HP` AND lmh.`Mã_LHP` = sub.`Mã_LHP` AND (lmh.`Nhóm` = 'CL' OR lmh.`Nhóm` = sub.`Nhóm`);"
+    
+    mycursor.execute(executeText)
     dataFromLopmonhoc = mycursor.fetchall()
 
     for itemLopmonhoc in dataFromLopmonhoc:  
         week = itemLopmonhoc[1]
         day = itemLopmonhoc[2]
         time = itemLopmonhoc[3]
-        parseLessonTime(timeTable, itemLopmonhoc[6], week, day, time)
+        parseLessonTime(timeTable, float(itemLopmonhoc[6]), week, day, time)
     return timeTable
 
 
