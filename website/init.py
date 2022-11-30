@@ -4,10 +4,13 @@ points = [0]
 distance = [0]
 sinhvien = {}
 dijkstra = [0]
+doneInit = False
 
 
 def initGlobal():
-    global distance
+    global doneInit
+    if doneInit:
+        return
 
     mycursor.execute("select * from `points`")
     data = mycursor.fetchall()
@@ -39,6 +42,8 @@ def initGlobal():
     data = mycursor.fetchall()
     for d in data:
         sinhvien[d[0]] = d[1]
+
+    doneInit = True
 
 
 def initRoad(showedPlaceList=[], placeNames=[""]):

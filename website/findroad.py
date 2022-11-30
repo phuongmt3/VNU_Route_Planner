@@ -21,7 +21,7 @@ class Road:
 
     # Update placesByTime, calculate distance, posList
     def calculate(self, startID, endID):
-        if len(self.placesByTime) < 2:
+        if len(self.placesByTime) <= 2:
             self.placesByTime = [startID, endID]
             self.distance = runDijkstra(startID, endID)
         else:
