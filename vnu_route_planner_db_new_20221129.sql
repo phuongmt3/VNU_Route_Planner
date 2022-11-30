@@ -336,7 +336,8 @@ DROP TABLE IF EXISTS `room`;
 CREATE TABLE `room` (
   `Mã_tòa_nhà` varchar(26) NOT NULL,
   `RoomNum` varchar(26) NOT NULL,
-  PRIMARY KEY (`Mã_tòa_nhà`,`RoomNum`)
+  PRIMARY KEY (`Mã_tòa_nhà`,`RoomNum`),
+  CONSTRAINT `fk_giangduong` FOREIGN KEY (`Mã_tòa_nhà`) REFERENCES `giangduong` (`Mã_tòa_nhà`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -387,4 +388,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-11-29 23:03:37
+-- Dump completed on 2022-11-30 21:17:51
