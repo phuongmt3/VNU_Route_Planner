@@ -115,6 +115,7 @@ def home():
 
 @views.route('/timelineChart', methods=['GET'])
 def chart():
+    initGlobal()
     today = date.today()
     classList = classListFromDate(today)
     return render_template('timelineChart.html', lop=json.dumps(classList[0]), gd=classList[1], week=classList[2])
@@ -145,6 +146,7 @@ def getGroupSchedule():
 
 @views.route('/calendar_overlap', methods=['GET', 'POST'])
 def calendarOverlap():
+    initGlobal()
     return render_template('calendar_overlap.html')
 
 
