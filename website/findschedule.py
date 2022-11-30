@@ -134,7 +134,7 @@ def getMSVList(msv, name, birth, courseClass, subjectCode, subjectName, subjectG
         msvList = mycursor.fetchall()
         return msvList
 
-    executeText = " SELECT DISTINCT sv.MSV FROM vnu_route_planner_db_new.sinhvien sv\
+    msvExecuteText = " SELECT DISTINCT sv.MSV FROM vnu_route_planner_db_new.sinhvien sv\
                     INNER JOIN vnu_route_planner_db_new.dangky dk\
                     ON sv.MSV = dk.MSV\
                     INNER JOIN vnu_route_planner_db_new.lopmonhoc lmh\
@@ -146,66 +146,61 @@ def getMSVList(msv, name, birth, courseClass, subjectCode, subjectName, subjectG
                     WHERE "
 
     if msv != '':
-        executeText += "sv.MSV LIKE '" + msv + "%' AND "
+        msvExecuteText += "sv.MSV LIKE '" + msv + "%' AND "
     if name != '':
-        executeText += "sv.`Tên` LIKE '%" + name + "%' AND "
+        msvExecuteText += "sv.`Tên` LIKE '%" + name + "%' AND "
     if birth != '':
         birth = birth.split('-')
-        executeText += "YEAR(sv.`Ngày_sinh`) = " + birth[0] + " AND "
+        msvExecuteText += "YEAR(sv.`Ngày_sinh`) = " + birth[0] + " AND "
         if len(birth) > 2:
-            executeText += "MONTH(sv.`Ngày_sinh`) = " + birth[1] + " AND "
-            executeText += "DAY(sv.`Ngày_sinh`) = " + birth[2] + " AND "
+            msvExecuteText += "MONTH(sv.`Ngày_sinh`) = " + birth[1] + " AND "
+            msvExecuteText += "DAY(sv.`Ngày_sinh`) = " + birth[2] + " AND "
 
     if courseClass != '':
-        executeText += "sv.`Lớp_khóa_học` LIKE '%" + courseClass + "%' AND "
+        msvExecuteText += "sv.`Lớp_khóa_học` LIKE '%" + courseClass + "%' AND "
     if subjectCode != '':
         subjectCode = subjectCode.split(' ')
-        executeText += "dk.`Mã_HP` = '" + subjectCode[0] + "' AND "
+        msvExecuteText += "dk.`Mã_HP` = '" + subjectCode[0] + "' AND "
         if len(subjectCode) > 1:
-            executeText += "dk.`Mã_LHP` = '" + subjectCode[1] + "' AND "
+            msvExecuteText += "dk.`Mã_LHP` = '" + subjectCode[1] + "' AND "
 
     if subjectName != '':
-        executeText += "mh.`Tên_môn_học` LIKE '%" + subjectName + "%' AND "
+        msvExecuteText += "mh.`Tên_môn_học` LIKE '%" + subjectName + "%' AND "
     if subjectGroup != '':
-        executeText += "dk.`Nhóm` = '" + subjectGroup + "' AND "
+        msvExecuteText += "dk.`Nhóm` = '" + subjectGroup + "' AND "
     if credit != '':
-        executeText += "mh.`Số_TC` = " + subjectGroup + " AND "
+        msvExecuteText += "mh.`Số_TC` = " + subjectGroup + " AND "
     if note != '':
-        executeText += "gc.`Nội_dung` = '" + note + "' AND "
+        msvExecuteText += "gc.`Nội_dung` = '" + note + "' AND "
 
-    executeText += "TRUE"
+    msvExecuteText += "TRUE"
 
-    mycursor.execute(executeText)
+    mycursor.execute(msvExecuteText)
     msvList = mycursor.fetchall()
 
     return msvList
 
 
 def getTimeTableFull(msvList):
-    msvList = [x[0] for x in msvList]
+    msvList = [str(x[0]) for x in msvList]
     totStudent = len(msvList)
 
     timeTable = [[[0 for j in range(totLesson)] for i in range(totDayOfWeek)] for k in range(totWeek)]
 
-    for msv in msvList:  # Duyệt các sinh viên
-        mycursor.execute("SELECT `Mã_HP`, `Mã_LHP`, `Nhóm` FROM dangky WHERE MSV = (%s)", (msv,))
-        dataFromDangky = mycursor.fetchall()
-        for itemDangky in dataFromDangky:  # Duyệt các môn học
-            HP = itemDangky[0]
-            LHP = itemDangky[1]
-            group = itemDangky[2]
+    mycursor.execute(
+        "SELECT lmh.Nhóm, lmh.Tuần, lmh.Thứ, lmh.Tiết, lmh.Mã_HP, lmh.Mã_LHP, sub.studentRate FROM lopmonhoc lmh\
+        INNER JOIN (\
+            SELECT `Mã_HP`, `Mã_LHP`, `Nhóm`, COUNT(1) / %s AS studentRate FROM dangky WHERE MSV IN (" + ','.join(msvList) + ")\
+            GROUP BY `Mã_HP`, `Mã_LHP`, `Nhóm`) sub\
+        ON lmh.Mã_HP = sub.Mã_HP AND lmh.Mã_LHP = sub.Mã_LHP AND (lmh.Nhóm = 'CL' OR lmh.Nhóm = sub.Nhóm);"
+        , (str(totStudent),))
+    dataFromLopmonhoc = mycursor.fetchall()
 
-            mycursor.execute(
-                "SELECT `Nhóm`, `Tuần`, `Thứ`, `Tiết` FROM lopmonhoc WHERE `Mã_HP` = (%s) AND `Mã_LHP` = (%s) AND (`Nhóm` = 'CL' OR `Nhóm` = (%s))"
-                , (HP, LHP, group))
-            dataFromLopmonhoc = mycursor.fetchall()
-
-            for itemLopmonhoc in dataFromLopmonhoc:  # Duyệt các giờ học lặp theo tuần
-                group = itemLopmonhoc[0]
-                week = itemLopmonhoc[1]
-                day = itemLopmonhoc[2]
-                time = itemLopmonhoc[3]
-                parseLessonTime(timeTable, 1 / totStudent, week, day, time)
+    for itemLopmonhoc in dataFromLopmonhoc:  
+        week = itemLopmonhoc[1]
+        day = itemLopmonhoc[2]
+        time = itemLopmonhoc[3]
+        parseLessonTime(timeTable, itemLopmonhoc[6], week, day, time)
     return timeTable
 
 
@@ -230,4 +225,4 @@ def parseLessonTime(timeTable, percent, week, day, time):
             prevPart = studyWeeks[-1]
             for week in studyWeeks:
                 for h in range(start - 1, end):
-                    timeTable[week][day][h] += percent
+                    timeTable[week - 1][day][h] += percent

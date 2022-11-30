@@ -12,11 +12,11 @@ db = mysql.connector.connect(
     ssl_ca=os.getenv('PLANETSCALE_SSL_CERT_PATH')
 )
 
-'''db = mysql.connector.connect(
-    host='localhost',
-    user='root',
-    password='root',
-    database='vnu_route_planner_db_new'
-)'''
+# db = mysql.connector.connect(
+#     host='localhost',
+#     user='root',
+#     password='root',
+#     database='vnu_route_planner_db_new'
+# )
 
 mycursor = db.cursor()
