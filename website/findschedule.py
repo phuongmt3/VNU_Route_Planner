@@ -1,5 +1,6 @@
 from datetime import date, datetime
-
+import mysql
+from .init import sinhvien
 from .models import mycursor
 
 startSemester = date(2022, 8, 29)
@@ -21,23 +22,34 @@ class ClassInfo:
         self.lecturer = arr[12]
 
 
+def cursorExecute(executeText, times=0):
+    try:
+        mycursor.execute(executeText)
+        return mycursor.fetchall()
+    except mysql.connector.Error as err:
+        if times < 5:
+            return cursorExecute(executeText, times + 1)
+        print("Error: {}".format(err))
+        print(executeText)
+
+
 def getSubjectList(msv):
-    mycursor.execute("select * \
-                from (select concat(signup.`Mã_HP`,' ',signup.`Mã_LHP`) as LMHCode, `Tên_môn_học`, lopmonhoc.`Nhóm`, `Số_TC`,\
-                    `Nội_dung`, `Tuần`, `Thứ`, `Tiết`, if(`Số_phòng`='',`Giảng_đường`,concat(`Số_phòng`,'-',`Giảng_đường`)) as Place,\
-                    `Số_SV`, \
-                    concat_ws(',',signup.`Mã_HP`,signup.`Mã_LHP`,lopmonhoc.`Nhóm`) as ClassID\
-                    From (select * from dangky where MSV=%s) signup\
-                    join monhoc on signup.`Mã_HP`=monhoc.`Mã_HP`\
-                    join lopmonhoc on signup.`Mã_HP`=lopmonhoc.`Mã_HP` and signup.`Mã_LHP`=lopmonhoc.`Mã_LHP` \
-                    and (signup.`Nhóm`=lopmonhoc.`Nhóm` or lopmonhoc.`Nhóm`='CL')\
-                    join ghichu on signup.`ID_ghi_chú`=ghichu.`ID_ghi_chú`) table1\
-                Join (select ClassID, group_concat(Ten) as Lecturer\
-                    from (SELECT concat_ws(',',`Mã_HP`,`Mã_LHP`,`Nhóm`) as ClassID, `Ten`\
-                        FROM dayhoc join giangvien on dayhoc.`ID_Giangvien`=giangvien.`ID_Giangvien`) gvien \
-                    Group by ClassID) table2\
-                on table1.ClassID=table2.ClassID", (msv,))
-    data = mycursor.fetchall()
+    executeText = "select * \
+            from (select concat(signup.`Mã_HP`,' ',signup.`Mã_LHP`) as LMHCode, `Tên_môn_học`, lopmonhoc.`Nhóm`, `Số_TC`,\
+                `Nội_dung`, `Tuần`, `Thứ`, `Tiết`, if(`Số_phòng`='',`Giảng_đường`,concat(`Số_phòng`,'-',`Giảng_đường`)) as Place,\
+                `Số_SV`, \
+                concat_ws(',',signup.`Mã_HP`,signup.`Mã_LHP`,lopmonhoc.`Nhóm`) as ClassID\
+                From (select * from dangky where MSV=" + str(msv) + ") signup\
+                join monhoc on signup.`Mã_HP`=monhoc.`Mã_HP`\
+                join lopmonhoc on signup.`Mã_HP`=lopmonhoc.`Mã_HP` and signup.`Mã_LHP`=lopmonhoc.`Mã_LHP` \
+                and (signup.`Nhóm`=lopmonhoc.`Nhóm` or lopmonhoc.`Nhóm`='CL')\
+                join ghichu on signup.`ID_ghi_chú`=ghichu.`ID_ghi_chú`) table1\
+            Join (select ClassID, group_concat(Ten) as Lecturer\
+                from (SELECT concat_ws(',',`Mã_HP`,`Mã_LHP`,`Nhóm`) as ClassID, `Ten`\
+                    FROM dayhoc join giangvien on dayhoc.`ID_Giangvien`=giangvien.`ID_Giangvien`) gvien \
+                Group by ClassID) table2\
+            on table1.ClassID=table2.ClassID"
+    data = cursorExecute(executeText)
     subjectList = []
     for d in data:
         subjectList.append(ClassInfo(d))
@@ -130,9 +142,7 @@ def classListFromDate(date):
 
 def getMSVList(msv, name, birth, courseClass, subjectCode, subjectName, subjectGroup, credit, note):
     if msv == name == birth == courseClass == subjectCode == subjectName == subjectGroup == credit == note == '':
-        mycursor.execute("SELECT MSV FROM vnu_route_planner_db_new.sinhvien")
-        msvList = mycursor.fetchall()
-        return msvList
+        return cursorExecute("SELECT MSV FROM vnu_route_planner_db_new.sinhvien")
 
     msvExecuteText = " SELECT DISTINCT sv.MSV FROM vnu_route_planner_db_new.sinhvien sv\
                     INNER JOIN vnu_route_planner_db_new.dangky dk\
@@ -175,8 +185,7 @@ def getMSVList(msv, name, birth, courseClass, subjectCode, subjectName, subjectG
 
     msvExecuteText += "TRUE"
 
-    mycursor.execute(msvExecuteText)
-    msvList = mycursor.fetchall()
+    msvList = cursorExecute(msvExecuteText)
 
     return msvList
 
@@ -188,14 +197,14 @@ def getTimeTableFull(msvList):
     timeTable = [[[0 for j in range(totLesson)] for i in range(totDayOfWeek)] for k in range(totWeek)]
     executeText = "SELECT lmh.`Nhóm`, lmh.`Tuần`, lmh.`Thứ`, lmh.`Tiết`, lmh.`Mã_HP`, lmh.`Mã_LHP`, sub.`studentRate` FROM lopmonhoc lmh\
                 INNER JOIN (\
-                    SELECT `Mã_HP`, `Mã_LHP`, `Nhóm`, COUNT(1) / " + str(totStudent) + " AS studentRate FROM dangky WHERE MSV IN (" + ','.join(msvList) + ")\
+                    SELECT `Mã_HP`, `Mã_LHP`, `Nhóm`, COUNT(1) / " + str(
+        totStudent) + " AS studentRate FROM dangky WHERE MSV IN (" + ','.join(msvList) + ")\
                     GROUP BY `Mã_HP`, `Mã_LHP`, `Nhóm`) sub\
                 ON lmh.`Mã_HP` = sub.`Mã_HP` AND lmh.`Mã_LHP` = sub.`Mã_LHP` AND (lmh.`Nhóm` = 'CL' OR lmh.`Nhóm` = sub.`Nhóm`);"
-    
-    mycursor.execute(executeText)
-    dataFromLopmonhoc = mycursor.fetchall()
 
-    for itemLopmonhoc in dataFromLopmonhoc:  
+    dataFromLopmonhoc = cursorExecute(executeText)
+
+    for itemLopmonhoc in dataFromLopmonhoc:
         week = itemLopmonhoc[1]
         day = itemLopmonhoc[2]
         time = itemLopmonhoc[3]
