@@ -86,15 +86,21 @@ class Road:
 
 
 def resetDijkstraTable():
-    print("resetDijkstraTable")
     mycursor.execute("delete from `dijkstra`")
     db.commit()
     mycursor.execute("select * from `distance`")
     data = mycursor.fetchall()
-    for row in data:
-        mycursor.execute("insert into `dijkstra` value (%s,%s,%s,%s)", (row[0], row[1], row[2], row[0]))
-        mycursor.execute("insert into `dijkstra` value (%s,%s,%s,%s)", (row[1], row[0], row[2], row[1]))
+
+    executeStr = "insert ignore into `dijkstra` values "
+    for row in range(0, len(data)):
+        executeStr += tupleToString((data[row][0], data[row][1], data[row][2], data[row][0])) + ','
+        executeStr += tupleToString((data[row][1], data[row][0], data[row][2], data[row][1]))
+        if row < len(data) - 1:
+            executeStr += ','
+
+    mycursor.execute(executeStr)
     db.commit()
+    print("resetDijkstraTable")
 
 
 def runDijkstra(id1, id2):
@@ -151,6 +157,7 @@ def runDijkstra(id1, id2):
                 executeStr = "insert into `dijkstra` values " + tupleToString(addDBList[0])
                 for i in range(1, len(addDBList)):
                     executeStr += ',' + tupleToString(addDBList[i])
+                mycursor.execute(executeStr)
                 db.commit()
             return cur[0]
 
@@ -174,7 +181,7 @@ def runDijkstra(id1, id2):
 def tupleToString(t):
     ans = '(' + str(t[0])
     for i in range(1, len(t)):
-        ans += ',' + str(i)
+        ans += ',' + str(t[i])
     ans += ')'
     return ans
 
