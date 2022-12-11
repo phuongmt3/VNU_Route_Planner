@@ -56,6 +56,7 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
+    <li><a href="#database">Database</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -133,6 +134,23 @@ Ngoài ra, VNU Route Planner còn tích hợp các chức năng khác giúp ngư
 <details>
   <summary>Class Timeline giúp thống kê trạng thái của các phòng học trong trường trong 1 ngày nhất định.</summary>
   <img src="https://user-images.githubusercontent.com/24197774/206911873-d672ccc8-1b97-4aa7-b1de-ab89256adae4.png" width="800">
+</details>
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+## Database
+<details>
+  <summary>Các nguồn thu thập dữ liệu:</summary>
+  <div><a href="http://112.137.129.87/qldt/"> - Tra cứu danh sách lớp môn học</a></div>
+  <div><a href="https://docs.google.com/spreadsheets/d/19MJjkbqBNYJMGRkgw_0SipSdlCRQPTqaTgT69Ux-qtk/edit#gid=1659688272"> - Thời khóa biểu chính thức học kỳ 1 năm 2022-2023</a></div>
+  <div><a href="http://112.137.129.30/viewgrade/cdr/"> - Chuẩn đầu ra các khóa</a></div>
+  <div><a href="www.openstreetmap.org"> - Openstreetmap</a></div>
+</details>
+  
+<details>
+  <summary>Cấu trúc cơ sở dữ liệu:</summary>
+  <img src="https://user-images.githubusercontent.com/24197774/206913180-dd751ce5-4bff-467f-8e7f-5f843d7daa81.png" width="800">
 </details>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
