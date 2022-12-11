@@ -93,41 +93,55 @@ Ngoài ra, VNU Route Planner còn tích hợp các chức năng khác giúp ngư
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-- Nhập mã sinh viên/ tên sinh viên vào ô tìm kiếm rồi ấn enter để load dữ liệu sinh viên.
-<img src="https://user-images.githubusercontent.com/24197774/206910775-eedfba6a-d144-4fb1-9d7a-35b716f1639e.png" width="800">
+<details>
+  <summary>Nhập mã sinh viên/ tên sinh viên vào ô tìm kiếm rồi ấn enter để load dữ liệu sinh viên.</summary>
+  <img src="https://user-images.githubusercontent.com/24197774/206910775-eedfba6a-d144-4fb1-9d7a-35b716f1639e.png" width="800">
+</details>
 
-- Đường đi dự tính sẽ hiểu thị khi gần đến (đang trong) thời gian diễn ra sự kiện, hoặc bằng cách ấn vào sự kiện trên thời khóa biểu.
-<img src="https://user-images.githubusercontent.com/24197774/206910811-ae4cb1ed-81c8-4c97-8292-e07e36f1acdf.png" width="800">
+<details>
+  <summary>Đường đi dự tính sẽ hiểu thị khi gần đến (đang trong) thời gian diễn ra sự kiện, hoặc bằng cách ấn vào sự kiện trên thời khóa biểu.</summary>
+  <img src="https://user-images.githubusercontent.com/24197774/206910811-ae4cb1ed-81c8-4c97-8292-e07e36f1acdf.png" width="800">
+</details>
 
-- Để thêm sự kiện, click vào khoảng trống trên calendar. Để xóa, chuột phải rồi click icon X trên sự kiện. Dữ liệu này sẽ được lưu vào trình duyệt để có thể xem lại sau.
-<img src="https://user-images.githubusercontent.com/24197774/206910965-86f70688-94d1-4396-b3f1-18cd5b48f55a.png" width="800">
-<img src="https://user-images.githubusercontent.com/24197774/206910997-01e9a558-3297-409a-b87d-a03d011b5219.png" width="800">
+<details>
+  <summary>Để thêm sự kiện, click vào khoảng trống trên calendar. Để xóa, chuột phải rồi click icon X trên sự kiện.</summary>
+  <img src="https://user-images.githubusercontent.com/24197774/206910965-86f70688-94d1-4396-b3f1-18cd5b48f55a.png" width="800">
+  <img src="https://user-images.githubusercontent.com/24197774/206910997-01e9a558-3297-409a-b87d-a03d011b5219.png" width="800">
+  
+  Lưu ý: Sự kiện này sẽ được lưu vào bộ nhớ trình duyệt để có thể xem lại sau. 
+</details>
 
-- Để thêm địa điểm muốn ghé qua trên đường đi, chọn địa điểm trên map rồi click vào Visit, ngược lại, click Unvisit. 
-<img src="https://user-images.githubusercontent.com/24197774/206911142-dd3ae106-9526-4ba5-9447-da869959debb.png" width="800">
-<img src="https://user-images.githubusercontent.com/24197774/206911330-21729719-208c-4996-9559-c705ac9622d8.png" width="800">
+<details>
+  <summary>Để thêm địa điểm muốn ghé qua trên đường đi, chọn địa điểm trên map rồi click vào Visit, ngược lại, click Unvisit. </summary>
+  <img src="https://user-images.githubusercontent.com/24197774/206911142-dd3ae106-9526-4ba5-9447-da869959debb.png" width="800">
+  <img src="https://user-images.githubusercontent.com/24197774/206911330-21729719-208c-4996-9559-c705ac9622d8.png" width="800">
+  
+  Lưu ý: Địa điểm ghé qua không được lưu lại và sẽ biến mất khi ấn vào sự kiện mới. 
+</details>
 
-Lưu ý: Địa điểm ghé qua không được lưu lại và sẽ biến mất khi ấn vào sự kiện mới. 
 
+<details>
+  <summary>Các công cụ khác nằm trong mục Other tools.</summary>
+  <img src="https://user-images.githubusercontent.com/24197774/206911570-9a2cad1d-c21a-40d4-bb54-b7a9775ebe9c.png" width="800">
+</details>
 
-- Các công cụ khác nằm trong mục Other tools.
-<img src="https://user-images.githubusercontent.com/24197774/206911570-9a2cad1d-c21a-40d4-bb54-b7a9775ebe9c.png" width="800">
+<details>
+  <summary>Calendar Overlap giúp thống kê thời gian học của một nhóm sinh viên nhất định (ví dụ 1 lớp khóa học).</summary>
+  <img src="https://user-images.githubusercontent.com/24197774/206911693-a5a9d79a-50f3-4930-bdbf-a14439aff092.png" width="800">
+</details>
 
-- Calendar Overlap giúp thống kê thời gian học của một nhóm sinh viên nhất định (ví dụ 1 lớp khóa học).
-<img src="https://user-images.githubusercontent.com/24197774/206911693-a5a9d79a-50f3-4930-bdbf-a14439aff092.png" width="800">
-
-- Class Timeline giúp thống kê trạng thái của các phòng học trong trường trong 1 ngày nhất định.
-<img src="https://user-images.githubusercontent.com/24197774/206911873-d672ccc8-1b97-4aa7-b1de-ab89256adae4.png" width="800">
-
+<details>
+  <summary>Class Timeline giúp thống kê trạng thái của các phòng học trong trường trong 1 ngày nhất định.</summary>
+  <img src="https://user-images.githubusercontent.com/24197774/206911873-d672ccc8-1b97-4aa7-b1de-ab89256adae4.png" width="800">
+</details>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 <!-- CONTRIBUTING -->
 ## Contributing
-
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
+Nếu bạn có ý tưởng gì giúp dự án phát triển, hãy vui lòng fork repo này và tạo pull request. Hoặc bạn cũng có thể mở một issue với tag "enhancement". 
+Hãy đừng quên cho dự án một star! Xin cảm ơn!
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
