@@ -83,7 +83,7 @@ Ngoài ra, VNU Route Planner còn tích hợp các chức năng khác giúp ngư
 
 * Frontend: 
 
-![HTML5][https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white]![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)![Bootstrap](https://img.shields.io/badge/bootstrap-%23563D7C.svg?style=for-the-badge&logo=bootstrap&logoColor=white)![jQuery](https://img.shields.io/badge/jquery-%230769AD.svg?style=for-the-badge&logo=jquery&logoColor=white)
+![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)![Bootstrap](https://img.shields.io/badge/bootstrap-%23563D7C.svg?style=for-the-badge&logo=bootstrap&logoColor=white)![jQuery](https://img.shields.io/badge/jquery-%230769AD.svg?style=for-the-badge&logo=jquery&logoColor=white)
 * Backend: 
 
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)![Flask](https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white)![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white)
@@ -133,7 +133,7 @@ Ngoài ra, VNU Route Planner còn tích hợp các chức năng khác giúp ngư
 
 <details>
   <summary>Class Timeline giúp thống kê trạng thái của các phòng học trong trường trong 1 ngày nhất định.</summary>
-  <img src="https://user-images.githubusercontent.com/24197774/206911873-d672ccc8-1b97-4aa7-b1de-ab89256adae4.png" width="800">
+  <img src="https://user-images.githubusercontent.com/74077349/207244925-6659e7b1-b6d6-4cfc-8002-c7b48df06599.png" width="800">
 </details>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -166,14 +166,6 @@ Hãy đừng quên cho dự án một star! Xin cảm ơn!
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-<!-- LICENSE -->
-## License
-
-Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
