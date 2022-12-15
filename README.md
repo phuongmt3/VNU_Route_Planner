@@ -36,7 +36,7 @@
     <a href="https://github.com/phuongmt3/VNU_Route_Planner"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://vnu-route-planner.herokuapp.com/">View Demo</a>
+    <a href="https://youtu.be/eqzGzZdYsHk">View Demo</a>
     ·
     <a href="https://github.com/phuongmt3/VNU_Route_Planner/issues">Report Bug</a>
     ·
