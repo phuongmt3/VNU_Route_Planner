@@ -138,6 +138,14 @@ Ngoài ra, VNU Route Planner còn tích hợp các chức năng khác giúp ngư
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
+## Notable Points
+
+- Thuật toán tìm đường cho phép linh hoạt thêm bớt các địa điểm trung gian cần đi qua với thời gian xử lý gần như ngay lập tức.
+- Tương tác chỉ đường thông minh giữa Calendar và Map. Ví dụ, khi ở thời gian giữa 2 events trên calendar, map sẽ tự động chỉ đường từ event trước đó đến event tiếp theo.
+- Animation hiển thị đường đi cần di chuyển sinh động, dễ hiểu.
+- Bộ nhớ local trên máy tính riêng của người dùng để lưu lại những calendar events của riêng từng người.
+
+
 ## Database
 <details>
   <summary>Các nguồn thu thập dữ liệu:</summary>
